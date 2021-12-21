@@ -23,8 +23,6 @@ export class PersonEntryComponent implements OnInit {
   handleClick(weekDay: string): void {
     this.weekModel[weekDay.toLowerCase() as keyof Week] =
       !this.weekModel[weekDay.toLowerCase() as keyof Week];
-
-    console.log(this.weekModel);
   }
 
   getClass(weekDay: string): string {

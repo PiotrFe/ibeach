@@ -1,5 +1,32 @@
 <h2>People list</h2>
+<button
+  *ngIf="!inEditMode"
+  type="button"
+  class="btn btn-primary"
+  (click)="setInEditMode(true)"
+>
+  Add
+</button>
+<button
+  *ngIf="inEditMode"
+  type="button"
+  class="btn btn-primary btn-main-action"
+  (click)="setInEditMode(true)"
+>
+  Save
+</button>
+<button
+  *ngIf="inEditMode"
+  type="button"
+  class="btn btn-secondary btn-main-action"
+  (click)="setInEditMode(true)"
+>
+  Cancel
+</button>
 <ul class="people">
+  <li *ngIf="inEditMode">
+    <person-entry-form></person-entry-form>
+  </li>
   <li *ngFor="let person of people">
     <person-entry [person]="person"></person-entry>
   </li>

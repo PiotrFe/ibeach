@@ -1,0 +1,35 @@
+<form [formGroup]="personForm" class="person-entry-form">
+  <input
+    id="person-name"
+    class="form-control person-name-form"
+    type="text"
+    formControlName="name"
+    [typeahead]="getTypeAhead('name')"
+  />
+  <input
+    id="person-skill"
+    class="form-control person-skill-form"
+    type="text"
+    formControlName="skill"
+    [typeahead]="getTypeAhead('skill')"
+  />
+
+  <div class="btn-group">
+    <label
+      *ngFor="let weekDay of weekDaysArr"
+      [ngClass]="getClass(weekDay)"
+      ngDefaultControl
+      (click)="handleClick(weekDay)"
+      btnCheckbox
+      tabindex="0"
+      role="button"
+      >{{ weekDay | titlecase }}</label
+    >
+  </div>
+  <input
+    id="person-comments"
+    class="form-control person-comments-form"
+    type="text"
+    formControlName="comments"
+  />
+</form>

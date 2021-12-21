@@ -1,6 +1,6 @@
 <div class="person-entry">
-  <span>{{ person.name }}</span>
-  <span>{{ person.skill }}</span>
+  <span class="person-name">{{ person.name }}</span>
+  <span class="person-skill">{{ person.skill }}</span>
   <div class="btn-group">
     <label
       *ngFor="let weekDay of weekDaysArr"
@@ -13,11 +13,5 @@
       >{{ weekDay | titlecase }}</label
     >
   </div>
-  <button
-    type="button"
-    class="btn btn-primary"
-    tooltip="Vivamus sagittis lacus vel augue laoreet rutrum faucibus."
-  >
-    Simple demo
-  </button>
+  <span class="person-comments">{{ person.comments }}</span>
 </div>

@@ -1,4 +1,4 @@
-.person-entry {
+.person-entry-form {
   width: 40vw;
   display: flex;
   justify-content: space-between;
@@ -6,17 +6,17 @@
   margin-bottom: 10px;
 }
 
-.person-name {
+.person-name-form {
   width: 25%;
   min-width: 25%;
 }
 
-.person-skill {
+.person-skill-form {
   width: 15%;
   min-width: 15%;
 }
 
-.person-comments {
+.person-comments-form {
   width: 30%;
   min-width: 30%;
 }

@@ -8,6 +8,11 @@ import { PEOPLE } from '../people';
 })
 export class PeopleListComponent implements OnInit {
   people = PEOPLE;
+  inEditMode = false;
+
+  setInEditMode(inEditMode: boolean) {
+    this.inEditMode = inEditMode;
+  }
 
   constructor() {}
 
