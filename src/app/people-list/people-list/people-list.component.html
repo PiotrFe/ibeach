@@ -19,7 +19,7 @@
   *ngIf="inEditMode"
   type="button"
   class="btn btn-primary btn-main-action"
-  (click)="setInEditMode(true)"
+  (click)="setInEditMode(false)"
 >
   Save
 </button>
@@ -46,10 +46,29 @@
       <person-entry-form
         [idx]="i"
         (deleteEvent)="removeRow($event)"
+        (formSubmitEvent)="addPerson($event)"
       ></person-entry-form>
     </li>
   </ul>
-  <li *ngFor="let person of people">
-    <person-entry [person]="person"></person-entry>
+  <li *ngFor="let person of people; let i = index">
+    <ng-container [ngSwitch]="person.inEditMode">
+      <person-entry
+        *ngSwitchCase="false"
+        [idx]="i"
+        [person]="person"
+        [inEditMode]="inEditMode"
+        (editEvent)="editRow($event)"
+        (deleteEvent)="removeExistingRow($event)"
+        (calendarChangeEvent)="updateCalendar($event)"
+      ></person-entry>
+      <person-entry-form
+        *ngSwitchCase="true"
+        [idx]="i"
+        [person]="person"
+        (deleteEvent)="removeExistingRow($event)"
+        (calendarChangeEvent)="updateCalendar($event)"
+        (formEditEvent)="updatePersonDetails($event)"
+      ></person-entry-form>
+    </ng-container>
   </li>
 </ul>

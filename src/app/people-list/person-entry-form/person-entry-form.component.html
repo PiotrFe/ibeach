@@ -1,4 +1,8 @@
-<form [formGroup]="personForm" class="person-entry-form">
+<form
+  [formGroup]="personForm"
+  (ngSubmit)="onSubmit()"
+  class="person-entry-form"
+>
   <input
     id="person-name"
     class="form-control person-name-form tbl-col"
@@ -18,7 +22,11 @@
   <span class="person-days-form tbl-col">{{ getDaysAvailable() }}</span>
 
   <div class="btn-group tbl-col">
-    <week-days (daysLeft)="onDaysLeft($event)"></week-days>
+    <week-days
+      [weekObj]="person?.week"
+      (calendarChange)="onCalendarChange($event)"
+      [inEditMode]="true"
+    ></week-days>
   </div>
   <input
     id="person-comments"
@@ -27,6 +35,9 @@
     placeholder="Comments"
     formControlName="comments"
   />
-  <i class="bi bi-check-circle i-active mr-8"></i>
+  <label for="{{ 'submit-form-' + idx }}">
+    <i class="bi bi-check-circle i-active mr-8"></i>
+  </label>
   <i class="bi bi-trash i-active" (click)="handleDelete()"></i>
+  <button id="{{ 'submit-form-' + idx }}" type="submit" hidden></button>
 </form>

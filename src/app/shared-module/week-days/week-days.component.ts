@@ -4,9 +4,10 @@ import {
   AfterViewInit,
   OnChanges,
   EventEmitter,
+  Input,
   Output,
 } from '@angular/core';
-import { Week } from './week';
+import { Week, getNewWeek } from './week';
 
 @Component({
   selector: 'week-days',
@@ -14,52 +15,39 @@ import { Week } from './week';
   styleUrls: ['./week-days.component.scss'],
 })
 export class WeekDaysComponent implements OnInit {
-  @Output() daysLeft = new EventEmitter<number>();
+  @Input() weekObj!: Week | undefined;
+  @Input() inEditMode: boolean = false;
 
-  daysAvail!: number;
-
-  weekModel: Week = {
-    mon: true,
-    tue: true,
-    wed: true,
-    thu: true,
-    fri: true,
-  };
+  @Output() calendarChange = new EventEmitter<Week>();
+  weekModel: Week = getNewWeek();
 
   weekDaysArr = Object.keys(this.weekModel);
 
   getBtnClass(weekDay: string): string {
+    const disabledCls = !this.inEditMode ? ' btn-inactive' : '';
+
     return this.weekModel[weekDay.toLowerCase() as keyof Week]
-      ? 'btn btn-primary'
-      : 'btn btn-disabled';
+      ? `btn btn-primary${disabledCls}`
+      : `btn btn-unavail${disabledCls}`;
   }
 
   handleBtnClick(weekDay: string): void {
+    if (!this.inEditMode) {
+      return;
+    }
     this.weekModel[weekDay.toLowerCase() as keyof Week] =
       !this.weekModel[weekDay.toLowerCase() as keyof Week];
 
-    this.setDaysAvailable();
+    this.calendarChange.emit(this.weekModel);
   }
 
-  setDaysAvailable(): void {
-    const daysAvail = Object.values(this.weekModel).reduce(
-      (acc, val) => (val ? acc + 1 : acc),
-      0
-    );
-
-    this.daysAvail = daysAvail;
-    this.daysLeft.emit(daysAvail);
-  }
-
-  constructor() {
-    // this.setDaysAvailable();
-  }
+  constructor() {}
 
   ngOnInit(): void {
-    this.setDaysAvailable();
-  }
-
-  ngAfterViewInit(): void {
-    // this.setDaysAvailable();
+    if (this.weekObj) {
+      this.weekModel = {
+        ...this.weekObj,
+      };
+    }
   }
 }

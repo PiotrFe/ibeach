@@ -2,7 +2,11 @@
   width: 100%;
 }
 
-.btn-disabled {
+.btn-unavail {
   color: gray;
   opacity: 0.8;
+}
+
+.btn-inactive {
+  pointer-events: none;
 }

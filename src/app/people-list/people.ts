@@ -4,7 +4,7 @@ export const PEOPLE: Person[] = [
   {
     name: 'Piotr',
     skill: 'ASC',
-    week: { mon: true, tue: true, wed: true, thu: true, fri: true },
+    week: { mon: false, tue: true, wed: false, thu: true, fri: true },
     comments: 'DnA',
   },
   {

@@ -3,7 +3,21 @@
   <span class="person-skill tbl-col">{{ person.skill }}</span>
   <span class="person-days tbl-col">{{ getDaysAvailable() }}</span>
   <div class="btn-group tbl-col">
-    <week-days (daysLeft)="onDaysLeft($event)"></week-days>
+    <week-days
+      (calendarChange)="onCalendarChange($event)"
+      [weekObj]="person.week"
+      [inEditMode]="inEditMode"
+    ></week-days>
   </div>
   <span class="person-comments tbl-col">{{ person.comments }}</span>
+  <i
+    *ngIf="inEditMode"
+    class="bi bi-pencil i-active mr-8"
+    (click)="handleEdit()"
+  ></i>
+  <i
+    *ngIf="inEditMode"
+    class="bi bi-trash i-active"
+    (click)="handleDelete()"
+  ></i>
 </div>

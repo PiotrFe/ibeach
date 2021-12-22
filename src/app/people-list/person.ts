@@ -11,14 +11,10 @@ export interface Person {
 }
 
 export class PersonEntry {
-  daysLeft: number = 5;
+  daysLeft!: number;
 
   getTypeAhead(key: string): any[] {
     return PEOPLE.map((item) => item[key as keyof Person]);
-  }
-
-  onDaysLeft(count: number): void {
-    this.daysLeft = count;
   }
 
   getDaysAvailable(): number {
