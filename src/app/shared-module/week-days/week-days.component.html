@@ -1,0 +1,12 @@
+<div class="weekday-list">
+  <label
+    *ngFor="let weekDay of weekDaysArr"
+    [ngClass]="getBtnClass(weekDay)"
+    ngDefaultControl
+    (click)="handleBtnClick(weekDay)"
+    btnCheckbox
+    tabindex="0"
+    role="button"
+    >{{ weekDay | titlecase }}</label
+  >
+</div>

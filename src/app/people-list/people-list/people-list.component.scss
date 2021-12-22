@@ -1,3 +1,8 @@
+ul ul {
+  margin-left: 0;
+  padding-left: 0;
+}
+
 li {
   list-style: none;
 }
@@ -8,4 +13,43 @@ li {
 
 .btn-main-action {
   margin-right: 10px;
+}
+
+.person-entry-header {
+  width: 40vw;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  font-weight: bold;
+  font-size: 1.5rem;
+
+  &__name {
+    width: 25%;
+    min-width: 25%;
+  }
+
+  &__skill {
+    width: 15%;
+    min-width: 15%;
+  }
+
+  &__days {
+    width: 10%;
+    min-width: 10%;
+  }
+
+  &__week {
+    width: 50%;
+    min-width: 50%;
+  }
+
+  &__comments {
+    width: 30%;
+    min-width: 30%;
+  }
+}
+
+.tbl-col {
+  margin-right: 8px;
 }

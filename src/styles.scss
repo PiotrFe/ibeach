@@ -12,3 +12,42 @@ html {
   font-size: 100%;
   padding: 10px;
 }
+
+.i-active {
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.mr {
+  &-1 {
+    margin-right: 1px;
+  }
+  &-2 {
+    margin-right: 2px;
+  }
+  &-3 {
+    margin-right: 3px;
+  }
+  &-4 {
+    margin-right: 4px;
+  }
+  &-5 {
+    margin-right: 5px;
+  }
+  &-6 {
+    margin-right: 6px;
+  }
+  &-7 {
+    margin-right: 7px;
+  }
+  &-8 {
+    margin-right: 8px;
+  }
+  &-9 {
+    margin-right: 9px;
+  }
+  &-10 {
+    margin-right: 10px;
+  }
+}

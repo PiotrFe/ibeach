@@ -1,17 +1,9 @@
 <div class="person-entry">
-  <span class="person-name">{{ person.name }}</span>
-  <span class="person-skill">{{ person.skill }}</span>
-  <div class="btn-group">
-    <label
-      *ngFor="let weekDay of weekDaysArr"
-      [ngClass]="getClass(weekDay)"
-      ngDefaultControl
-      (click)="handleClick(weekDay)"
-      btnCheckbox
-      tabindex="0"
-      role="button"
-      >{{ weekDay | titlecase }}</label
-    >
+  <span class="person-name tbl-col">{{ person.name }}</span>
+  <span class="person-skill tbl-col">{{ person.skill }}</span>
+  <span class="person-days tbl-col">{{ getDaysAvailable() }}</span>
+  <div class="btn-group tbl-col">
+    <week-days (daysLeft)="onDaysLeft($event)"></week-days>
   </div>
-  <span class="person-comments">{{ person.comments }}</span>
+  <span class="person-comments tbl-col">{{ person.comments }}</span>
 </div>

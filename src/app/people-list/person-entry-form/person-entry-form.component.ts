@@ -1,26 +1,19 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
-import { Week } from '../week';
-import { Person } from '../person';
-import { PEOPLE } from '../people';
+import { PersonEntry } from '../person';
 
 @Component({
   selector: 'person-entry-form',
   templateUrl: './person-entry-form.component.html',
   styleUrls: ['./person-entry-form.component.scss'],
 })
-export class PersonEntryFormComponent implements OnInit {
-  constructor() {}
+export class PersonEntryFormComponent extends PersonEntry implements OnInit {
+  @Input() idx!: number;
+  @Output() deleteEvent = new EventEmitter<number>();
 
-  weekModel: Week = {
-    mon: true,
-    tue: true,
-    wed: true,
-    thu: true,
-    fri: true,
-  };
-
-  weekDaysArr = Object.keys(this.weekModel);
+  constructor() {
+    super();
+  }
 
   personForm = new FormGroup({
     name: new FormControl(''),
@@ -28,19 +21,8 @@ export class PersonEntryFormComponent implements OnInit {
     comments: new FormControl(''),
   });
 
-  getTypeAhead(key: string): any[] {
-    return PEOPLE.map((item) => item[key as keyof Person]);
-  }
-
-  getClass(weekDay: string): string {
-    return this.weekModel[weekDay.toLowerCase() as keyof Week]
-      ? 'btn btn-primary'
-      : 'btn btn-disabled';
-  }
-
-  handleClick(weekDay: string): void {
-    this.weekModel[weekDay.toLowerCase() as keyof Week] =
-      !this.weekModel[weekDay.toLowerCase() as keyof Week];
+  handleDelete(): void {
+    this.deleteEvent.emit(this.idx);
   }
 
   ngOnInit(): void {}

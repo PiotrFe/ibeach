@@ -5,6 +5,14 @@
   class="btn btn-primary"
   (click)="setInEditMode(true)"
 >
+  Edit
+</button>
+<button
+  *ngIf="inEditMode"
+  type="button"
+  class="btn btn-primary btn-main-action"
+  (click)="addNewRow()"
+>
   Add
 </button>
 <button
@@ -19,14 +27,28 @@
   *ngIf="inEditMode"
   type="button"
   class="btn btn-secondary btn-main-action"
-  (click)="setInEditMode(true)"
+  (click)="setInEditMode(false)"
 >
   Cancel
 </button>
 <ul class="people">
-  <li *ngIf="inEditMode">
-    <person-entry-form></person-entry-form>
+  <li>
+    <div class="person-entry-header">
+      <span class="person-entry-header__name tbl-col">Name</span>
+      <span class="person-entry-header__skill tbl-col">Skill</span>
+      <span class="person-entry-header__days tbl-col">Days</span>
+      <span class="person-entry-header__week tbl-col"> Week </span>
+      <span class="person-entry-header__comments tbl-col">Comments</span>
+    </div>
   </li>
+  <ul *ngIf="inEditMode">
+    <li *ngFor="let row of newRows; let i = index">
+      <person-entry-form
+        [idx]="i"
+        (deleteEvent)="removeRow($event)"
+      ></person-entry-form>
+    </li>
+  </ul>
   <li *ngFor="let person of people">
     <person-entry [person]="person"></person-entry>
   </li>

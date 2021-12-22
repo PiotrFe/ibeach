@@ -1,35 +1,32 @@
 <form [formGroup]="personForm" class="person-entry-form">
   <input
     id="person-name"
-    class="form-control person-name-form"
+    class="form-control person-name-form tbl-col"
     type="text"
+    placeholder="Name"
     formControlName="name"
     [typeahead]="getTypeAhead('name')"
   />
   <input
     id="person-skill"
-    class="form-control person-skill-form"
+    class="form-control person-skill-form tbl-col"
     type="text"
+    placeholder="Skill"
     formControlName="skill"
     [typeahead]="getTypeAhead('skill')"
   />
+  <span class="person-days-form tbl-col">{{ getDaysAvailable() }}</span>
 
-  <div class="btn-group">
-    <label
-      *ngFor="let weekDay of weekDaysArr"
-      [ngClass]="getClass(weekDay)"
-      ngDefaultControl
-      (click)="handleClick(weekDay)"
-      btnCheckbox
-      tabindex="0"
-      role="button"
-      >{{ weekDay | titlecase }}</label
-    >
+  <div class="btn-group tbl-col">
+    <week-days (daysLeft)="onDaysLeft($event)"></week-days>
   </div>
   <input
     id="person-comments"
-    class="form-control person-comments-form"
+    class="form-control person-comments-form tbl-col"
     type="text"
+    placeholder="Comments"
     formControlName="comments"
   />
+  <i class="bi bi-check-circle i-active mr-8"></i>
+  <i class="bi bi-trash i-active" (click)="handleDelete()"></i>
 </form>
