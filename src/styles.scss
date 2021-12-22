@@ -10,10 +10,19 @@
 html {
   // font-size: 62.5%;
   font-size: 100%;
-  padding: 10px;
+}
+
+.content-container {
+  margin: 10px;
 }
 
 .i-active {
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.clickable {
   &:hover {
     cursor: pointer;
   }

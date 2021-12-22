@@ -34,10 +34,25 @@
 <ul class="people">
   <li>
     <div class="person-entry-header">
-      <span class="person-entry-header__name tbl-col">Name</span>
-      <span class="person-entry-header__skill tbl-col">Skill</span>
-      <span class="person-entry-header__days tbl-col">Days</span>
-      <span class="person-entry-header__week tbl-col"> Week </span>
+      <span
+        class="person-entry-header__name tbl-col clickable"
+        (click)="handleSort('name')"
+        >Name <i *ngIf="getSort('name', 1)" class="bi bi-sort-down-alt"></i>
+        <i *ngIf="getSort('name', -1)" class="bi bi-sort-up"></i
+      ></span>
+      <span
+        class="person-entry-header__skill tbl-col clickable"
+        (click)="handleSort('skill')"
+        >Skill <i *ngIf="getSort('skill', 1)" class="bi bi-sort-down-alt"></i>
+        <i *ngIf="getSort('skill', -1)" class="bi bi-sort-up"></i
+      ></span>
+      <span
+        class="person-entry-header__days tbl-col clickable"
+        (click)="handleSort('days')"
+        >Days <i *ngIf="getSort('days', 1)" class="bi bi-sort-down-alt"></i>
+        <i *ngIf="getSort('days', -1)" class="bi bi-sort-up"></i
+      ></span>
+      <span class="person-entry-header__week tbl-col clickable"> Week </span>
       <span class="person-entry-header__comments tbl-col">Comments</span>
     </div>
   </li>

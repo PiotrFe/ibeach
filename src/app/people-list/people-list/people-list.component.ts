@@ -12,6 +12,10 @@ export class PeopleListComponent implements OnInit {
   people = PEOPLE.map((item) => ({ ...item, inEditMode: false }));
   inEditMode = false;
   newRows: Person[] = [];
+  sort: { field: string; order: number } = {
+    field: '',
+    order: 0,
+  };
 
   setInEditMode(inEditMode: boolean): void {
     this.inEditMode = inEditMode;
@@ -99,6 +103,50 @@ export class PeopleListComponent implements OnInit {
     });
 
     this.newRows.splice(idx, 1);
+  }
+
+  getSort(colName: string, order: number): boolean {
+    if (this.sort.field === colName) {
+      return this.sort.order === order;
+    }
+    return false;
+  }
+
+  updateSortIcon(colName: string): void {
+    if (this.sort.field === colName) {
+      if (this.sort.order === 0) {
+        this.sort.order = 1;
+      } else if (this.sort.order === 1) {
+        this.sort.order = -1;
+      } else if (this.sort.order === -1) {
+        this.sort.order = 0;
+      }
+    } else {
+      this.sort.field = colName;
+      this.sort.order = 1;
+    }
+  }
+
+  handleSort(colName: string): void {
+    this.updateSortIcon(colName);
+
+    if (colName === 'name') {
+      const order = this.sort.order;
+
+      this.people.sort(function (a, b) {
+        const nameA = a.name.toUpperCase();
+        const nameB = b.name.toUpperCase();
+
+        if (nameA < nameB) {
+          return order * -1;
+        }
+        if (nameA > nameB) {
+          return order;
+        }
+
+        return 0;
+      });
+    }
   }
 
   constructor() {}
