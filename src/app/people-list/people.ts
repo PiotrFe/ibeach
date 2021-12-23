@@ -65,4 +65,16 @@ export const PEOPLE: Person[] = [
       fri: false,
     }),
   },
+  {
+    name: 'Barbie',
+    skill: 'BA',
+    week: { mon: false, tue: false, wed: false, thu: false, fri: true },
+    daysLeft: getDaysLeft({
+      mon: false,
+      tue: false,
+      wed: false,
+      thu: false,
+      fri: true,
+    }),
+  },
 ];

@@ -220,83 +220,125 @@ export class PeopleListComponent implements OnInit {
     }
   }
 
-  handleSort(colName: string): void {
+  sortValsByName = (
+    a: PersonEditable,
+    b: PersonEditable,
+    asc: boolean = false
+  ): number => {
+    const order = this.sort.order;
+
+    const nameA = a.name.toUpperCase();
+    const nameB = b.name.toUpperCase();
+
+    if (nameA < nameB) {
+      return asc ? -1 : order * -1;
+    }
+    if (nameA > nameB) {
+      return asc ? 1 : order;
+    }
+
+    return 0;
+  };
+
+  sortValsByDays = (
+    a: PersonEditable,
+    b: PersonEditable,
+    asc: boolean = false
+  ): number => {
+    const order = this.sort.order;
+    const daysA = a.daysLeft;
+    const daysB = b.daysLeft;
+
+    if (daysA < daysB) {
+      return asc ? 1 : order;
+    }
+    if (daysA > daysB) {
+      return asc ? -1 : order * -1;
+    }
+
+    return 0;
+  };
+
+  sortValsBySkill = (
+    a: PersonEditable,
+    b: PersonEditable,
+    asc: boolean = false
+  ): number => {
+    const order = this.sort.order;
+    const skillA = a.skill;
+    const skillB = b.skill;
+
+    if (
+      SKILL_INDEX[skillA as keyof typeof SKILL_INDEX] <
+      SKILL_INDEX[skillB as keyof typeof SKILL_INDEX]
+    ) {
+      return asc ? 1 : order;
+    }
+    if (
+      SKILL_INDEX[skillA as keyof typeof SKILL_INDEX] >
+      SKILL_INDEX[skillB as keyof typeof SKILL_INDEX]
+    ) {
+      return asc ? -1 : order * -1;
+    }
+
+    return 0;
+  };
+
+  handleSort = (colName: string): void => {
     this.updateSortIcon(colName);
     const order = this.sort.order;
+    const sortValsBySkill = this.sortValsBySkill;
+    const sortValsByName = this.sortValsByName;
+    const sortValsByDays = this.sortValsByDays;
 
     if (colName === 'name') {
       this.people.sort(function (a, b) {
-        const nameA = a.name.toUpperCase();
-        const nameB = b.name.toUpperCase();
-
-        if (nameA < nameB) {
-          return order * -1;
-        }
-        if (nameA > nameB) {
-          return order;
-        }
-
-        return 0;
+        return sortValsBySkill(a, b);
       });
     }
 
     if (colName === 'skill') {
       this.people.sort(function (a, b) {
-        const skillA = a.skill;
-        const skillB = b.skill;
+        // (1) sort by skill
+        let returnVal: number = sortValsBySkill(a, b);
 
-        if (
-          SKILL_INDEX[skillA as keyof typeof SKILL_INDEX] <
-          SKILL_INDEX[skillB as keyof typeof SKILL_INDEX]
-        ) {
-          return order;
+        if (returnVal !== 0) {
+          return returnVal;
         }
-        if (
-          SKILL_INDEX[skillA as keyof typeof SKILL_INDEX] >
-          SKILL_INDEX[skillB as keyof typeof SKILL_INDEX]
-        ) {
-          return order * -1;
-        }
-        const nameA = a.name.toUpperCase();
-        const nameB = b.name.toUpperCase();
+        // (2) sort by days (asc)
+        returnVal = sortValsByDays(a, b, true);
 
-        if (nameA < nameB) {
-          return -1;
-        }
-        if (nameA > nameB) {
-          return 1;
+        if (returnVal !== 0) {
+          return returnVal;
         }
 
-        return 0;
+        // (3) sort by name (asc)
+        return sortValsByName(a, b, true);
       });
     }
 
     if (colName === 'days') {
       this.people.sort(function (a, b) {
-        const daysA = a.daysLeft;
-        const daysB = b.daysLeft;
+        // (1) sort by days
+        let returnVal: number = sortValsByDays(a, b);
 
-        if (daysA < daysB) {
-          return order;
-        }
-        if (daysA > daysB) {
-          return order * -1;
-        }
-        const nameA = a.name.toUpperCase();
-        const nameB = b.name.toUpperCase();
-
-        if (nameA < nameB) {
-          return -1;
-        }
-        if (nameA > nameB) {
-          return 1;
+        if (returnVal !== 0) {
+          return returnVal;
         }
 
-        return 0;
+        // (3) sort by name (skill)
+        returnVal = sortValsBySkill(a, b, true);
+
+        if (returnVal !== 0) {
+          return returnVal;
+        }
+
+        // (3) sort by name (asc)
+        return sortValsByName(a, b, true);
       });
     }
     this.updateFilteredView();
-  }
+  };
 
   constructor() {}
 
