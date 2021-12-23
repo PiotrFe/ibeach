@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { FormControl } from '@angular/forms';
 import { PEOPLE } from '../people';
 import { Person } from '../person';
 import {
@@ -35,8 +36,6 @@ export class PeopleListComponent implements OnInit {
     ...person,
     inEditMode: false,
   }));
-  inEditMode = false;
-  showAvailableOnly = false;
   newRows: Person[] = [];
   sort: { field: string; order: number } = {
     field: '',
@@ -44,31 +43,49 @@ export class PeopleListComponent implements OnInit {
   };
   filters: Filter[] = [];
 
+  inEditMode = false;
+  showAvailableOnly = false;
   peopleFilteredView = this.people;
+  skillFilter = new FormControl('All');
 
   // *****************
   // FILTER HANDLERS
   // *****************
   // applyFilters();
 
+  updateFilteredView(): void {
+    this.peopleFilteredView = this.filterPeopleView(this.people);
+  }
+
   filterPeopleView(people: PersonEditable[]): PersonEditable[] {
     if (!this.filters.length) {
       return people;
     }
     return this.people.filter((person) => {
-      let returnPerson = true;
+      let daysLeftPass = true;
+      let skillPass = true;
 
       for (let filter of this.filters) {
         if (filter.field === 'days') {
-          returnPerson = person.daysLeft > 0;
+          daysLeftPass = person.daysLeft > 0;
+        }
+        if (filter.field === 'skill') {
+          skillPass = person.skill === filter.value;
         }
       }
 
-      return returnPerson;
+      return daysLeftPass && skillPass;
     });
   }
 
-  toggleShowAvailableOnly() {
+  clearFilters(): void {
+    this.filters = [];
+    this.showAvailableOnly = false;
+    this.skillFilter.setValue('All');
+    this.updateFilteredView();
+  }
+
+  toggleShowAvailableOnly(): void {
     this.showAvailableOnly = !this.showAvailableOnly;
 
     if (this.showAvailableOnly) {
@@ -84,8 +101,35 @@ export class PeopleListComponent implements OnInit {
     this.updateFilteredView();
   }
 
-  updateFilteredView(): void {
-    this.peopleFilteredView = this.filterPeopleView(this.people);
+  updateSkillFilter(event: any): void {
+    const skill = event.target.value;
+
+    this.filters = this.filters.filter(
+      (filter: Filter) => filter.field !== 'skill'
+    );
+
+    if (skill !== 'All') {
+      this.filters.push({
+        field: 'skill',
+        value: skill,
+      });
+    }
+
+    this.updateFilteredView();
+  }
+
+  getClearFilterBtnClass(): string {
+    const baseClass = 'bi bi-x-circle-fill fs-12';
+    const otherClasses = [];
+    if (this.filters.length) {
+      otherClasses.push(' clickable');
+    } else {
+      otherClasses.push(' btn-inactive');
+      otherClasses.push('btn-greyed-out');
+    }
+
+    const otherClsStr = otherClasses.join(' ');
+    return `${baseClass}${otherClsStr}`;
   }
 
   // *****************
@@ -293,7 +337,7 @@ export class PeopleListComponent implements OnInit {
 
     if (colName === 'name') {
       this.people.sort(function (a, b) {
-        return sortValsBySkill(a, b);
+        return sortValsByName(a, b);
       });
     }
 

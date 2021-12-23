@@ -1,5 +1,5 @@
 <nav class="main-toolbar">
-  <div class="toolbar-group-left">
+  <div class="toolbar-group toolbar-group--left">
     <button
       *ngIf="!inEditMode"
       type="button"
@@ -33,12 +33,20 @@
       Cancel
     </button>
   </div>
-  <div class="toolbar-group-right">
-    <div
-      class="form-check form-switch"
-      data-bs-toggle="tooltip"
-      title="Disabled tooltip"
+  <div class="toolbar-group toolbar-group--right flex flex-ctr-ver">
+    <select
+      class="form-select mr-10"
+      (change)="updateSkillFilter($event)"
+      [formControl]="skillFilter"
     >
+      <option value="All" selected>All</option>
+      <option value="EM">EM</option>
+      <option value="ASC">ASC</option>
+      <option value="FELL">FELL</option>
+      <option value="BA">BA</option>
+      <option value="INT">INT</option>
+    </select>
+    <div class="form-check form-switch">
       <input
         class="form-check-input"
         type="checkbox"
@@ -47,11 +55,17 @@
         [checked]="showAvailableOnly"
         (click)="toggleShowAvailableOnly()"
         tooltip="Show available only"
-        placement="left"
-        [delay]="500"
-        triggers="mouseenter:click"
+        placement="top"
+        [delay]="600"
       />
     </div>
+    <i
+      [ngClass]="getClearFilterBtnClass()"
+      tooltip="Clear filters"
+      placement="top"
+      [delay]="600"
+      (click)="clearFilters()"
+    ></i>
   </div>
 </nav>
 

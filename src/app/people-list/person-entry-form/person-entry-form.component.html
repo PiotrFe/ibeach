@@ -11,14 +11,16 @@
     formControlName="name"
     [typeahead]="getTypeAhead('name')"
   />
-  <input
-    id="person-skill"
-    class="form-control person-skill-form tbl-row mr-12"
-    type="text"
-    placeholder="Skill"
+  <select
+    class="form-select person-skill-form tbl-row mr-12"
     formControlName="skill"
-    [typeahead]="getTypeAhead('skill')"
-  />
+  >
+    <option value="EM">EM</option>
+    <option value="ASC">ASC</option>
+    <option value="FELL">FELL</option>
+    <option value="FELL">BA</option>
+    <option value="FELL">INT</option>
+  </select>
   <span [ngClass]="getFieldClasses('days')">{{ getDaysAvailable() }}</span>
 
   <div class="btn-group tbl-row mr-12">
