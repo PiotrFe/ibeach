@@ -1,15 +1,15 @@
 <div class="person-entry">
-  <span class="person-name tbl-col">{{ person.name }}</span>
-  <span class="person-skill tbl-col">{{ person.skill }}</span>
-  <span class="person-days tbl-col">{{ getDaysAvailable() }}</span>
-  <div class="btn-group tbl-col">
+  <span [ngClass]="getFieldClasses('name')">{{ person.name }}</span>
+  <span [ngClass]="getFieldClasses('skill')">{{ person.skill }}</span>
+  <span [ngClass]="getFieldClasses('days')">{{ person.daysLeft }}</span>
+  <div class="btn-group tbl-row mr-12">
     <week-days
       (calendarChange)="onCalendarChange($event)"
       [weekObj]="person.week"
       [inEditMode]="inEditMode"
     ></week-days>
   </div>
-  <span class="person-comments tbl-col">{{ person.comments }}</span>
+  <span [ngClass]="getFieldClasses('comments')">{{ person.comments }}</span>
   <i
     *ngIf="inEditMode"
     class="bi bi-pencil i-active mr-8"

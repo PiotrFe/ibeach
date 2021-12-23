@@ -1,7 +1,11 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Person, PersonEntry } from '../person';
-import { Week, getNewWeek } from 'src/app/shared-module/week-days/week';
+import {
+  Week,
+  getNewWeek,
+  getDaysLeft,
+} from 'src/app/shared-module/week-days/week';
 
 @Component({
   selector: 'person-entry-form',
@@ -11,6 +15,8 @@ import { Week, getNewWeek } from 'src/app/shared-module/week-days/week';
 export class PersonEntryFormComponent extends PersonEntry implements OnInit {
   @Input() idx!: number;
   @Input() person!: Person | undefined;
+  @Input() sortField!: string;
+
   @Output() deleteEvent = new EventEmitter<number>();
   @Output() calendarChangeEvent = new EventEmitter<{
     calendarObj: Week;
@@ -30,8 +36,10 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
     week: Week;
   }>();
 
-  constructor() {
-    super();
+  daysLeft!: number;
+
+  getDaysAvailable(): number {
+    return this.daysLeft;
   }
 
   localCalendarObj!: Week;
@@ -41,6 +49,10 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
     skill: new FormControl('', [Validators.required]),
     comments: new FormControl(''),
   });
+
+  constructor() {
+    super();
+  }
 
   handleDelete(): void {
     this.deleteEvent.emit(this.idx);
@@ -77,10 +89,14 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
   }
 
   setDaysLeft(calendarObj: Week) {
-    this.daysLeft = Object.values(calendarObj).reduce(
-      (acc, val) => (val ? acc + 1 : acc),
-      0
-    );
+    this.daysLeft = getDaysLeft(calendarObj);
+  }
+
+  getFieldClasses(fieldName: string): string {
+    const baseClass = `person-${fieldName}-form tbl-row mr-12 flex flex-ctr-ver pl-3`;
+    const sortedClass = fieldName === this.sortField ? ' sorted' : '';
+
+    return `${baseClass}${sortedClass}`;
   }
 
   ngOnInit(): void {

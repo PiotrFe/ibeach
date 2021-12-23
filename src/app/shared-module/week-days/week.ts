@@ -19,3 +19,7 @@ export const getNewWeek = (): Week => {
     ...newWeek,
   };
 };
+
+export const getDaysLeft = (weekObj: Week): number => {
+  return Object.values(weekObj).reduce((acc, val) => (val ? acc + 1 : acc), 0);
+};

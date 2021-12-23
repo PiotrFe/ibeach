@@ -11,6 +11,7 @@ export class PersonEntryComponent extends PersonEntry implements OnInit {
   @Input() idx!: number;
   @Input() person!: Person;
   @Input() inEditMode!: boolean;
+  @Input() sortField!: string;
 
   @Output() editEvent = new EventEmitter<number>();
   @Output() deleteEvent = new EventEmitter<number>();
@@ -35,12 +36,12 @@ export class PersonEntryComponent extends PersonEntry implements OnInit {
     this.calendarChangeEvent.emit({ calendarObj, idx: this.idx });
   }
 
-  ngOnInit(): void {
-    if (this.person?.week) {
-      this.daysLeft = Object.values(this.person?.week).reduce(
-        (acc, val) => (val ? acc + 1 : acc),
-        0
-      );
-    }
+  getFieldClasses(fieldName: string): string {
+    const baseClass = `person-${fieldName} tbl-row mr-12 flex flex-ctr-ver pl-3`;
+    const sortedClass = fieldName === this.sortField ? ' sorted' : '';
+
+    return `${baseClass}${sortedClass}`;
   }
+
+  ngOnInit(): void {}
 }

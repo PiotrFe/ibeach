@@ -1,77 +1,105 @@
-<h2>People list</h2>
-<button
-  *ngIf="!inEditMode"
-  type="button"
-  class="btn btn-primary"
-  (click)="setInEditMode(true)"
->
-  Edit
-</button>
-<button
-  *ngIf="inEditMode"
-  type="button"
-  class="btn btn-primary btn-main-action"
-  (click)="addNewRow()"
->
-  Add
-</button>
-<button
-  *ngIf="inEditMode"
-  type="button"
-  class="btn btn-primary btn-main-action"
-  (click)="setInEditMode(false)"
->
-  Save
-</button>
-<button
-  *ngIf="inEditMode"
-  type="button"
-  class="btn btn-secondary btn-main-action"
-  (click)="setInEditMode(false)"
->
-  Cancel
-</button>
+<nav class="main-toolbar">
+  <div class="toolbar-group-left">
+    <button
+      *ngIf="!inEditMode"
+      type="button"
+      class="btn btn-primary"
+      (click)="setInEditMode(true)"
+    >
+      Edit
+    </button>
+    <button
+      *ngIf="inEditMode"
+      type="button"
+      class="btn btn-primary btn-main-action"
+      (click)="addNewRow()"
+    >
+      Add
+    </button>
+    <button
+      *ngIf="inEditMode"
+      type="button"
+      class="btn btn-primary btn-main-action"
+      (click)="setInEditMode(false)"
+    >
+      Save
+    </button>
+    <button
+      *ngIf="inEditMode"
+      type="button"
+      class="btn btn-secondary btn-main-action"
+      (click)="setInEditMode(false)"
+    >
+      Cancel
+    </button>
+  </div>
+  <div class="toolbar-group-right">
+    <div
+      class="form-check form-switch"
+      data-bs-toggle="tooltip"
+      title="Disabled tooltip"
+    >
+      <input
+        class="form-check-input"
+        type="checkbox"
+        role="switch"
+        id="flexSwitchCheckChecked"
+        [checked]="showAvailableOnly"
+        (click)="toggleShowAvailableOnly()"
+        tooltip="Show available only"
+        placement="left"
+        [delay]="500"
+        triggers="mouseenter:click"
+      />
+    </div>
+  </div>
+</nav>
+
 <ul class="people">
   <li>
     <div class="person-entry-header">
       <span
-        class="person-entry-header__name tbl-col clickable"
+        class="person-entry-header__name tbl-row mr-12 pl-3 clickable"
         (click)="handleSort('name')"
         >Name <i *ngIf="getSort('name', 1)" class="bi bi-sort-down-alt"></i>
         <i *ngIf="getSort('name', -1)" class="bi bi-sort-up"></i
       ></span>
       <span
-        class="person-entry-header__skill tbl-col clickable"
+        class="person-entry-header__skill tbl-row mr-12 pl-3 clickable"
         (click)="handleSort('skill')"
         >Skill <i *ngIf="getSort('skill', 1)" class="bi bi-sort-down-alt"></i>
         <i *ngIf="getSort('skill', -1)" class="bi bi-sort-up"></i
       ></span>
       <span
-        class="person-entry-header__days tbl-col clickable"
+        class="person-entry-header__days tbl-row mr-12 pl-3 clickable"
         (click)="handleSort('days')"
         >Days <i *ngIf="getSort('days', 1)" class="bi bi-sort-down-alt"></i>
         <i *ngIf="getSort('days', -1)" class="bi bi-sort-up"></i
       ></span>
-      <span class="person-entry-header__week tbl-col clickable"> Week </span>
-      <span class="person-entry-header__comments tbl-col">Comments</span>
+      <span class="person-entry-header__week tbl-row mr-12 clickable">
+        Week
+      </span>
+      <span class="person-entry-header__comments tbl-row pl-3">Comments</span>
     </div>
   </li>
   <ul *ngIf="inEditMode">
     <li *ngFor="let row of newRows; let i = index">
       <person-entry-form
         [idx]="i"
+        [sortField]="sort.field"
         (deleteEvent)="removeRow($event)"
         (formSubmitEvent)="addPerson($event)"
       ></person-entry-form>
     </li>
   </ul>
-  <li *ngFor="let person of people; let i = index">
+  <li *ngFor="let person of peopleFilteredView; let i = index">
     <ng-container [ngSwitch]="person.inEditMode">
       <person-entry
         *ngSwitchCase="false"
         [idx]="i"
         [person]="person"
         [inEditMode]="inEditMode"
+        [sortField]="sort.field"
         (editEvent)="editRow($event)"
         (deleteEvent)="removeExistingRow($event)"
         (calendarChangeEvent)="updateCalendar($event)"
@@ -80,6 +108,7 @@
         *ngSwitchCase="true"
         [idx]="i"
         [person]="person"
+        [sortField]="sort.field"
         (deleteEvent)="removeExistingRow($event)"
         (calendarChangeEvent)="updateCalendar($event)"
         (formEditEvent)="updatePersonDetails($event)"

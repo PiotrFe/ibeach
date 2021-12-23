@@ -3,7 +3,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  height: 2.7rem;
 }
 
 .person-name-form {
@@ -12,13 +12,13 @@
 }
 
 .person-skill-form {
-  width: 15%;
-  min-width: 15%;
+  width: 13%;
+  min-width: 13%;
 }
 
 .person-days-form {
-  width: 10%;
-  min-width: 10%;
+  width: 13%;
+  min-width: 13%;
 }
 
 .person-comments-form {
@@ -29,8 +29,4 @@
 .btn-group {
   width: 50%;
   min-width: 50%;
-}
-
-.tbl-col {
-  margin-right: 12px;
 }

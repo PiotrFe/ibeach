@@ -5,7 +5,7 @@
 >
   <input
     id="person-name"
-    class="form-control person-name-form tbl-col"
+    class="form-control person-name-form tbl-row mr-12"
     type="text"
     placeholder="Name"
     formControlName="name"
@@ -13,15 +13,15 @@
   />
   <input
     id="person-skill"
-    class="form-control person-skill-form tbl-col"
+    class="form-control person-skill-form tbl-row mr-12"
     type="text"
     placeholder="Skill"
     formControlName="skill"
     [typeahead]="getTypeAhead('skill')"
   />
-  <span class="person-days-form tbl-col">{{ getDaysAvailable() }}</span>
+  <span [ngClass]="getFieldClasses('days')">{{ getDaysAvailable() }}</span>
 
-  <div class="btn-group tbl-col">
+  <div class="btn-group tbl-row mr-12">
     <week-days
       [weekObj]="person?.week"
       (calendarChange)="onCalendarChange($event)"
@@ -30,7 +30,7 @@
   </div>
   <input
     id="person-comments"
-    class="form-control person-comments-form tbl-col"
+    class="form-control person-comments-form tbl-row"
     type="text"
     placeholder="Comments"
     formControlName="comments"

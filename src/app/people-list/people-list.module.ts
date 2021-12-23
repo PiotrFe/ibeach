@@ -6,6 +6,7 @@ import { PersonEntryComponent } from './person-entry/person-entry.component';
 import { PersonEntryFormComponent } from './person-entry-form/person-entry-form.component';
 import { SharedModuleModule } from '../shared-module/shared-module.module';
 import { TypeaheadModule } from 'ngx-bootstrap/typeahead';
+import { TooltipModule } from 'ngx-bootstrap/tooltip';
 
 @NgModule({
   declarations: [
@@ -20,6 +21,7 @@ import { TypeaheadModule } from 'ngx-bootstrap/typeahead';
     ReactiveFormsModule,
     SharedModuleModule,
     TypeaheadModule.forRoot(),
+    TooltipModule.forRoot(),
   ],
 })
 export class PeopleListModule {}
