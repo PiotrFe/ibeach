@@ -3,12 +3,18 @@ import { PEOPLE } from './people';
 
 export const SKILLS = ['EM', 'ASC', 'FELL', 'BA', 'INT'];
 
+export interface Tag {
+  type: string;
+  value: string;
+}
+
 export interface Person {
   name: string;
   skill: string;
   week: Week;
   daysLeft: number;
   comments?: string;
+  tags: Tag[];
 }
 
 export class PersonEntry {

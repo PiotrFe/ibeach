@@ -10,6 +10,13 @@
     ></week-days>
   </div>
   <span [ngClass]="getFieldClasses('comments')">{{ person.comments }}</span>
+  <div [ngClass]="getFieldClasses('tags')">
+    <ul *ngFor="let tag of person.tags" class="tag-list flex flex-ctr-ver">
+      <li class="badge bg-secondary btn-inactive">{{ tag.value }}</li>
+    </ul>
+    <i class="bi bi-plus clickable add-tag"></i>
+  </div>
+
   <i
     *ngIf="inEditMode"
     class="bi bi-pencil i-active mr-8"

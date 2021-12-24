@@ -28,7 +28,7 @@
       *ngIf="inEditMode"
       type="button"
       class="btn btn-secondary btn-main-action"
-      (click)="setInEditMode(false)"
+      (click)="cancelChanges()"
     >
       Cancel
     </button>
@@ -93,7 +93,10 @@
       <span class="person-entry-header__week tbl-row mr-12 clickable">
         Week
       </span>
-      <span class="person-entry-header__comments tbl-row pl-3">Comments</span>
+      <span class="person-entry-header__comments tbl-row pl-3 mr-12"
+        >Comments</span
+      >
+      <span class="person-entry-header__comments tbl-row pl-3">Tags</span>
     </div>
   </li>
   <ul *ngIf="inEditMode">

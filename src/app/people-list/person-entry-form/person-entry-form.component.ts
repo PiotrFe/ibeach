@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { Person, PersonEntry } from '../person';
+import { Person, PersonEntry, Tag } from '../person';
 import {
   Week,
   getNewWeek,
@@ -34,15 +34,16 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
     comments: string;
     idx: number;
     week: Week;
+    tags: Tag[];
   }>();
 
   daysLeft!: number;
+  localCalendarObj!: Week;
+  tags!: Tag[];
 
   getDaysAvailable(): number {
     return this.daysLeft;
   }
-
-  localCalendarObj!: Week;
 
   personForm = new FormGroup({
     name: new FormControl('', [Validators.required, Validators.minLength(3)]),
@@ -74,6 +75,7 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
         skill,
         comments,
         week: this.localCalendarObj,
+        tags: this.tags,
         idx: this.idx,
       });
     }
@@ -105,12 +107,15 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
       this.personForm.setValue({
         name,
         skill,
-        comments,
+        comments: comments || '',
       });
+      this.tags = this.person.tags;
+    } else {
+      this.tags = [];
     }
 
     if (this.person?.week) {
-      this.setDaysLeft(this.person?.week);
+      this.setDaysLeft(this.person.week);
     } else {
       this.daysLeft = 5;
       this.localCalendarObj = getNewWeek();

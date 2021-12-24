@@ -32,11 +32,16 @@
   </div>
   <input
     id="person-comments"
-    class="form-control person-comments-form tbl-row"
+    class="form-control person-comments-form tbl-row mr-12"
     type="text"
     placeholder="Comments"
     formControlName="comments"
   />
+  <ul [ngClass]="getFieldClasses('tags')" *ngFor="let tag of tags">
+    <li class="badge bg-secondary btn-inactive">{{ tag.value }}</li>
+  </ul>
+  <span [ngClass]="getFieldClasses('tags')" *ngIf="!tags.length"></span>
+
   <label for="{{ 'submit-form-' + idx }}">
     <i class="bi bi-check-circle i-active mr-8"></i>
   </label>

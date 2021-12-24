@@ -14,6 +14,7 @@ export const PEOPLE: Person[] = [
       thu: true,
       fri: true,
     }),
+    tags: [{ type: 'industry', value: 'FIG' }],
   },
   {
     name: 'Mark',
@@ -27,6 +28,7 @@ export const PEOPLE: Person[] = [
       thu: true,
       fri: true,
     }),
+    tags: [{ type: 'function', value: 'DnA' }],
   },
   {
     name: 'Todd',
@@ -40,6 +42,7 @@ export const PEOPLE: Person[] = [
       thu: true,
       fri: false,
     }),
+    tags: [],
   },
   {
     name: 'Tom',
@@ -52,6 +55,7 @@ export const PEOPLE: Person[] = [
       thu: true,
       fri: true,
     }),
+    tags: [],
   },
   {
     name: 'Tom',
@@ -64,6 +68,7 @@ export const PEOPLE: Person[] = [
       thu: false,
       fri: false,
     }),
+    tags: [],
   },
   {
     name: 'Barbie',
@@ -76,5 +81,6 @@ export const PEOPLE: Person[] = [
       thu: false,
       fri: true,
     }),
+    tags: [],
   },
 ];
