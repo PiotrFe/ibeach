@@ -27,6 +27,7 @@
         bsDatepicker
         [bsValue]="bsInlineValue"
         [bsConfig]="{ isAnimated: true, dateInputFormat: 'DD-MMM-YYYY' }"
+        (bsValueChange)="setReferenceDate($event)"
       />
     </div>
   </div>

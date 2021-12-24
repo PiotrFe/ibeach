@@ -11,29 +11,53 @@ import { Week } from '../week';
   styleUrls: ['./upload-section.component.scss'],
 })
 export class UploadSectionComponent implements OnInit {
-  bsInlineValue = new Date();
+  bsInlineValue: Date = new Date();
+  referenceDateStart: Date = this.bsInlineValue;
+  referenceDateEnd!: Date;
   uploadError!: string;
   fileSelected: boolean = false;
   previewData: Person[] = [];
 
   constructor() {}
 
-  parseData(data: any): Person[] {
-    const returnData = data.map((entry: any) => {
-      const name: string = entry.Name;
-      const skill: string = entry.Skill?.split(' - ')[0];
-      const week: Week = getNewWeek();
-      const daysLeft: number = getDaysLeft(week);
-      const tags: Tag[] = [];
+  setReferenceDate(date: Date) {
+    // correct reference period to always cover midnight-midnight
+    this.referenceDateStart = date;
+    this.referenceDateEnd = new Date(
+      this.referenceDateStart.getTime() + 1000 * 60 * 60 * 24 * 7
+    );
 
-      return {
-        name,
-        skill,
-        week,
-        daysLeft,
-        tags,
-      };
+    console.log({
+      from: this.referenceDateStart,
+      to: this.referenceDateEnd,
     });
+  }
+
+  parseData(data: any): Person[] {
+    const returnData = data
+      .filter((entry: any) => {
+        const availabilityDate = Date.parse(entry['Availability date']);
+
+        return (
+          availabilityDate >= this.referenceDateStart.getTime() &&
+          availabilityDate <= this.referenceDateEnd.getTime()
+        );
+      })
+      .map((entry: any) => {
+        const name: string = entry.Name;
+        const skill: string = entry.Skill?.split(' - ')[0];
+        const week: Week = getNewWeek();
+        const daysLeft: number = getDaysLeft(week);
+        const tags: Tag[] = [];
+
+        return {
+          name,
+          skill,
+          week,
+          daysLeft,
+          tags,
+        };
+      });
 
     return returnData;
   }
@@ -53,6 +77,9 @@ export class UploadSectionComponent implements OnInit {
           this.uploadError = String(err);
         }
         this.fileSelected = true;
+        console.log({
+          data,
+        });
         this.previewData = this.parseData(data);
       });
     };
