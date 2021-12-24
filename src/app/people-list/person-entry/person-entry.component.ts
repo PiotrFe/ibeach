@@ -12,6 +12,7 @@ export class PersonEntryComponent extends PersonEntry implements OnInit {
   @Input() person!: Person;
   @Input() inEditMode!: boolean;
   @Input() sortField!: string;
+  @Input() editable: boolean = true;
 
   @Output() editEvent = new EventEmitter<number>();
   @Output() deleteEvent = new EventEmitter<number>();

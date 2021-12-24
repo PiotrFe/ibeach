@@ -1,0 +1,23 @@
+<div class="person-entry-header">
+  <span
+    class="person-entry-header__name tbl-row mr-12 pl-3 clickable"
+    (click)="handleClick('name')"
+    >Name <i *ngIf="getSort('name', 1)" class="bi bi-sort-down-alt"></i>
+    <i *ngIf="getSort('name', -1)" class="bi bi-sort-up"></i
+  ></span>
+  <span
+    class="person-entry-header__skill tbl-row mr-12 pl-3 clickable"
+    (click)="handleClick('skill')"
+    >Skill <i *ngIf="getSort('skill', 1)" class="bi bi-sort-down-alt"></i>
+    <i *ngIf="getSort('skill', -1)" class="bi bi-sort-up"></i
+  ></span>
+  <span
+    class="person-entry-header__days tbl-row mr-12 pl-3 clickable"
+    (click)="handleClick('days')"
+    >Days <i *ngIf="getSort('days', 1)" class="bi bi-sort-down-alt"></i>
+    <i *ngIf="getSort('days', -1)" class="bi bi-sort-up"></i
+  ></span>
+  <span class="person-entry-header__week tbl-row mr-12 clickable"> Week </span>
+  <span class="person-entry-header__comments tbl-row pl-3 mr-12">Comments</span>
+  <span class="person-entry-header__comments tbl-row pl-3">Tags</span>
+</div>

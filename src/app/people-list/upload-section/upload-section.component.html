@@ -1,0 +1,47 @@
+<nav class="main-toolbar">
+  <div class="toolbar-group toolbar-group--left flex flex-ctr-ver">
+    <label
+      *ngIf="!fileSelected"
+      for="upload"
+      type="button"
+      class="btn btn-primary mr-20"
+    >
+      Select file
+    </label>
+    <input
+      type="file"
+      id="upload"
+      name="upload"
+      accept="csv"
+      hidden
+      (change)="onFileSelected($event)"
+    />
+    <button *ngIf="fileSelected" type="button" class="btn btn-success mr-20">
+      Upload
+    </button>
+    <div class="col-xs-12 col-12 col-md-6 form-group">
+      <input
+        type="text"
+        placeholder="Datepicker"
+        class="form-control"
+        bsDatepicker
+        [bsValue]="bsInlineValue"
+        [bsConfig]="{ isAnimated: true, dateInputFormat: 'DD-MMM-YYYY' }"
+      />
+    </div>
+  </div>
+</nav>
+<ul *ngIf="previewData.length" class="people">
+  <li>
+    <people-list-header></people-list-header>
+  </li>
+  <div class="people-content">
+    <li *ngFor="let person of previewData; let i = index">
+      <person-entry
+        [idx]="i"
+        [person]="person"
+        [editable]="false"
+      ></person-entry>
+    </li>
+  </div>
+</ul>

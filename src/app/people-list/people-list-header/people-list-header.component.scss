@@ -1,0 +1,35 @@
+.person-entry-header {
+  width: 40vw;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  font-weight: bold;
+  font-size: 1.1rem;
+  user-select: none;
+
+  &__name {
+    width: 25%;
+    min-width: 25%;
+  }
+
+  &__skill {
+    width: 13%;
+    min-width: 13%;
+  }
+
+  &__days {
+    width: 13%;
+    min-width: 13%;
+  }
+
+  &__week {
+    width: 50%;
+    min-width: 50%;
+  }
+
+  &__comments {
+    width: 30%;
+    min-width: 30%;
+  }
+}
