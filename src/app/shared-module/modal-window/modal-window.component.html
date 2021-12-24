@@ -1,0 +1,22 @@
+<ng-template #template>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">{{ title }}</h4>
+    <button
+      type="button"
+      class="btn-close close pull-right"
+      aria-label="Close"
+      (click)="modalRef?.hide()"
+    >
+      <span aria-hidden="true" class="visually-hidden">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">{{ text }}</div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="close(false)">
+      {{ btnCloseText }}
+    </button>
+    <button type="button" class="btn btn-success" (click)="close(true)">
+      {{ btnConfirmText }}
+    </button>
+  </div>
+</ng-template>

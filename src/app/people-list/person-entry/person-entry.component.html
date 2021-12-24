@@ -14,7 +14,7 @@
     <ul *ngFor="let tag of person.tags" class="tag-list flex flex-ctr-ver">
       <li class="badge bg-secondary btn-inactive">{{ tag.value }}</li>
     </ul>
-    <i class="bi bi-plus clickable add-tag"></i>
+    <i *ngIf="inEditMode" class="bi bi-plus clickable add-tag"></i>
   </div>
 
   <i

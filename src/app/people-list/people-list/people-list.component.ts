@@ -47,6 +47,7 @@ export class PeopleListComponent implements OnInit {
   showAvailableOnly = false;
   peopleFilteredView = this.people;
   skillFilter = new FormControl('All');
+  showSubmitModal = false;
 
   // *****************
   // FILTER HANDLERS
@@ -413,6 +414,19 @@ export class PeopleListComponent implements OnInit {
     }
     this.updateFilteredView();
   };
+
+  // *****************
+  // SUBMIT HANDLERS
+  // *****************
+  onSubmit() {
+    this.showSubmitModal = true;
+  }
+  handleModalClose(submit: boolean) {
+    this.showSubmitModal = false;
+    if (submit) {
+      alert('List has been submitted');
+    }
+  }
 
   constructor() {}
 

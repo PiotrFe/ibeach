@@ -3,6 +3,14 @@
     <button
       *ngIf="!inEditMode"
       type="button"
+      class="btn btn-success mr-20"
+      (click)="onSubmit()"
+    >
+      Submit
+    </button>
+    <button
+      *ngIf="!inEditMode"
+      type="button"
       class="btn btn-primary"
       (click)="setInEditMode(true)"
     >
@@ -133,3 +141,12 @@
     </ng-container>
   </li>
 </ul>
+<modal-window
+  *ngIf="showSubmitModal"
+  [title]="'Submit people list'"
+  [text]="'Are you sure?'"
+  [btnConfirmText]="'Submit'"
+  [btnCloseText]="'Close'"
+  [modalType]="'CONFIRM'"
+  (closeEvent)="handleModalClose($event)"
+></modal-window>
