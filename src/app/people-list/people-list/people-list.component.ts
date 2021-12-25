@@ -219,8 +219,10 @@ export class PeopleListComponent implements OnInit {
     availDate: Date;
     pdm: string;
     idx: number;
+    week: Week;
+    tags: Tag[];
   }) {
-    const { name, skill, comments, idx, availDate, pdm } = objParam;
+    const { name, skill, comments, idx, availDate, pdm, week, tags } = objParam;
     const personObj: PersonEditable = this.peopleFilteredView[idx];
 
     this.people = this.people.map((person) => {
@@ -234,6 +236,8 @@ export class PeopleListComponent implements OnInit {
         comments,
         availDate,
         pdm,
+        week,
+        tags,
         inEditMode: false,
       };
     });

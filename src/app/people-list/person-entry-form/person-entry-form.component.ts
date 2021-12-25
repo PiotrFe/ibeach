@@ -1,6 +1,8 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Person, PersonEntry, Tag } from '../person';
+import { getPDMArr } from '../../utils/getPDMs';
+
 import {
   Week,
   getNewWeek,
@@ -31,6 +33,8 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
     availDate: Date;
     pdm: string;
     idx: number;
+    week: Week;
+    tags: Tag[];
   }>();
   @Output() formSubmitEvent = new EventEmitter<{
     name: string;
@@ -46,6 +50,7 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
   daysLeft!: number;
   localCalendarObj!: Week;
   tags!: Tag[];
+  pdmArr: string[] = getPDMArr();
 
   getDaysAvailable(): number {
     return this.daysLeft;
@@ -77,6 +82,8 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
         comments,
         availDate,
         pdm,
+        week: this.localCalendarObj,
+        tags: this.tags,
         idx: this.idx,
       });
     } else {
@@ -94,12 +101,8 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
   }
 
   onCalendarChange(calendarObj: Week) {
-    if (this.person) {
-      this.calendarChangeEvent.emit({ calendarObj, idx: this.idx });
-    } else {
-      this.localCalendarObj = calendarObj;
-      this.setDaysLeft(calendarObj);
-    }
+    this.localCalendarObj = calendarObj;
+    this.setDaysLeft(calendarObj);
   }
 
   setDaysLeft(calendarObj: Week) {
@@ -129,6 +132,7 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
     }
 
     if (this.person?.week) {
+      this.localCalendarObj = this.person.week;
       this.setDaysLeft(this.person.week);
     } else {
       this.daysLeft = 5;

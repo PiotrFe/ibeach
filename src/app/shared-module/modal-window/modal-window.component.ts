@@ -21,6 +21,7 @@ const MODAL_TYPES = {
 })
 export class ModalWindowComponent implements OnInit {
   @ViewChild('template') template!: TemplateRef<any>;
+  @ViewChild('template_simple') templateSimple!: TemplateRef<any>;
 
   @Input() title: string = '';
   @Input() text: string = '';
@@ -40,6 +41,10 @@ export class ModalWindowComponent implements OnInit {
 
   ngOnInit(): void {}
   ngAfterViewInit() {
-    this.modalRef = this.modalService.show(this.template);
+    if (this.title) {
+      this.modalRef = this.modalService.show(this.template);
+    } else {
+      this.modalRef = this.modalService.show(this.templateSimple);
+    }
   }
 }

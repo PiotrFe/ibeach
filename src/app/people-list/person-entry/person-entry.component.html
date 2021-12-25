@@ -7,6 +7,7 @@
   <span [ngClass]="getFieldClasses('days')">{{ person.daysLeft }}</span>
   <div class="btn-group tbl-row mr-12">
     <week-days
+      class="flex flex-ctr-ver"
       (calendarChange)="onCalendarChange($event)"
       [weekObj]="person.week"
       [inEditMode]="inEditMode"

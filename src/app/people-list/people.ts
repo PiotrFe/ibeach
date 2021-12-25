@@ -16,7 +16,7 @@ export const PEOPLE: Person[] = [
     }),
     tags: [{ type: 'industry', value: 'FIG' }],
     availDate: new Date(),
-    pdm: 'Susan Sontag',
+    pdm: 'Livia Schneider',
   },
   {
     name: 'Mark',
@@ -32,7 +32,7 @@ export const PEOPLE: Person[] = [
     }),
     tags: [{ type: 'function', value: 'DnA' }],
     availDate: new Date(),
-    pdm: 'Susan Sontag',
+    pdm: 'Livia Schneider',
   },
   {
     name: 'Todd',
@@ -48,7 +48,7 @@ export const PEOPLE: Person[] = [
     }),
     tags: [],
     availDate: new Date(Date.parse('28-Dec-2021')),
-    pdm: 'Woody Allen',
+    pdm: 'Sabrina Reck',
   },
   {
     name: 'Tom',
@@ -63,7 +63,7 @@ export const PEOPLE: Person[] = [
     }),
     tags: [],
     availDate: new Date(),
-    pdm: 'Jane Mansfield',
+    pdm: 'Denada Heqimi',
   },
   {
     name: 'Tom',
@@ -78,7 +78,7 @@ export const PEOPLE: Person[] = [
     }),
     tags: [],
     availDate: new Date(Date.parse('03-Jan-2022')),
-    pdm: 'Jane Mansfield',
+    pdm: 'Sabrina Reck',
   },
   {
     name: 'Barbie',
@@ -93,6 +93,6 @@ export const PEOPLE: Person[] = [
     }),
     tags: [],
     availDate: new Date(Date.parse('26-Dec-2021')),
-    pdm: 'Magnus Carlsen',
+    pdm: 'Piotr Ferensztajn',
   },
 ];
