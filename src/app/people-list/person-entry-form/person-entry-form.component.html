@@ -12,18 +12,25 @@
     [typeahead]="getTypeAhead('name')"
   />
   <select
-    class="form-select person-skill-form tbl-row mr-12"
+    class="form-control person-skill-form tbl-row mr-12"
     formControlName="skill"
   >
     <option value="EM">EM</option>
     <option value="ASC">ASC</option>
     <option value="FELL">FELL</option>
-    <option value="FELL">BA</option>
-    <option value="FELL">INT</option>
+    <option value="BA">BA</option>
+    <option value="INT">INT</option>
   </select>
 
   <div
-    class="col-xs-12 col-12 col-md-3 form-group person-date-form tbl-row mr-12"
+    class="
+      col-xs-12 col-12 col-md-3
+      form-group
+      person-date-form
+      tbl-row
+      mr-12
+      flex flex-ctr-hor
+    "
   >
     <input
       type="text"
@@ -46,10 +53,12 @@
     ></week-days>
   </div>
 
-  <ul [ngClass]="getFieldClasses('tags')" *ngFor="let tag of tags">
-    <li class="badge bg-secondary btn-inactive">{{ tag.value }}</li>
-  </ul>
-  <span [ngClass]="getFieldClasses('tags')" *ngIf="!tags.length"></span>
+  <div [ngClass]="getFieldClasses('tags')">
+    <i class="bi bi-plus clickable add-tag"></i>
+    <ul *ngFor="let tag of tags" class="tag-list flex flex-ctr-ver">
+      <li class="badge bg-secondary btn-inactive">{{ tag.value }}</li>
+    </ul>
+  </div>
   <select
     class="form-control person-pdm-form tbl-row mr-12"
     formControlName="pdm"

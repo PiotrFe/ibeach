@@ -235,6 +235,7 @@ export class PeopleListComponent implements OnInit {
         skill,
         comments,
         availDate,
+        daysLeft: getDaysLeft(week),
         pdm,
         week,
         tags,
@@ -300,7 +301,7 @@ export class PeopleListComponent implements OnInit {
       }
     } else {
       this.sort.field = colName;
-      this.sort.order = 1;
+      this.sort.order = ['skill', 'days'].includes(colName) ? -1 : 1;
     }
   }
 
@@ -334,10 +335,10 @@ export class PeopleListComponent implements OnInit {
     const daysB = b.daysLeft;
 
     if (daysA < daysB) {
-      return asc ? 1 : order;
+      return asc ? -1 : order * -1;
     }
     if (daysA > daysB) {
-      return asc ? -1 : order * -1;
+      return asc ? 1 : order;
     }
 
     return 0;
@@ -356,13 +357,13 @@ export class PeopleListComponent implements OnInit {
       SKILL_INDEX[skillA as keyof typeof SKILL_INDEX] <
       SKILL_INDEX[skillB as keyof typeof SKILL_INDEX]
     ) {
-      return asc ? 1 : order;
+      return asc ? -1 : order * -1;
     }
     if (
       SKILL_INDEX[skillA as keyof typeof SKILL_INDEX] >
       SKILL_INDEX[skillB as keyof typeof SKILL_INDEX]
     ) {
-      return asc ? -1 : order * -1;
+      return asc ? 1 : order;
     }
 
     return 0;
