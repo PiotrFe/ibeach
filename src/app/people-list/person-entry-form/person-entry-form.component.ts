@@ -29,6 +29,7 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
     skill: string;
     comments: string;
     availDate: Date;
+    pdm: string;
     idx: number;
   }>();
   @Output() formSubmitEvent = new EventEmitter<{
@@ -36,6 +37,7 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
     skill: string;
     comments: string;
     availDate: Date;
+    pdm: string;
     idx: number;
     week: Week;
     tags: Tag[];
@@ -54,6 +56,7 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
     skill: new FormControl('', [Validators.required]),
     comments: new FormControl(''),
     availDate: new FormControl(''),
+    pdm: new FormControl(''),
   });
 
   constructor() {
@@ -65,7 +68,7 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
   }
 
   onSubmit(): void {
-    const { name, skill, comments, availDate } = this.personForm.value;
+    const { name, skill, comments, availDate, pdm } = this.personForm.value;
 
     if (this.person) {
       this.formEditEvent.emit({
@@ -73,6 +76,7 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
         skill,
         comments,
         availDate,
+        pdm,
         idx: this.idx,
       });
     } else {
@@ -81,6 +85,7 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
         skill,
         comments,
         availDate,
+        pdm,
         week: this.localCalendarObj,
         tags: this.tags,
         idx: this.idx,
@@ -110,12 +115,13 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
 
   ngOnInit(): void {
     if (this.person) {
-      const { name, skill, comments, availDate } = this.person;
+      const { name, skill, comments, availDate, pdm } = this.person;
       this.personForm.setValue({
         name,
         skill,
         comments: comments || '',
         availDate: availDate || '',
+        pdm: pdm || '',
       });
       this.tags = this.person.tags;
     } else {

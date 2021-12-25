@@ -217,9 +217,10 @@ export class PeopleListComponent implements OnInit {
     skill: string;
     comments: string;
     availDate: Date;
+    pdm: string;
     idx: number;
   }) {
-    const { name, skill, comments, idx, availDate } = objParam;
+    const { name, skill, comments, idx, availDate, pdm } = objParam;
     const personObj: PersonEditable = this.peopleFilteredView[idx];
 
     this.people = this.people.map((person) => {
@@ -232,6 +233,7 @@ export class PeopleListComponent implements OnInit {
         skill,
         comments,
         availDate,
+        pdm,
         inEditMode: false,
       };
     });
@@ -243,18 +245,20 @@ export class PeopleListComponent implements OnInit {
     skill: string;
     comments: string;
     availDate: Date;
+    pdm: string;
     idx: number;
     week: Week;
     tags: Tag[];
   }) {
     this.clearSort();
-    const { name, skill, comments, idx, week, tags, availDate } = objParam;
+    const { name, skill, comments, idx, week, tags, availDate, pdm } = objParam;
 
     this.people.unshift({
       name,
       skill,
       availDate,
       week,
+      pdm,
       comments,
       inEditMode: false,
       daysLeft: getDaysLeft(week),
@@ -382,6 +386,29 @@ export class PeopleListComponent implements OnInit {
     return 0;
   };
 
+  sortValsByPDM = (
+    a: PersonEditable,
+    b: PersonEditable,
+    asc: boolean = false
+  ): number => {
+    if (!a.pdm || !b.pdm) {
+      return 0;
+    }
+    const order = this.sort.order;
+
+    const nameA = a.pdm.toUpperCase();
+    const nameB = b.pdm.toUpperCase();
+
+    if (nameA < nameB) {
+      return asc ? -1 : order * -1;
+    }
+    if (nameA > nameB) {
+      return asc ? 1 : order;
+    }
+
+    return 0;
+  };
+
   handleSort = (colName: string): void => {
     this.updateSortIcon(colName);
     const order = this.sort.order;
@@ -389,6 +416,7 @@ export class PeopleListComponent implements OnInit {
     const sortValsByName = this.sortValsByName;
     const sortValsByDays = this.sortValsByDays;
     const sortValsByDate = this.sortValsByDate;
+    const sortValsByPDM = this.sortValsByPDM;
 
     if (colName === 'name') {
       this.people.sort(function (a, b) {
@@ -451,6 +479,17 @@ export class PeopleListComponent implements OnInit {
         }
         // (3) sort by name (asc)
         return sortValsByName(a, b, true);
+      });
+    }
+
+    if (colName === 'pdm') {
+      this.people.sort(function (a, b) {
+        let returnVal: number = sortValsByPDM(a, b);
+
+        if (returnVal !== 0) {
+          return returnVal;
+        }
+        return sortValsBySkill(a, b, true);
       });
     }
     this.updateFilteredView();

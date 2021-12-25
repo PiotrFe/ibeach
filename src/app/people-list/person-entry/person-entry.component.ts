@@ -42,8 +42,9 @@ export class PersonEntryComponent extends PersonEntry implements OnInit {
   getFieldClasses(fieldName: string): string {
     const baseClass = `person-${fieldName} tbl-row mr-12 flex flex-ctr-ver pl-3`;
     const sortedClass = fieldName === this.sortField ? ' sorted' : '';
+    const otherClass = fieldName === 'pdm' ? ' flex-ctr-hor' : '';
 
-    return `${baseClass}${sortedClass}`;
+    return `${baseClass}${sortedClass}${otherClass}`;
   }
 
   ngOnInit(): void {}

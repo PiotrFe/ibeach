@@ -1,5 +1,5 @@
 .person-entry-form {
-  width: 40vw;
+  width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -7,36 +7,43 @@
 }
 
 .person-name-form {
-  width: 25%;
-  min-width: 25%;
+  width: 13%;
+  min-width: 13%;
 }
 
 .person-skill-form {
-  width: 13%;
-  min-width: 13%;
+  width: 5%;
+  min-width: 5%;
 }
 
 .person-date-form {
-  width: 15%;
-  min-width: 15%;
+  width: 6%;
+  min-width: 6%;
 }
 
 .person-days-form {
-  width: 13%;
-  min-width: 13%;
+  width: 6%;
+  min-width: 6%;
+  justify-content: center;
 }
 
 .person-comments-form {
-  width: 30%;
-  min-width: 30%;
+  flex-grow: 1;
 }
 
 .person-tags-form {
-  width: 25%;
-  min-width: 25%;
+  width: 12%;
+  min-width: 12%;
+  position: relative;
+}
+
+.person-pdm-form {
+  width: 5%;
+  min-width: 5%;
+  text-align: center;
 }
 
 .btn-group {
-  width: 50%;
-  min-width: 50%;
+  width: 23%;
+  min-width: 23%;
 }

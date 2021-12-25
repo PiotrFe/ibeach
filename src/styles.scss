@@ -151,6 +151,30 @@ html {
 // ****************
 
 .fs {
+  &-07 {
+    font-size: 0.7rem;
+  }
+
+  &-075 {
+    font-size: 0.75rem;
+  }
+
+  &-08 {
+    font-size: 0.8rem;
+  }
+
+  &-085 {
+    font-size: 0.85rem;
+  }
+
+  &-09 {
+    font-size: 0.9rem;
+  }
+
+  &-095 {
+    font-size: 0.95rem;
+  }
+
   &-11 {
     font-size: 1.1rem;
   }
@@ -240,6 +264,7 @@ ul {
 .people {
   max-height: 70vh;
   overflow: scroll;
+  padding: 0 2rem;
 }
 
 .people-content {

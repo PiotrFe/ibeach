@@ -1,39 +1,57 @@
 .person-entry {
-  width: 40vw;
+  width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
   height: 2.7rem;
+  border-bottom: 0.8px dashed rgba(0, 0, 0, 0.3);
 }
 
 .person-name {
-  width: 25%;
-  min-width: 25%;
+  width: 13%;
+  min-width: 13%;
 }
 
 .person-skill {
-  width: 13%;
-  min-width: 13%;
+  width: 5%;
+  min-width: 5%;
 }
 
 .person-availDate {
-  width: 15%;
-  min-width: 15%;
+  width: 6%;
+  min-width: 6%;
 }
 
 .person-days {
-  width: 13%;
-  min-width: 13%;
+  width: 6%;
+  min-width: 6%;
+  justify-content: center;
 }
 
 .person-comments {
-  width: 30%;
-  min-width: 30%;
+  flex-grow: 1;
+}
+
+.person-pdm {
+  width: 5%;
+  min-width: 5%;
+  text-align: center;
+
+  & > span {
+    width: 2rem;
+    height: 2rem;
+    background-color: #6c757d;
+    border-radius: 50px;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 }
 
 .person-tags {
-  width: 25%;
-  min-width: 25%;
+  width: 12%;
+  min-width: 12%;
   position: relative;
 }
 
@@ -49,6 +67,6 @@
 }
 
 .btn-group {
-  width: 50%;
-  min-width: 50%;
+  width: 23%;
+  min-width: 23%;
 }

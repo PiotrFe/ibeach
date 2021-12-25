@@ -2,30 +2,36 @@
   <span
     class="person-entry-header__name tbl-row mr-12 pl-3 clickable"
     (click)="handleClick('name')"
-    >Name <i *ngIf="getSort('name', 1)" class="bi bi-sort-down-alt"></i>
-    <i *ngIf="getSort('name', -1)" class="bi bi-sort-up"></i
+    >Name <i *ngIf="getSort('name', 1)" class="bi bi-sort-down-alt fs-085"></i>
+    <i *ngIf="getSort('name', -1)" class="bi bi-sort-up fs-085"></i
   ></span>
   <span
     class="person-entry-header__skill tbl-row mr-12 pl-3 clickable"
     (click)="handleClick('skill')"
-    >Skill <i *ngIf="getSort('skill', 1)" class="bi bi-sort-down-alt"></i>
-    <i *ngIf="getSort('skill', -1)" class="bi bi-sort-up"></i
+    >Skill
+    <i *ngIf="getSort('skill', 1)" class="bi bi-sort-down-alt fs-085"></i>
+    <i *ngIf="getSort('skill', -1)" class="bi bi-sort-up fs-085"></i
   ></span>
   <span
     class="person-entry-header__availDate tbl-row mr-12 pl-3 clickable"
     (click)="handleClick('availDate')"
-    >Available from
-    <i *ngIf="getSort('availDate', 1)" class="bi bi-sort-down-alt"></i>
-    <i *ngIf="getSort('availDate', -1)" class="bi bi-sort-up"></i
+    >From
+    <i *ngIf="getSort('availDate', 1)" class="bi bi-sort-down-alt fs-085"></i>
+    <i *ngIf="getSort('availDate', -1)" class="bi bi-sort-up fs-085"></i
   ></span>
   <span
     class="person-entry-header__days tbl-row mr-12 pl-3 clickable"
     (click)="handleClick('days')"
-    >Days <i *ngIf="getSort('days', 1)" class="bi bi-sort-down-alt"></i>
-    <i *ngIf="getSort('days', -1)" class="bi bi-sort-up"></i
+    >Days <i *ngIf="getSort('days', 1)" class="bi bi-sort-down-alt fs-085"></i>
+    <i *ngIf="getSort('days', -1)" class="bi bi-sort-up fs-085"></i
   ></span>
-  <span class="person-entry-header__week tbl-row mr-12 clickable">Week</span>
-  <span class="person-entry-header__comments tbl-row pl-3 mr-12">Comments</span>
-  <span class="person-entry-header__comments tbl-row pl-3 mr-12">Tags</span>
-  <span class="person-entry-header__comments tbl-row pl-3">PDM</span>
+  <span class="person-entry-header__week tbl-row mr-12">Week</span>
+  <span class="person-entry-header__tags tbl-row pl-3 mr-12">Tags</span>
+  <span
+    class="person-entry-header__pdm tbl-row pl-3 mr-12 clickable"
+    (click)="handleClick('pdm')"
+    >PDM<i *ngIf="getSort('pdm', 1)" class="bi bi-sort-down-alt fs-085"></i>
+    <i *ngIf="getSort('pdm', -1)" class="bi bi-sort-up fs-085"></i
+  ></span>
+  <span class="person-entry-header__comments tbl-row pl-3">Comments</span>
 </div>

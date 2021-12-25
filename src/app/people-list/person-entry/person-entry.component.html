@@ -2,7 +2,7 @@
   <span [ngClass]="getFieldClasses('name')">{{ person.name }}</span>
   <span [ngClass]="getFieldClasses('skill')">{{ person.skill }}</span>
   <span [ngClass]="getFieldClasses('availDate')">{{
-    person.availDate | date: "dd-MMM-YY"
+    person.availDate | date: "dd-MMM"
   }}</span>
   <span [ngClass]="getFieldClasses('days')">{{ person.daysLeft }}</span>
   <div class="btn-group tbl-row mr-12">
@@ -12,14 +12,17 @@
       [inEditMode]="inEditMode"
     ></week-days>
   </div>
-  <span [ngClass]="getFieldClasses('comments')">{{ person.comments }}</span>
+
   <div [ngClass]="getFieldClasses('tags')">
     <ul *ngFor="let tag of person.tags" class="tag-list flex flex-ctr-ver">
       <li class="badge bg-secondary btn-inactive">{{ tag.value }}</li>
     </ul>
     <i *ngIf="inEditMode" class="bi bi-plus clickable add-tag"></i>
   </div>
-
+  <div [ngClass]="getFieldClasses('pdm')">
+    <span>{{ person.pdm | initials }}</span>
+  </div>
+  <span [ngClass]="getFieldClasses('comments')">{{ person.comments }}</span>
   <i
     *ngIf="editable && inEditMode"
     class="bi bi-pencil i-active mr-8"
