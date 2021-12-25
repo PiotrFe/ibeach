@@ -15,6 +15,7 @@ export const PEOPLE: Person[] = [
       fri: true,
     }),
     tags: [{ type: 'industry', value: 'FIG' }],
+    availDate: new Date(),
   },
   {
     name: 'Mark',
@@ -29,6 +30,7 @@ export const PEOPLE: Person[] = [
       fri: true,
     }),
     tags: [{ type: 'function', value: 'DnA' }],
+    availDate: new Date(),
   },
   {
     name: 'Todd',
@@ -43,6 +45,7 @@ export const PEOPLE: Person[] = [
       fri: false,
     }),
     tags: [],
+    availDate: new Date(Date.parse('28-Dec-2022')),
   },
   {
     name: 'Tom',
@@ -56,6 +59,7 @@ export const PEOPLE: Person[] = [
       fri: true,
     }),
     tags: [],
+    availDate: new Date(),
   },
   {
     name: 'Tom',
@@ -69,6 +73,7 @@ export const PEOPLE: Person[] = [
       fri: false,
     }),
     tags: [],
+    availDate: new Date(Date.parse('03-Jan-2022')),
   },
   {
     name: 'Barbie',
@@ -82,5 +87,6 @@ export const PEOPLE: Person[] = [
       fri: true,
     }),
     tags: [],
+    availDate: new Date(Date.parse('26-Dec-2021')),
   },
 ];

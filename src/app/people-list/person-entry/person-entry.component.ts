@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Person, PersonEntry } from '../person';
 import { Week } from 'src/app/shared-module/week-days/week';
+import { PAGE_SECTIONS } from '../../app.component';
 
 @Component({
   selector: 'person-entry',
@@ -13,6 +14,7 @@ export class PersonEntryComponent extends PersonEntry implements OnInit {
   @Input() inEditMode!: boolean;
   @Input() sortField!: string;
   @Input() editable: boolean = true;
+  @Input() currPageSection!: keyof typeof PAGE_SECTIONS;
 
   @Output() editEvent = new EventEmitter<number>();
   @Output() deleteEvent = new EventEmitter<number>();

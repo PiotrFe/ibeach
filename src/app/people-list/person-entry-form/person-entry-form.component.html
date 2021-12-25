@@ -21,6 +21,20 @@
     <option value="FELL">BA</option>
     <option value="FELL">INT</option>
   </select>
+
+  <div
+    class="col-xs-12 col-12 col-md-3 form-group person-date-form tbl-row mr-12"
+  >
+    <input
+      type="text"
+      placeholder="Datepicker"
+      class="form-control"
+      bsDatepicker
+      [bsConfig]="{ isAnimated: true, dateInputFormat: 'DD-MMM-YYYY' }"
+      formControlName="availDate"
+    />
+  </div>
+
   <span [ngClass]="getFieldClasses('days')">{{ getDaysAvailable() }}</span>
 
   <div class="btn-group tbl-row mr-12">

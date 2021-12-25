@@ -11,6 +11,8 @@ export interface Tag {
 export interface Person {
   name: string;
   skill: string;
+  pdm?: string;
+  availDate?: Date;
   week: Week;
   daysLeft: number;
   comments?: string;

@@ -12,12 +12,20 @@
     <i *ngIf="getSort('skill', -1)" class="bi bi-sort-up"></i
   ></span>
   <span
+    class="person-entry-header__availDate tbl-row mr-12 pl-3 clickable"
+    (click)="handleClick('availDate')"
+    >Available from
+    <i *ngIf="getSort('availDate', 1)" class="bi bi-sort-down-alt"></i>
+    <i *ngIf="getSort('availDate', -1)" class="bi bi-sort-up"></i
+  ></span>
+  <span
     class="person-entry-header__days tbl-row mr-12 pl-3 clickable"
     (click)="handleClick('days')"
     >Days <i *ngIf="getSort('days', 1)" class="bi bi-sort-down-alt"></i>
     <i *ngIf="getSort('days', -1)" class="bi bi-sort-up"></i
   ></span>
-  <span class="person-entry-header__week tbl-row mr-12 clickable"> Week </span>
+  <span class="person-entry-header__week tbl-row mr-12 clickable">Week</span>
   <span class="person-entry-header__comments tbl-row pl-3 mr-12">Comments</span>
-  <span class="person-entry-header__comments tbl-row pl-3">Tags</span>
+  <span class="person-entry-header__comments tbl-row pl-3 mr-12">Tags</span>
+  <span class="person-entry-header__comments tbl-row pl-3">PDM</span>
 </div>

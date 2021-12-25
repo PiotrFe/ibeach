@@ -1,6 +1,9 @@
 <div class="person-entry">
   <span [ngClass]="getFieldClasses('name')">{{ person.name }}</span>
   <span [ngClass]="getFieldClasses('skill')">{{ person.skill }}</span>
+  <span [ngClass]="getFieldClasses('availDate')">{{
+    person.availDate | date: "dd-MMM-YY"
+  }}</span>
   <span [ngClass]="getFieldClasses('days')">{{ person.daysLeft }}</span>
   <div class="btn-group tbl-row mr-12">
     <week-days

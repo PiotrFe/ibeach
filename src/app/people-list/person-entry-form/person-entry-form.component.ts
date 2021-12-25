@@ -6,6 +6,7 @@ import {
   getNewWeek,
   getDaysLeft,
 } from 'src/app/shared-module/week-days/week';
+import { PAGE_SECTIONS } from '../../app.component';
 
 @Component({
   selector: 'person-entry-form',
@@ -16,6 +17,7 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
   @Input() idx!: number;
   @Input() person!: Person | undefined;
   @Input() sortField!: string;
+  @Input() currPageSection!: keyof typeof PAGE_SECTIONS;
 
   @Output() deleteEvent = new EventEmitter<number>();
   @Output() calendarChangeEvent = new EventEmitter<{
@@ -26,12 +28,14 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
     name: string;
     skill: string;
     comments: string;
+    availDate: Date;
     idx: number;
   }>();
   @Output() formSubmitEvent = new EventEmitter<{
     name: string;
     skill: string;
     comments: string;
+    availDate: Date;
     idx: number;
     week: Week;
     tags: Tag[];
@@ -49,6 +53,7 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
     name: new FormControl('', [Validators.required, Validators.minLength(3)]),
     skill: new FormControl('', [Validators.required]),
     comments: new FormControl(''),
+    availDate: new FormControl(''),
   });
 
   constructor() {
@@ -60,13 +65,14 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
   }
 
   onSubmit(): void {
-    const { name, skill, comments } = this.personForm.value;
+    const { name, skill, comments, availDate } = this.personForm.value;
 
     if (this.person) {
       this.formEditEvent.emit({
         name,
         skill,
         comments,
+        availDate,
         idx: this.idx,
       });
     } else {
@@ -74,6 +80,7 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
         name,
         skill,
         comments,
+        availDate,
         week: this.localCalendarObj,
         tags: this.tags,
         idx: this.idx,
@@ -103,11 +110,12 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
 
   ngOnInit(): void {
     if (this.person) {
-      const { name, skill, comments } = this.person;
+      const { name, skill, comments, availDate } = this.person;
       this.personForm.setValue({
         name,
         skill,
         comments: comments || '',
+        availDate: availDate || '',
       });
       this.tags = this.person.tags;
     } else {

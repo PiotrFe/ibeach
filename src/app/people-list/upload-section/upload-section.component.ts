@@ -23,24 +23,22 @@ export class UploadSectionComponent implements OnInit {
   setReferenceDate(date: Date) {
     // correct reference period to always cover midnight-midnight
     this.referenceDateStart = date;
+    this.referenceDateStart.setHours(0, 0, 0, 0);
     this.referenceDateEnd = new Date(
       this.referenceDateStart.getTime() + 1000 * 60 * 60 * 24 * 7
     );
-
-    console.log({
-      from: this.referenceDateStart,
-      to: this.referenceDateEnd,
-    });
   }
 
   parseData(data: any): Person[] {
     const returnData = data
       .filter((entry: any) => {
-        const availabilityDate = Date.parse(entry['Availability date']);
+        const availabilityDate: number = Date.parse(entry['Availability date']);
+        const skill: string = entry.Skill?.split(' - ')[0];
 
         return (
           availabilityDate >= this.referenceDateStart.getTime() &&
-          availabilityDate <= this.referenceDateEnd.getTime()
+          availabilityDate <= this.referenceDateEnd.getTime() &&
+          skill !== 'AP'
         );
       })
       .map((entry: any) => {
@@ -49,10 +47,14 @@ export class UploadSectionComponent implements OnInit {
         const week: Week = getNewWeek();
         const daysLeft: number = getDaysLeft(week);
         const tags: Tag[] = [];
+        const availDate: Date = new Date(
+          Date.parse(entry['Availability date'])
+        );
 
         return {
           name,
           skill,
+          availDate,
           week,
           daysLeft,
           tags,

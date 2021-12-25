@@ -216,14 +216,12 @@ export class PeopleListComponent implements OnInit {
     name: string;
     skill: string;
     comments: string;
+    availDate: Date;
     idx: number;
   }) {
-    const { name, skill, comments, idx } = objParam;
+    const { name, skill, comments, idx, availDate } = objParam;
     const personObj: PersonEditable = this.peopleFilteredView[idx];
-    console.log({
-      idx,
-      personObj,
-    });
+
     this.people = this.people.map((person) => {
       if (person !== personObj) {
         return person;
@@ -233,6 +231,7 @@ export class PeopleListComponent implements OnInit {
         name,
         skill,
         comments,
+        availDate,
         inEditMode: false,
       };
     });
@@ -243,16 +242,18 @@ export class PeopleListComponent implements OnInit {
     name: string;
     skill: string;
     comments: string;
+    availDate: Date;
     idx: number;
     week: Week;
     tags: Tag[];
   }) {
     this.clearSort();
-    const { name, skill, comments, idx, week, tags } = objParam;
+    const { name, skill, comments, idx, week, tags, availDate } = objParam;
 
     this.people.unshift({
       name,
       skill,
+      availDate,
       week,
       comments,
       inEditMode: false,
@@ -359,12 +360,35 @@ export class PeopleListComponent implements OnInit {
     return 0;
   };
 
+  sortValsByDate = (
+    a: PersonEditable,
+    b: PersonEditable,
+    asc: boolean = false
+  ): number => {
+    if (!a.availDate || !b.availDate) {
+      return 0;
+    }
+    const order = this.sort.order;
+    const dateA = a.availDate.getTime();
+    const dateB = b.availDate.getTime();
+
+    if (dateA < dateB) {
+      return asc ? -1 : order * -1;
+    }
+    if (dateA > dateB) {
+      return asc ? 1 : order;
+    }
+
+    return 0;
+  };
+
   handleSort = (colName: string): void => {
     this.updateSortIcon(colName);
     const order = this.sort.order;
     const sortValsBySkill = this.sortValsBySkill;
     const sortValsByName = this.sortValsByName;
     const sortValsByDays = this.sortValsByDays;
+    const sortValsByDate = this.sortValsByDate;
 
     if (colName === 'name') {
       this.people.sort(function (a, b) {
@@ -401,13 +425,30 @@ export class PeopleListComponent implements OnInit {
           return returnVal;
         }
 
-        // (3) sort by name (skill)
+        // (2) sort by name (skill)
         returnVal = sortValsBySkill(a, b, true);
 
         if (returnVal !== 0) {
           return returnVal;
         }
 
+        // (3) sort by name (asc)
+        return sortValsByName(a, b, true);
+      });
+    }
+    if (colName === 'availDate') {
+      this.people.sort(function (a, b) {
+        let returnVal: number = sortValsByDate(a, b);
+
+        if (returnVal !== 0) {
+          return returnVal;
+        }
+        // (2) sort by name (skill)
+        returnVal = sortValsBySkill(a, b, true);
+
+        if (returnVal !== 0) {
+          return returnVal;
+        }
         // (3) sort by name (asc)
         return sortValsByName(a, b, true);
       });

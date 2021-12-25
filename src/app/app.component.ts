@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 
-const PAGE_SECTIONS = {
+export const PAGE_SECTIONS = {
   ALLOCATE: 'ALLOCATE',
   SUBMIT: 'SUBMIT',
   UPLOAD: 'UPLOAD',
@@ -14,7 +14,7 @@ const PAGE_SECTIONS = {
 })
 export class AppComponent {
   title = 'client-dev-app';
-  pageSection = PAGE_SECTIONS.UPLOAD;
+  pageSection = PAGE_SECTIONS.SUBMIT;
 
   setPageSection(sectionName: keyof typeof PAGE_SECTIONS): void {
     this.pageSection = sectionName;

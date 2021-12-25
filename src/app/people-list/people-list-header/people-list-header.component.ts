@@ -1,4 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { PAGE_SECTIONS } from '../../app.component';
 
 @Component({
   selector: 'people-list-header',
@@ -9,6 +10,7 @@ export class PeopleListHeaderComponent implements OnInit {
   @Output() newSortEvent = new EventEmitter<string>();
   @Input() sortable: boolean = false;
   @Input() currentSort!: { field: string; order: number };
+  @Input() currPageSection!: keyof typeof PAGE_SECTIONS;
 
   constructor() {}
 

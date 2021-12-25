@@ -91,6 +91,7 @@
       <person-entry-form
         [idx]="i"
         [sortField]="sort.field"
+        [currPageSection]="'ALLOCATE'"
         (deleteEvent)="removeRow($event)"
         (formSubmitEvent)="addPerson($event)"
       ></person-entry-form>
@@ -104,6 +105,7 @@
         [person]="person"
         [inEditMode]="inEditMode"
         [sortField]="sort.field"
+        [currPageSection]="'ALLOCATE'"
         (editEvent)="editRow($event)"
         (deleteEvent)="removeExistingRow($event)"
         (calendarChangeEvent)="updateCalendar($event)"
@@ -113,6 +115,7 @@
         [idx]="i"
         [person]="person"
         [sortField]="sort.field"
+        [currPageSection]="'ALLOCATE'"
         (deleteEvent)="removeExistingRow($event)"
         (calendarChangeEvent)="updateCalendar($event)"
         (formEditEvent)="updatePersonDetails($event)"
@@ -123,7 +126,7 @@
 <modal-window
   *ngIf="showSubmitModal"
   [title]="'Submit people list'"
-  [text]="'Are you sure?'"
+  [text]="'Submit list?'"
   [btnConfirmText]="'Submit'"
   [btnCloseText]="'Close'"
   [modalType]="'CONFIRM'"
