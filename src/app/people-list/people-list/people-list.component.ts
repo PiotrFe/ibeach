@@ -43,11 +43,12 @@ export class PeopleListComponent implements OnInit {
   };
   filters: Filter[] = [];
 
-  inEditMode = false;
-  showAvailableOnly = false;
+  inEditMode: boolean = false;
+  saveChangesInProgress: boolean = false;
+  showAvailableOnly: boolean = false;
   peopleFilteredView = this.people;
   skillFilter = new FormControl('All');
-  showSubmitModal = false;
+  showSubmitModal: boolean = false;
 
   // *****************
   // FILTER HANDLERS
@@ -144,8 +145,37 @@ export class PeopleListComponent implements OnInit {
     }
   }
 
+  saveChanges(): void {
+    if (!this.checkIfAnyFormsOpen()) {
+      this.setInEditMode(false);
+      this.updateFilteredView();
+      return;
+    }
+
+    this.saveChangesInProgress = true;
+  }
+
+  checkIfAnyFormsOpen = (): boolean => {
+    const atLeastOneFormOpen =
+      this.people.find((person: PersonEditable) => person.inEditMode) ||
+      this.newRows.length > 0;
+
+    return Boolean(atLeastOneFormOpen);
+  };
+
+  onChangeSaved(): void {
+    if (this.saveChangesInProgress && !this.checkIfAnyFormsOpen()) {
+      setTimeout(() => {
+        this.saveChangesInProgress = false;
+        this.setInEditMode(false);
+      });
+    }
+
+    this.updateFilteredView();
+  }
+
   cancelChanges(): void {
-    this.people = this.people.map((person) => ({
+    this.people = this.people.map((person: PersonEditable) => ({
       ...person,
       inEditMode: false,
     }));
@@ -172,13 +202,6 @@ export class PeopleListComponent implements OnInit {
   editRow(idx: number): void {
     const personObj: PersonEditable = this.peopleFilteredView[idx];
     const mainIdx = this.people.findIndex((person) => person === personObj);
-    console.log({
-      idx,
-      mainIdx,
-      personObj,
-      peopleArr: this.people,
-      filteredArr: this.peopleFilteredView,
-    });
     this.people[mainIdx] = {
       ...this.people[mainIdx],
       inEditMode: true,
@@ -242,7 +265,8 @@ export class PeopleListComponent implements OnInit {
         inEditMode: false,
       };
     });
-    this.updateFilteredView();
+
+    this.onChangeSaved();
   }
 
   addPerson(objParam: {
@@ -270,8 +294,10 @@ export class PeopleListComponent implements OnInit {
       tags,
     });
 
+    console.log({ objParam });
+
     this.newRows.splice(idx, 1);
-    this.updateFilteredView();
+    this.onChangeSaved();
   }
 
   // *****************

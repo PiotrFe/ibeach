@@ -1,5 +1,7 @@
 import { Week } from './week';
 import { PEOPLE } from './people';
+import { getTagArr } from '../utils/getTags';
+import { isNgTemplate } from '@angular/compiler';
 
 export const SKILLS = ['EM', 'ASC', 'FELL', 'BA', 'INT'];
 
@@ -22,5 +24,8 @@ export interface Person {
 export class PersonEntry {
   getTypeAhead(key: string): any[] {
     return PEOPLE.map((item) => item[key as keyof Person]);
+  }
+  getTagTypeAhead(): any[] {
+    return getTagArr().map((item) => item.value);
   }
 }

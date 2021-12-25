@@ -28,7 +28,7 @@
       *ngIf="inEditMode"
       type="button"
       class="btn btn-primary btn-main-action"
-      (click)="setInEditMode(false)"
+      (click)="saveChanges()"
     >
       Save
     </button>
@@ -92,6 +92,7 @@
         [idx]="i"
         [sortField]="sort.field"
         [currPageSection]="'ALLOCATE'"
+        [dispatchToParentAndClose]="saveChangesInProgress"
         (deleteEvent)="removeRow($event)"
         (formSubmitEvent)="addPerson($event)"
       ></person-entry-form>
@@ -116,6 +117,7 @@
         [person]="person"
         [sortField]="sort.field"
         [currPageSection]="'ALLOCATE'"
+        [dispatchToParentAndClose]="saveChangesInProgress"
         (deleteEvent)="removeExistingRow($event)"
         (calendarChangeEvent)="updateCalendar($event)"
         (formEditEvent)="updatePersonDetails($event)"

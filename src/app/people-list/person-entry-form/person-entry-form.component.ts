@@ -1,4 +1,11 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  Input,
+  Output,
+  EventEmitter,
+  SimpleChanges,
+} from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Person, PersonEntry, Tag } from '../person';
 import { getPDMArr } from '../../utils/getPDMs';
@@ -20,6 +27,7 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
   @Input() person!: Person | undefined;
   @Input() sortField!: string;
   @Input() currPageSection!: keyof typeof PAGE_SECTIONS;
+  @Input() dispatchToParentAndClose: boolean = false;
 
   @Output() deleteEvent = new EventEmitter<number>();
   @Output() calendarChangeEvent = new EventEmitter<{
@@ -140,5 +148,12 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
     }
   }
 
-  ngOnChanges() {}
+  ngOnChanges(changes: SimpleChanges): void {
+    if (
+      changes['dispatchToParentAndClose'] &&
+      changes['dispatchToParentAndClose'].currentValue === true
+    ) {
+      this.onSubmit();
+    }
+  }
 }
