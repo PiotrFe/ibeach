@@ -7,11 +7,17 @@ export const getWeekDayDate = (
   const baseDay: number = baseDate.getDay();
   const dayUnit: number = 1000 * 60 * 60 * 24;
   const unitCount =
-    baseDay === 0 && dir === 'prev'
+    baseDay === day && dir === 'prev'
+      ? -7
+      : baseDay === day && dir === 'next'
+      ? 7
+      : baseDay === 0 && dir === 'prev'
       ? 7 - day
-      : baseDay === 6 && dir === 'next'
-      ? 1 + day
-      : day;
+      : baseDay === 0 && dir === 'next'
+      ? 0 + day
+      : dir === 'next'
+      ? 7 - baseDay + day
+      : baseDay - day;
 
   let returnDate!: Date;
 
@@ -22,6 +28,8 @@ export const getWeekDayDate = (
   }
 
   returnDate.setHours(0, 0, 0, 0);
+
+  console.log({ day, dir, refDate, baseDate, baseDay, unitCount, returnDate });
 
   return returnDate;
 };

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { v4 as uuidv4 } from 'uuid';
 import { PEOPLE } from '../people';
+import { getWeekDayDate } from '../../utils/getWeekDay';
 import { PersonEditable, Tag } from '../person';
 import {
   Week,
@@ -46,6 +47,7 @@ export class PeopleListComponent implements OnInit {
   showAvailableOnly: boolean = false;
   peopleFilteredView = this.people;
   skillFilter = new FormControl('All');
+  referenceDate = new FormControl('');
   showSubmitModal: boolean = false;
 
   // *****************
@@ -542,5 +544,16 @@ export class PeopleListComponent implements OnInit {
 
   ngOnInit(): void {
     this.peopleFilteredView = this.filterPeopleView(this.people);
+    const today = new Date();
+    const dayOfWeek = today.getDay();
+    let monday;
+
+    if (dayOfWeek === 2 || dayOfWeek === 3) {
+      monday = getWeekDayDate(1, 'prev', today);
+    } else {
+      monday = getWeekDayDate(1, 'next', today);
+    }
+
+    this.referenceDate.setValue(monday);
   }
 }

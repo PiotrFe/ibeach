@@ -34,7 +34,6 @@
       mr-12
       flex flex-ctr-hor
     "
-    [class.is-invalid]="isFieldValid('availDate')"
   >
     <input
       type="text"
@@ -43,6 +42,7 @@
       bsDatepicker
       [bsConfig]="{ isAnimated: true, dateInputFormat: 'DD-MMM-YYYY' }"
       formControlName="availDate"
+      [class.is-invalid]="isFieldValid('availDate')"
     />
   </div>
 

@@ -62,28 +62,18 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
   pdmArr: string[] = getPDMArr();
 
   // ***************
-  // FORM GROUP AND GETTERS
+  // FORM GROUP
   // ***************
 
   personForm = new FormGroup({
     name: new FormControl('', [Validators.required, Validators.minLength(3)]),
     skill: new FormControl('', [Validators.required]),
-    availDate: new FormControl(getWeekDayDate(1, 'next')),
+    availDate: new FormControl(getWeekDayDate(1, 'next'), [
+      Validators.required,
+    ]),
     comments: new FormControl(''),
     pdm: new FormControl(''),
   });
-
-  get name() {
-    return this.personForm.get('name');
-  }
-
-  get skill() {
-    return this.personForm.get('skill');
-  }
-
-  get availDate() {
-    return this.personForm.get('availDate');
-  }
 
   isFieldValid(field: string) {
     return (
