@@ -51,9 +51,33 @@ export class PeopleListComponent implements OnInit {
   showSubmitModal: boolean = false;
 
   // *****************
+  // CALENDAR HANDLERS
+  // *****************
+
+  onDateChange(date: any) {
+    const refDate = new Date(date);
+    const day = refDate.getDay();
+
+    if (day !== 1) {
+      this.referenceDate.setValue(getWeekDayDate(1, 'prev', refDate));
+    }
+  }
+
+  setPrevMonday() {
+    this.referenceDate.setValue(
+      getWeekDayDate(1, 'prev', this.referenceDate.value)
+    );
+  }
+
+  setNextMonday() {
+    this.referenceDate.setValue(
+      getWeekDayDate(1, 'next', this.referenceDate.value)
+    );
+  }
+
+  // *****************
   // FILTER HANDLERS
   // *****************
-  // applyFilters();
 
   updateFilteredView(): void {
     this.peopleFilteredView = this.filterPeopleView(this.people);

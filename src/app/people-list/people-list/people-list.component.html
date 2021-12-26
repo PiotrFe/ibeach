@@ -43,17 +43,18 @@
     </button>
   </div>
   <div class="toolbar-group toolbar-group--center flex flex-ctr-ver">
-    <span class="mr-12">Week of</span>
     <div
       class="
         col-xs-12 col-12 col-md-6
+        mw-11
         form-group
         person-date-form
         tbl-row
         mr-20
-        flex flex-ctr-hor
+        flex flex-ctr-hor flex-ctr-ver
       "
     >
+      <i class="bi bi-arrow-left clickable mr-5" (click)="setPrevMonday()"></i>
       <input
         id="calendar-main"
         type="text"
@@ -62,12 +63,14 @@
         bsDatepicker
         [bsConfig]="{ isAnimated: true, dateInputFormat: 'DD-MMM-YYYY' }"
         [formControl]="referenceDate"
+        (bsValueChange)="onDateChange($event)"
       />
+      <i class="bi bi-arrow-right clickable ml-5" (click)="setNextMonday()"></i>
     </div>
   </div>
   <div class="toolbar-group toolbar-group--right flex flex-ctr-ver">
     <select
-      class="form-select mr-10"
+      class="form-select mr-10 mw-6"
       (change)="updateSkillFilter($event)"
       [formControl]="skillFilter"
     >
