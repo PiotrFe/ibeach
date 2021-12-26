@@ -574,12 +574,15 @@ export class PeopleListComponent implements OnInit {
     const dayOfWeek = today.getDay();
     let monday;
 
-    if (dayOfWeek === 2 || dayOfWeek === 3) {
-      monday = getWeekDayDate(1, 'prev', today);
-    } else {
-      monday = getWeekDayDate(1, 'next', today);
+    if (dayOfWeek === 1) {
+      monday = today;
+    } else if (dayOfWeek !== 1) {
+      if (dayOfWeek === 2 || dayOfWeek === 3) {
+        monday = getWeekDayDate(1, 'prev', today);
+      } else {
+        monday = getWeekDayDate(1, 'next', today);
+      }
     }
-
     this.referenceDate.setValue(monday);
   }
 }

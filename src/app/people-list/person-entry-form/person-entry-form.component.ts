@@ -11,6 +11,7 @@ import { Person, PersonEntry, Tag } from '../person';
 import { getPDMArr } from '../../utils/getPDMs';
 import { getWeekDayDate } from '../../utils/getWeekDay';
 import { getNewAvailDate } from '../../utils/getNewFromDate';
+import { getCalendarFromDate } from '../../utils/getCalendarFromDate';
 
 import {
   Week,
@@ -137,8 +138,11 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
 
   onCalendarChange(calendarObj: Week) {
     const newAvailDate = getNewAvailDate(calendarObj, this.referenceDate);
-
     this.personForm.patchValue({ availDate: newAvailDate });
+    this.updateCalendarView(calendarObj);
+  }
+
+  updateCalendarView(calendarObj: Week) {
     this.localCalendarObj = calendarObj;
     this.setDaysLeft(calendarObj);
   }
@@ -189,6 +193,11 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
       this.localCalendarObj = getNewWeek();
       this.personForm.patchValue({ availDate: this.referenceDate });
     }
+
+    this.personForm.get('availDate')!.valueChanges.subscribe((val: Date) => {
+      const newCalendarObj = getCalendarFromDate(val, this.localCalendarObj);
+      this.localCalendarObj = newCalendarObj;
+    });
   }
 
   ngOnChanges(changes: SimpleChanges): void {

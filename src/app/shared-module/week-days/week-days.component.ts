@@ -6,6 +6,7 @@ import {
   EventEmitter,
   Input,
   Output,
+  SimpleChanges,
 } from '@angular/core';
 import { Week, getNewWeek } from './week';
 
@@ -15,18 +16,17 @@ import { Week, getNewWeek } from './week';
   styleUrls: ['./week-days.component.scss'],
 })
 export class WeekDaysComponent implements OnInit {
-  @Input() weekObj!: Week | undefined;
+  @Input() weekObj!: Week;
   @Input() inEditMode: boolean = false;
-
   @Output() calendarChange = new EventEmitter<Week>();
-  weekModel: Week = getNewWeek();
 
+  weekModel: Week = getNewWeek();
   weekDaysArr = Object.keys(this.weekModel);
 
   getBtnClass(weekDay: string): string {
     const disabledCls = !this.inEditMode ? ' btn-inactive' : '';
 
-    return this.weekModel[weekDay.toLowerCase() as keyof Week]
+    return this.weekObj[weekDay.toLowerCase() as keyof Week]
       ? `btn btn-primary${disabledCls}`
       : `btn btn-unavail${disabledCls}`;
   }
@@ -43,10 +43,11 @@ export class WeekDaysComponent implements OnInit {
 
   constructor() {}
 
-  ngOnInit(): void {
-    if (this.weekObj) {
+  ngOnInit(): void {}
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['weekObj'] && changes['weekObj'].currentValue) {
       this.weekModel = {
-        ...this.weekObj,
+        ...changes['weekObj'].currentValue,
       };
     }
   }

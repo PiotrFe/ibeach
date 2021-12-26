@@ -51,7 +51,7 @@
   <div class="btn-group tbl-row mr-12">
     <week-days
       class="flex flex-ctr-ver"
-      [weekObj]="person?.week"
+      [weekObj]="localCalendarObj"
       (calendarChange)="onCalendarChange($event)"
       [inEditMode]="true"
     ></week-days>
