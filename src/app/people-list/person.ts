@@ -21,6 +21,11 @@ export interface Person {
   tags: Tag[];
 }
 
+export interface PersonEditable extends Person {
+  id: string;
+  inEditMode: boolean;
+}
+
 export class PersonEntry {
   getTypeAhead(key: string): any[] {
     return PEOPLE.map((item) => item[key as keyof Person]);

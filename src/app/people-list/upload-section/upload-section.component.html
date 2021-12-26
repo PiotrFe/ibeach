@@ -39,7 +39,7 @@
   <div class="people-content">
     <li *ngFor="let person of previewData; let i = index">
       <person-entry
-        [idx]="i"
+        [id]="person.id"
         [person]="person"
         [editable]="false"
       ></person-entry>

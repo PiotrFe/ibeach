@@ -9,18 +9,18 @@ import { PAGE_SECTIONS } from '../../app.component';
   styleUrls: ['./person-entry.component.scss'],
 })
 export class PersonEntryComponent extends PersonEntry implements OnInit {
-  @Input() idx!: number;
+  @Input() id!: string;
   @Input() person!: Person;
   @Input() inEditMode!: boolean;
   @Input() sortField!: string;
   @Input() editable: boolean = true;
   @Input() currPageSection!: keyof typeof PAGE_SECTIONS;
 
-  @Output() editEvent = new EventEmitter<number>();
-  @Output() deleteEvent = new EventEmitter<number>();
+  @Output() editEvent = new EventEmitter<string>();
+  @Output() deleteEvent = new EventEmitter<string>();
   @Output() calendarChangeEvent = new EventEmitter<{
+    id: string;
     calendarObj: Week;
-    idx: number;
   }>();
 
   constructor() {
@@ -28,15 +28,15 @@ export class PersonEntryComponent extends PersonEntry implements OnInit {
   }
 
   handleEdit(): void {
-    this.editEvent.emit(this.idx);
+    this.editEvent.emit(this.id);
   }
 
   handleDelete(): void {
-    this.deleteEvent.emit(this.idx);
+    this.deleteEvent.emit(this.id);
   }
 
   onCalendarChange(calendarObj: Week) {
-    this.calendarChangeEvent.emit({ calendarObj, idx: this.idx });
+    this.calendarChangeEvent.emit({ calendarObj, id: this.id });
   }
 
   getFieldClasses(fieldName: string): string {

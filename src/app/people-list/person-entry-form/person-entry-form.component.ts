@@ -23,34 +23,34 @@ import { PAGE_SECTIONS } from '../../app.component';
   styleUrls: ['./person-entry-form.component.scss'],
 })
 export class PersonEntryFormComponent extends PersonEntry implements OnInit {
-  @Input() idx!: number;
+  @Input() id!: string;
   @Input() person!: Person | undefined;
   @Input() sortField!: string;
   @Input() currPageSection!: keyof typeof PAGE_SECTIONS;
   @Input() dispatchToParentAndClose: boolean = false;
 
-  @Output() deleteEvent = new EventEmitter<number>();
+  @Output() deleteEvent = new EventEmitter<string>();
   @Output() calendarChangeEvent = new EventEmitter<{
+    id: string;
     calendarObj: Week;
-    idx: number;
   }>();
   @Output() formEditEvent = new EventEmitter<{
+    id: string;
     name: string;
     skill: string;
     comments: string;
     availDate: Date;
     pdm: string;
-    idx: number;
     week: Week;
     tags: Tag[];
   }>();
   @Output() formSubmitEvent = new EventEmitter<{
+    id: string;
     name: string;
     skill: string;
     comments: string;
     availDate: Date;
     pdm: string;
-    idx: number;
     week: Week;
     tags: Tag[];
   }>();
@@ -77,7 +77,7 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
   }
 
   handleDelete(): void {
-    this.deleteEvent.emit(this.idx);
+    this.deleteEvent.emit(this.id);
   }
 
   onSubmit(): void {
@@ -85,6 +85,7 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
 
     if (this.person) {
       this.formEditEvent.emit({
+        id: this.id,
         name,
         skill,
         comments,
@@ -92,10 +93,10 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
         pdm,
         week: this.localCalendarObj,
         tags: this.tags,
-        idx: this.idx,
       });
     } else {
       this.formSubmitEvent.emit({
+        id: this.id,
         name,
         skill,
         comments,
@@ -103,7 +104,6 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
         pdm,
         week: this.localCalendarObj,
         tags: this.tags,
-        idx: this.idx,
       });
     }
   }

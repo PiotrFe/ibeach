@@ -73,9 +73,9 @@
     formControlName="comments"
   />
 
-  <label for="{{ 'submit-form-' + idx }}">
+  <label for="{{ 'submit-form-' + id }}">
     <i class="bi bi-check-circle i-active mr-8"></i>
   </label>
   <i class="bi bi-trash i-active" (click)="handleDelete()"></i>
-  <button id="{{ 'submit-form-' + idx }}" type="submit" hidden></button>
+  <button id="{{ 'submit-form-' + id }}" type="submit" hidden></button>
 </form>

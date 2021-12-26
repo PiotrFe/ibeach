@@ -87,9 +87,9 @@
   </li>
 
   <ul *ngIf="inEditMode">
-    <li *ngFor="let row of newRows; let i = index">
+    <li *ngFor="let row of newRows">
       <person-entry-form
-        [idx]="i"
+        [id]="row.id"
         [sortField]="sort.field"
         [currPageSection]="'ALLOCATE'"
         [dispatchToParentAndClose]="saveChangesInProgress"
@@ -98,11 +98,11 @@
       ></person-entry-form>
     </li>
   </ul>
-  <li *ngFor="let person of peopleFilteredView; let i = index">
+  <li *ngFor="let person of peopleFilteredView">
     <ng-container [ngSwitch]="person.inEditMode">
       <person-entry
         *ngSwitchCase="false"
-        [idx]="i"
+        [id]="person.id"
         [person]="person"
         [inEditMode]="inEditMode"
         [sortField]="sort.field"
@@ -113,7 +113,7 @@
       ></person-entry>
       <person-entry-form
         *ngSwitchCase="true"
-        [idx]="i"
+        [id]="person.id"
         [person]="person"
         [sortField]="sort.field"
         [currPageSection]="'ALLOCATE'"

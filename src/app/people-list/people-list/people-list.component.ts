@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import { v4 as uuidv4 } from 'uuid';
 import { PEOPLE } from '../people';
-import { Person, Tag } from '../person';
+import { PersonEditable, Tag } from '../person';
 import {
   Week,
   getNewWeek,
@@ -22,21 +23,18 @@ interface Filter {
   value?: string;
 }
 
-interface PersonEditable extends Person {
-  inEditMode: boolean;
-}
-
 @Component({
   selector: 'people-list',
   templateUrl: './people-list.component.html',
   styleUrls: ['./people-list.component.scss'],
 })
 export class PeopleListComponent implements OnInit {
-  people = PEOPLE.map((person) => ({
+  people: PersonEditable[] = PEOPLE.map((person) => ({
     ...person,
     inEditMode: false,
+    id: uuidv4(),
   }));
-  newRows: Person[] = [];
+  newRows: PersonEditable[] = [];
   sort: { field: string; order: number } = {
     field: '',
     order: 0,
@@ -186,42 +184,40 @@ export class PeopleListComponent implements OnInit {
 
   addNewRow(): void {
     this.newRows.push({
+      id: uuidv4(),
       name: '',
       skill: '',
       week: getNewWeek(),
       daysLeft: 5,
       comments: '',
       tags: [],
+      inEditMode: true,
     });
   }
 
-  removeRow(idx: number): void {
-    this.newRows = this.newRows.filter((item, index) => index !== idx);
+  removeRow(id: string): void {
+    this.newRows = this.newRows.filter((item) => item.id !== id);
   }
 
-  editRow(idx: number): void {
-    const personObj: PersonEditable = this.peopleFilteredView[idx];
-    const mainIdx = this.people.findIndex((person) => person === personObj);
-    this.people[mainIdx] = {
-      ...this.people[mainIdx],
+  editRow(id: string): void {
+    const idx = this.people.findIndex((person) => person.id === id);
+    this.people[idx] = {
+      ...this.people[idx],
       inEditMode: true,
     };
     this.updateFilteredView();
   }
 
-  removeExistingRow(idx: number): void {
-    const personObj: PersonEditable = this.peopleFilteredView[idx];
-    const mainIdx = this.people.findIndex((person) => person === personObj);
-    this.people = this.people.filter((item, index) => index !== mainIdx);
+  removeExistingRow(id: string): void {
+    this.people = this.people.filter((person) => person.id !== id);
     this.updateFilteredView();
   }
 
-  updateCalendar(objParam: { calendarObj: Week; idx: number }): void {
-    const { calendarObj, idx } = objParam;
-    const personObj: PersonEditable = this.peopleFilteredView[idx];
+  updateCalendar(objParam: { id: string; calendarObj: Week }): void {
+    const { calendarObj, id } = objParam;
 
     this.people = this.people.map((person) => {
-      if (person !== personObj) {
+      if (person.id !== id) {
         return person;
       }
       return {
@@ -236,20 +232,19 @@ export class PeopleListComponent implements OnInit {
   }
 
   updatePersonDetails(objParam: {
+    id: string;
     name: string;
     skill: string;
     comments: string;
     availDate: Date;
     pdm: string;
-    idx: number;
     week: Week;
     tags: Tag[];
   }) {
-    const { name, skill, comments, idx, availDate, pdm, week, tags } = objParam;
-    const personObj: PersonEditable = this.peopleFilteredView[idx];
+    const { id, name, skill, comments, availDate, pdm, week, tags } = objParam;
 
     this.people = this.people.map((person) => {
-      if (person !== personObj) {
+      if (person.id !== id) {
         return person;
       }
       return {
@@ -270,19 +265,21 @@ export class PeopleListComponent implements OnInit {
   }
 
   addPerson(objParam: {
+    id: string;
     name: string;
     skill: string;
     comments: string;
     availDate: Date;
     pdm: string;
-    idx: number;
+
     week: Week;
     tags: Tag[];
   }) {
     this.clearSort();
-    const { name, skill, comments, idx, week, tags, availDate, pdm } = objParam;
+    const { id, name, skill, comments, week, tags, availDate, pdm } = objParam;
 
     this.people.unshift({
+      id,
       name,
       skill,
       availDate,
@@ -294,9 +291,11 @@ export class PeopleListComponent implements OnInit {
       tags,
     });
 
-    console.log({ objParam });
+    const indexToRemove: number = this.newRows.findIndex(
+      (row) => row.id === id
+    );
 
-    this.newRows.splice(idx, 1);
+    this.newRows.splice(indexToRemove, 1);
     this.onChangeSaved();
   }
 

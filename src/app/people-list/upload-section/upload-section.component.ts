@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
+import { v4 as uuidv4 } from 'uuid';
 import { TypeaheadOptions } from 'ngx-bootstrap/typeahead';
 import { getDaysLeft, getNewWeek } from 'src/app/shared-module/week-days/week';
 import { parse } from '../../utils/csv-parser/index';
-import { Person, Tag } from '../person';
+import { PersonEditable, Tag } from '../person';
 import { Week } from '../week';
 
 @Component({
@@ -16,7 +17,7 @@ export class UploadSectionComponent implements OnInit {
   referenceDateEnd!: Date;
   uploadError!: string;
   fileSelected: boolean = false;
-  previewData: Person[] = [];
+  previewData: PersonEditable[] = [];
 
   constructor() {}
 
@@ -29,7 +30,7 @@ export class UploadSectionComponent implements OnInit {
     );
   }
 
-  parseData(data: any): Person[] {
+  parseData(data: any): PersonEditable[] {
     const returnData = data
       .filter((entry: any) => {
         const availabilityDate: number = Date.parse(entry['Availability date']);
@@ -52,15 +53,17 @@ export class UploadSectionComponent implements OnInit {
         );
 
         return {
+          id: uuidv4(),
           name,
           skill,
           availDate,
           week,
           daysLeft,
           tags,
+          inEditMode: false,
         };
       })
-      .sort((a: Person, b: Person) => {
+      .sort((a: PersonEditable, b: PersonEditable) => {
         const nameA = a.name.toUpperCase();
         const nameB = b.name.toUpperCase();
 
