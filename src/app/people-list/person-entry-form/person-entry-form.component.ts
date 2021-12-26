@@ -9,6 +9,7 @@ import {
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Person, PersonEntry, Tag } from '../person';
 import { getPDMArr } from '../../utils/getPDMs';
+import { getWeekDayDate } from '../../utils/getWeekDay';
 
 import {
   Week,
@@ -60,20 +61,49 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
   tags!: Tag[];
   pdmArr: string[] = getPDMArr();
 
-  getDaysAvailable(): number {
-    return this.daysLeft;
-  }
+  // ***************
+  // FORM GROUP AND GETTERS
+  // ***************
 
   personForm = new FormGroup({
     name: new FormControl('', [Validators.required, Validators.minLength(3)]),
     skill: new FormControl('', [Validators.required]),
+    availDate: new FormControl(getWeekDayDate(1, 'next')),
     comments: new FormControl(''),
-    availDate: new FormControl(''),
     pdm: new FormControl(''),
   });
 
-  constructor() {
-    super();
+  get name() {
+    return this.personForm.get('name');
+  }
+
+  get skill() {
+    return this.personForm.get('skill');
+  }
+
+  get availDate() {
+    return this.personForm.get('availDate');
+  }
+
+  isFieldValid(field: string) {
+    return (
+      !this.personForm.get(field)!.valid && this.personForm.get(field)!.touched
+    );
+  }
+
+  validateFormFields() {
+    Object.keys(this.personForm.controls).forEach((field) => {
+      const control = this.personForm.get(field);
+      control?.markAsTouched({ onlySelf: true });
+    });
+  }
+
+  // ***************
+  // INSTANCE METHODS
+  // ***************
+
+  getDaysAvailable(): number {
+    return this.daysLeft;
   }
 
   handleDelete(): void {
@@ -81,6 +111,11 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
   }
 
   onSubmit(): void {
+    if (!this.personForm.valid) {
+      this.validateFormFields();
+      return;
+    }
+
     const { name, skill, comments, availDate, pdm } = this.personForm.value;
 
     if (this.person) {
@@ -123,6 +158,18 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
 
     return `${baseClass}${sortedClass}`;
   }
+
+  // ***************
+  // CONSTRUCTOR
+  // ***************
+
+  constructor() {
+    super();
+  }
+
+  // ***************
+  // LIFECYCLE HOOKS
+  // ***************
 
   ngOnInit(): void {
     if (this.person) {

@@ -336,6 +336,20 @@ ul {
   overflow: scroll;
 }
 
+.tag-list {
+  width: 100%;
+  height: 100%;
+  padding: 3px;
+}
+
+.nav-main {
+  user-select: none;
+}
+
+// ****************
+// ELEMENT VARIANTS STYLING
+// ****************
+
 .btn-inactive {
   pointer-events: none;
 }
@@ -355,12 +369,6 @@ ul {
   }
 }
 
-.tag-list {
-  width: 100%;
-  height: 100%;
-  padding: 3px;
-}
-
-.nav-main {
-  user-select: none;
+.form-error {
+  border-color: red;
 }

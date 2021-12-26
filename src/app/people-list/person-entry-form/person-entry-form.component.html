@@ -2,17 +2,20 @@
   [formGroup]="personForm"
   (ngSubmit)="onSubmit()"
   class="person-entry-form"
+  novalidate
 >
   <input
-    id="person-name"
     class="form-control person-name-form tbl-row mr-12"
+    [class.is-invalid]="isFieldValid('name')"
     type="text"
     placeholder="Name"
     formControlName="name"
     [typeahead]="getTypeAhead('name')"
+    required
   />
   <select
     class="form-control person-skill-form tbl-row mr-12"
+    [class.is-invalid]="isFieldValid('skill')"
     formControlName="skill"
   >
     <option value="EM">EM</option>
@@ -31,6 +34,7 @@
       mr-12
       flex flex-ctr-hor
     "
+    [class.is-invalid]="isFieldValid('availDate')"
   >
     <input
       type="text"
