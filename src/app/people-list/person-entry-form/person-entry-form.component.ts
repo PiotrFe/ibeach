@@ -10,6 +10,7 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Person, PersonEntry, Tag } from '../person';
 import { getPDMArr } from '../../utils/getPDMs';
 import { getWeekDayDate } from '../../utils/getWeekDay';
+import { getNewAvailDate } from '../../utils/getNewFromDate';
 
 import {
   Week,
@@ -27,6 +28,7 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
   @Input() id!: string;
   @Input() person!: Person | undefined;
   @Input() sortField!: string;
+  @Input() referenceDate!: Date;
   @Input() currPageSection!: keyof typeof PAGE_SECTIONS;
   @Input() dispatchToParentAndClose: boolean = false;
 
@@ -134,6 +136,9 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
   }
 
   onCalendarChange(calendarObj: Week) {
+    const newAvailDate = getNewAvailDate(calendarObj, this.referenceDate);
+
+    this.personForm.patchValue({ availDate: newAvailDate });
     this.localCalendarObj = calendarObj;
     this.setDaysLeft(calendarObj);
   }
@@ -182,6 +187,7 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
     } else {
       this.daysLeft = 5;
       this.localCalendarObj = getNewWeek();
+      this.personForm.patchValue({ availDate: this.referenceDate });
     }
   }
 

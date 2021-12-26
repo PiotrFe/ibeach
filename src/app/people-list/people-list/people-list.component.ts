@@ -3,6 +3,7 @@ import { FormControl } from '@angular/forms';
 import { v4 as uuidv4 } from 'uuid';
 import { PEOPLE } from '../people';
 import { getWeekDayDate } from '../../utils/getWeekDay';
+import { getNewAvailDate } from '../../utils/getNewFromDate';
 import { PersonEditable, Tag } from '../person';
 import {
   Week,
@@ -241,6 +242,7 @@ export class PeopleListComponent implements OnInit {
 
   updateCalendar(objParam: { id: string; calendarObj: Week }): void {
     const { calendarObj, id } = objParam;
+    const newAvailDate = getNewAvailDate(calendarObj, this.referenceDate.value);
 
     this.people = this.people.map((person) => {
       if (person.id !== id) {
@@ -248,6 +250,7 @@ export class PeopleListComponent implements OnInit {
       }
       return {
         ...person,
+        availDate: newAvailDate,
         week: {
           ...calendarObj,
         },
@@ -297,7 +300,6 @@ export class PeopleListComponent implements OnInit {
     comments: string;
     availDate: Date;
     pdm: string;
-
     week: Week;
     tags: Tag[];
   }) {
