@@ -7,7 +7,7 @@
   <span [ngClass]="getFieldClasses('days')">{{ person.daysLeft }}</span>
   <div class="btn-group tbl-row mr-12">
     <week-days
-      class="flex flex-ctr-ver"
+      class="flex flex-ver-ctr"
       (calendarChange)="onCalendarChange($event)"
       [weekObj]="person.week"
       [inEditMode]="inEditMode"
@@ -15,10 +15,23 @@
   </div>
 
   <div [ngClass]="getFieldClasses('tags')">
-    <i *ngIf="inEditMode" class="bi bi-plus clickable add-tag"></i>
-    <ul *ngFor="let tag of person.tags" class="tag-list flex flex-ctr-ver">
-      <li class="badge bg-secondary btn-inactive">{{ tag.value }}</li>
-    </ul>
+    <i
+      *ngIf="inEditMode"
+      class="bi bi-plus clickable add-tag"
+      (click)="setShowAddTag(true)"
+    ></i>
+    <div class="tag-list flex flex-ver-ctr">
+      <ul *ngFor="let tag of person.tags" class="flex flex-ver-ctr mr-5">
+        <li class="badge bg-secondary btn-inactive">{{ tag.value }}</li>
+      </ul>
+      <input
+        *ngIf="showAddTag"
+        class="form-control form-control-xs tag-input tbl-row mr-12"
+        type="text"
+        formControlName="tag"
+        [typeahead]="getTypeAhead('tag')"
+      />
+    </div>
   </div>
   <div [ngClass]="getFieldClasses('pdm')">
     <span>{{ person.pdm | initials }}</span>

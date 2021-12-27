@@ -1,20 +1,20 @@
 <div class="person-entry-header">
   <span
-    class="person-entry-header__name tbl-row mr-12 pl-3 clickable"
+    class="section-name tbl-row mr-12 pl-3 clickable"
     (click)="handleClick('name')"
     >Name
     <i *ngIf="getSort('name', 1)" class="bi bi-sort-down-alt fs-085 ml-2"></i>
     <i *ngIf="getSort('name', -1)" class="bi bi-sort-up fs-085 ml-2"></i
   ></span>
   <span
-    class="person-entry-header__skill tbl-row mr-12 pl-3 clickable"
+    class="section-skill tbl-row mr-12 pl-3 clickable"
     (click)="handleClick('skill')"
     >Skill
     <i *ngIf="getSort('skill', 1)" class="bi bi-sort-down-alt fs-085 ml-2s"></i>
     <i *ngIf="getSort('skill', -1)" class="bi bi-sort-up fs-085 ml-2"></i
   ></span>
   <span
-    class="person-entry-header__availDate tbl-row mr-12 pl-3 clickable"
+    class="section-availDate tbl-row mr-12 pl-3 clickable"
     (click)="handleClick('availDate')"
     >From
     <i
@@ -24,16 +24,16 @@
     <i *ngIf="getSort('availDate', -1)" class="bi bi-sort-up fs-085 ml-2"></i
   ></span>
   <span
-    class="person-entry-header__days tbl-row mr-12 pl-3 clickable"
+    class="section-days tbl-row mr-12 pl-3 clickable"
     (click)="handleClick('days')"
     >Days
     <i *ngIf="getSort('days', 1)" class="bi bi-sort-down-alt fs-085 ml-2"></i>
     <i *ngIf="getSort('days', -1)" class="bi bi-sort-up fs-085 ml-2"></i
   ></span>
-  <span class="person-entry-header__week tbl-row mr-12">Week</span>
-  <span class="person-entry-header__tags tbl-row pl-3 mr-12">Tags</span>
+  <span class="section-week tbl-row mr-12">Week</span>
+  <span class="section-tags tbl-row pl-3 mr-12">Tags</span>
   <span
-    class="person-entry-header__pdm tbl-row pl-3 mr-12 clickable"
+    class="section-pdm tbl-row pl-3 mr-12 clickable"
     (click)="handleClick('pdm')"
     >PDM<i
       *ngIf="getSort('pdm', 1)"
@@ -41,5 +41,5 @@
     ></i>
     <i *ngIf="getSort('pdm', -1)" class="bi bi-sort-up fs-085 ml-2"></i
   ></span>
-  <span class="person-entry-header__comments tbl-row pl-3">Comments</span>
+  <span class="section-comments tbl-row pl-3">Comments</span>
 </div>

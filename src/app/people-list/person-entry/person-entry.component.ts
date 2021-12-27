@@ -40,7 +40,7 @@ export class PersonEntryComponent extends PersonEntry implements OnInit {
   }
 
   getFieldClasses(fieldName: string): string {
-    const baseClass = `person-${fieldName} tbl-row mr-12 flex flex-ctr-ver pl-3`;
+    const baseClass = `section-${fieldName} tbl-row mr-12 flex flex-ver-ctr pl-3`;
     const sortedClass = fieldName === this.sortField ? ' sorted' : '';
     const otherClass = fieldName === 'pdm' ? ' flex-ctr-hor' : '';
 

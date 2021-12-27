@@ -1,5 +1,5 @@
 <nav class="main-toolbar">
-  <div class="toolbar-group toolbar-group--left flex flex-ctr-ver">
+  <div class="toolbar-group toolbar-group--left flex flex-ver-ctr">
     <button
       *ngIf="!inEditMode"
       type="button"
@@ -42,7 +42,7 @@
       Cancel
     </button>
   </div>
-  <div class="toolbar-group toolbar-group--center flex flex-ctr-ver">
+  <div class="toolbar-group toolbar-group--center flex flex-ver-ctr">
     <calendar
       [scrollable]="true"
       [weekly]="true"
@@ -51,7 +51,7 @@
       (dateChangeEvent)="onDateChange($event)"
     ></calendar>
   </div>
-  <div class="toolbar-group toolbar-group--right flex flex-ctr-ver">
+  <div class="toolbar-group toolbar-group--right flex flex-ver-ctr">
     <select
       class="form-select mr-10 mw-6"
       (change)="updateSkillFilter($event)"

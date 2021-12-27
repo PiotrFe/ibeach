@@ -9,46 +9,4 @@
   user-select: none;
   border-bottom: 1px solid rgba(0, 0, 0, 0.7);
   padding-bottom: 10px;
-
-  &__name {
-    width: 11%;
-    min-width: 11%;
-  }
-
-  &__skill {
-    width: 7%;
-    min-width: 7%;
-  }
-
-  &__availDate {
-    width: 7%;
-    min-width: 7%;
-  }
-
-  &__days {
-    width: 6%;
-    min-width: 6%;
-    text-align: center;
-  }
-
-  &__week {
-    width: 23%;
-    min-width: 23%;
-    text-align: center;
-  }
-
-  &__tags {
-    width: 12%;
-    min-width: 12%;
-  }
-
-  &__comments {
-    flex-grow: 1;
-  }
-
-  &__pdm {
-    width: 5%;
-    min-width: 5%;
-    text-align: center;
-  }
 }

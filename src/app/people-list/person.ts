@@ -26,10 +26,27 @@ export interface PersonEditable extends Person {
 }
 
 export class PersonEntry {
+  showAddTag: boolean = false;
+
   getTypeAhead(key: string): any[] {
+    if (key === 'pdm') {
+      return this.getPDMTypeAhead(key);
+    }
+    if (key === 'tag') {
+      return this.getTagTypeAhead(key);
+    }
+
+    return [];
+  }
+
+  getPDMTypeAhead(key: string): any[] {
     return PEOPLE.map((item) => item[key as keyof Person]);
   }
-  getTagTypeAhead(): any[] {
+  getTagTypeAhead(key: string): any[] {
     return getTagArr().map((item) => item.value);
+  }
+
+  setShowAddTag(show: boolean): void {
+    this.showAddTag = show;
   }
 }

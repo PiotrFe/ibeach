@@ -5,7 +5,7 @@
   novalidate
 >
   <input
-    class="form-control person-name-form tbl-row mr-12"
+    class="form-control section-name tbl-row mr-12 mw-6"
     [class.is-invalid]="isFieldValid('name')"
     type="text"
     placeholder="Name"
@@ -14,7 +14,7 @@
     required
   />
   <select
-    class="form-control person-skill-form tbl-row mr-12"
+    class="form-control section-skill tbl-row mr-12 mw-3"
     [class.is-invalid]="isFieldValid('skill')"
     formControlName="skill"
   >
@@ -25,7 +25,7 @@
     <option value="INT">INT</option>
   </select>
   <calendar
-    [ngClass]="getFieldClasses('date')"
+    [ngClass]="getFieldClasses('availDate')"
     [dateVal]="personForm.get('availDate')!.value"
     [showError]="isFieldValid('availDate')"
     (dateChangeEvent)="onDateChange($event)"
@@ -35,7 +35,7 @@
 
   <div class="btn-group tbl-row mr-12">
     <week-days
-      class="flex flex-ctr-ver"
+      class="flex flex-ver-ctr"
       [weekObj]="localCalendarObj"
       (calendarChange)="onCalendarChange($event)"
       [inEditMode]="true"
@@ -44,19 +44,19 @@
 
   <div [ngClass]="getFieldClasses('tags')">
     <i class="bi bi-plus clickable add-tag"></i>
-    <ul *ngFor="let tag of tags" class="tag-list flex flex-ctr-ver">
+    <ul *ngFor="let tag of tags" class="tag-list flex flex-ver-ctr">
       <li class="badge bg-secondary btn-inactive">{{ tag.value }}</li>
     </ul>
   </div>
   <select
-    class="form-control person-pdm-form tbl-row mr-12"
+    class="form-control section-pdm tbl-row mr-12 mw-4"
     formControlName="pdm"
   >
     <option *ngFor="let pdm of pdmArr" [value]="pdm">{{ pdm }}</option>
   </select>
   <input
     id="person-comments"
-    class="form-control person-comments-form tbl-row mr-12"
+    class="form-control section-comments tbl-row mr-12"
     type="text"
     placeholder="Comments"
     formControlName="comments"

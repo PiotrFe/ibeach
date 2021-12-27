@@ -7,36 +7,7 @@
   border-bottom: 0.8px dashed rgba(0, 0, 0, 0.3);
 }
 
-.person-name {
-  width: 11%;
-  min-width: 11%;
-}
-
-.person-skill {
-  width: 7%;
-  min-width: 7%;
-}
-
-.person-availDate {
-  width: 7%;
-  min-width: 7%;
-}
-
-.person-days {
-  width: 6%;
-  min-width: 6%;
-  justify-content: center;
-}
-
-.person-comments {
-  flex-grow: 1;
-}
-
-.person-pdm {
-  width: 5%;
-  min-width: 5%;
-  text-align: center;
-
+.section-pdm {
   & > span {
     width: 2rem;
     height: 2rem;
@@ -49,13 +20,12 @@
   }
 }
 
-.person-tags {
-  width: 12%;
-  min-width: 12%;
-  position: relative;
-}
-
-.btn-group {
-  width: 23%;
-  min-width: 23%;
+.tag-list {
+  > ul {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: flex-start;
+    padding-left: 0;
+  }
 }
