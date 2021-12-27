@@ -2,8 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { v4 as uuidv4 } from 'uuid';
 import { PEOPLE } from '../people';
-import { getWeekDayDate } from '../../utils/getWeekDay';
-import { getNewAvailDate } from '../../utils/getNewFromDate';
+import { getWeekDayDate, getNewAvailDate } from '../../utils/';
 import { PersonEditable, Tag } from '../person';
 import {
   Week,
@@ -48,32 +47,11 @@ export class PeopleListComponent implements OnInit {
   showAvailableOnly: boolean = false;
   peopleFilteredView = this.people;
   skillFilter = new FormControl('All');
-  referenceDate = new FormControl('');
+  referenceDate: Date = new Date();
   showSubmitModal: boolean = false;
 
-  // *****************
-  // CALENDAR HANDLERS
-  // *****************
-
-  onDateChange(date: any) {
-    const refDate = new Date(date);
-    const day = refDate.getDay();
-
-    if (day !== 1) {
-      this.referenceDate.setValue(getWeekDayDate(1, 'prev', refDate));
-    }
-  }
-
-  setPrevMonday() {
-    this.referenceDate.setValue(
-      getWeekDayDate(1, 'prev', this.referenceDate.value)
-    );
-  }
-
-  setNextMonday() {
-    this.referenceDate.setValue(
-      getWeekDayDate(1, 'next', this.referenceDate.value)
-    );
+  onDateChange(date: Date) {
+    this.referenceDate = date;
   }
 
   // *****************
@@ -242,7 +220,7 @@ export class PeopleListComponent implements OnInit {
 
   updateCalendar(objParam: { id: string; calendarObj: Week }): void {
     const { calendarObj, id } = objParam;
-    const newAvailDate = getNewAvailDate(calendarObj, this.referenceDate.value);
+    const newAvailDate = getNewAvailDate(calendarObj, this.referenceDate);
 
     this.people = this.people.map((person) => {
       if (person.id !== id) {
@@ -570,19 +548,5 @@ export class PeopleListComponent implements OnInit {
 
   ngOnInit(): void {
     this.peopleFilteredView = this.filterPeopleView(this.people);
-    const today = new Date();
-    const dayOfWeek = today.getDay();
-    let monday;
-
-    if (dayOfWeek === 1) {
-      monday = today;
-    } else if (dayOfWeek !== 1) {
-      if (dayOfWeek === 2 || dayOfWeek === 3) {
-        monday = getWeekDayDate(1, 'prev', today);
-      } else {
-        monday = getWeekDayDate(1, 'next', today);
-      }
-    }
-    this.referenceDate.setValue(monday);
   }
 }

@@ -1,5 +1,5 @@
 import { Week } from '../shared-module/week-days/week';
-import { getWeekDayDate } from './getWeekDay';
+import { getWeekDayDate } from './index';
 
 export const getNewAvailDate = (calendarObj: Week, refDate: Date): Date => {
   const refTime: number = refDate.getTime();

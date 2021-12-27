@@ -1,0 +1,33 @@
+<div
+  class="
+    calendar
+    col-xs-12 col-12 col-md-6
+    mw-11
+    form-group
+    person-date-form
+    tbl-row
+    mr-20
+    flex flex-ctr-hor flex-ctr-ver
+  "
+>
+  <i
+    *ngIf="scrollable"
+    class="bi bi-arrow-left clickable mr-5"
+    (click)="setNew('prev')"
+  ></i>
+  <input
+    type="text"
+    placeholder="Datepicker"
+    class="form-control"
+    bsDatepicker
+    [bsConfig]="{ isAnimated: true, dateInputFormat: 'DD-MMM-YYYY' }"
+    [formControl]="displayDate"
+    (bsValueChange)="onDateChange($event)"
+    [class.is-invalid]="showError"
+  />
+  <i
+    *ngIf="scrollable"
+    class="bi bi-arrow-right clickable ml-5"
+    (click)="setNew('next')"
+  ></i>
+</div>

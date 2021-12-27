@@ -19,17 +19,13 @@
     <button *ngIf="fileSelected" type="button" class="btn btn-success mr-20">
       Upload
     </button>
-    <div class="col-xs-12 col-12 col-md-6 form-group mw-8">
-      <input
-        type="text"
-        placeholder="Datepicker"
-        class="form-control"
-        bsDatepicker
-        [bsValue]="bsInlineValue"
-        [bsConfig]="{ isAnimated: true, dateInputFormat: 'DD-MMM-YYYY' }"
-        (bsValueChange)="setReferenceDate($event)"
-      />
-    </div>
+    <calendar
+      [scrollable]="true"
+      [weekly]="true"
+      [baseDay]="1"
+      [dateVal]="referenceDateStart"
+      (dateChangeEvent)="setReferenceDate($event)"
+    ></calendar>
   </div>
 </nav>
 <ul *ngIf="previewData.length" class="people">

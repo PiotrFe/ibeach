@@ -43,30 +43,13 @@
     </button>
   </div>
   <div class="toolbar-group toolbar-group--center flex flex-ctr-ver">
-    <div
-      class="
-        col-xs-12 col-12 col-md-6
-        mw-11
-        form-group
-        person-date-form
-        tbl-row
-        mr-20
-        flex flex-ctr-hor flex-ctr-ver
-      "
-    >
-      <i class="bi bi-arrow-left clickable mr-5" (click)="setPrevMonday()"></i>
-      <input
-        id="calendar-main"
-        type="text"
-        placeholder="Datepicker"
-        class="form-control"
-        bsDatepicker
-        [bsConfig]="{ isAnimated: true, dateInputFormat: 'DD-MMM-YYYY' }"
-        [formControl]="referenceDate"
-        (bsValueChange)="onDateChange($event)"
-      />
-      <i class="bi bi-arrow-right clickable ml-5" (click)="setNextMonday()"></i>
-    </div>
+    <calendar
+      [scrollable]="true"
+      [weekly]="true"
+      [baseDay]="1"
+      [dateVal]="referenceDate"
+      (dateChangeEvent)="onDateChange($event)"
+    ></calendar>
   </div>
   <div class="toolbar-group toolbar-group--right flex flex-ctr-ver">
     <select
@@ -119,7 +102,7 @@
         [id]="row.id"
         [sortField]="sort.field"
         [currPageSection]="'ALLOCATE'"
-        [referenceDate]="referenceDate.value"
+        [referenceDate]="referenceDate"
         [dispatchToParentAndClose]="saveChangesInProgress"
         (deleteEvent)="removeRow($event)"
         (formSubmitEvent)="addPerson($event)"
@@ -145,7 +128,7 @@
         [person]="person"
         [sortField]="sort.field"
         [currPageSection]="'ALLOCATE'"
-        [referenceDate]="referenceDate.value"
+        [referenceDate]="referenceDate"
         [dispatchToParentAndClose]="saveChangesInProgress"
         (deleteEvent)="removeExistingRow($event)"
         (calendarChangeEvent)="updateCalendar($event)"

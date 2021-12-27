@@ -8,10 +8,12 @@ import {
 } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Person, PersonEntry, Tag } from '../person';
-import { getPDMArr } from '../../utils/getPDMs';
-import { getWeekDayDate } from '../../utils/getWeekDay';
-import { getNewAvailDate } from '../../utils/getNewFromDate';
-import { getCalendarFromDate } from '../../utils/getCalendarFromDate';
+import { getPDMArr } from '../../utils/getPDMArr';
+import {
+  getWeekDayDate,
+  getNewAvailDate,
+  getCalendarFromDate,
+} from '../../utils/';
 
 import {
   Week,
@@ -134,6 +136,10 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
         tags: this.tags,
       });
     }
+  }
+
+  onDateChange(date: Date) {
+    this.personForm.patchValue({ availDate: date });
   }
 
   onCalendarChange(calendarObj: Week) {

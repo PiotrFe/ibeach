@@ -1,7 +1,6 @@
 import { Week } from './week';
 import { PEOPLE } from './people';
-import { getTagArr } from '../utils/getTags';
-import { isNgTemplate } from '@angular/compiler';
+import { getTagArr } from '../utils/';
 
 export const SKILLS = ['EM', 'ASC', 'FELL', 'BA', 'INT'];
 

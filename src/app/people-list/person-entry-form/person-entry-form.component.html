@@ -24,27 +24,12 @@
     <option value="BA">BA</option>
     <option value="INT">INT</option>
   </select>
-
-  <div
-    class="
-      col-xs-12 col-12 col-md-3
-      form-group
-      person-date-form
-      tbl-row
-      mr-12
-      flex flex-ctr-hor
-    "
-  >
-    <input
-      type="text"
-      placeholder="Datepicker"
-      class="form-control"
-      bsDatepicker
-      [bsConfig]="{ isAnimated: true, dateInputFormat: 'DD-MMM-YYYY' }"
-      formControlName="availDate"
-      [class.is-invalid]="isFieldValid('availDate')"
-    />
-  </div>
+  <calendar
+    [ngClass]="getFieldClasses('date')"
+    [dateVal]="personForm.get('availDate')!.value"
+    [showError]="isFieldValid('availDate')"
+    (dateChangeEvent)="onDateChange($event)"
+  ></calendar>
 
   <span [ngClass]="getFieldClasses('days')">{{ getDaysAvailable() }}</span>
 

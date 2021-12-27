@@ -8,7 +8,6 @@ import { SharedModuleModule } from '../shared-module/shared-module.module';
 import { TypeaheadModule } from 'ngx-bootstrap/typeahead';
 import { TooltipModule } from 'ngx-bootstrap/tooltip';
 import { UploadSectionComponent } from './upload-section/upload-section.component';
-import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { PeopleListHeaderComponent } from './people-list-header/people-list-header.component';
 
 @NgModule({
@@ -27,7 +26,6 @@ import { PeopleListHeaderComponent } from './people-list-header/people-list-head
     SharedModuleModule,
     TypeaheadModule.forRoot(),
     TooltipModule.forRoot(),
-    BsDatepickerModule.forRoot(),
   ],
 })
 export class PeopleListModule {}
