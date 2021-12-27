@@ -14,9 +14,23 @@ const newWeek: Week = {
   fri: true,
 };
 
+const clearWeek: Week = {
+  mon: false,
+  tue: false,
+  wed: false,
+  thu: false,
+  fri: false,
+};
+
 export const getNewWeek = (): Week => {
   return {
     ...newWeek,
+  };
+};
+
+export const getClearWeek = (): Week => {
+  return {
+    ...clearWeek,
   };
 };
 

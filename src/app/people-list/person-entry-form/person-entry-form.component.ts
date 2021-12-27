@@ -201,7 +201,11 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
     }
 
     this.personForm.get('availDate')!.valueChanges.subscribe((val: Date) => {
-      const newCalendarObj = getCalendarFromDate(val, this.localCalendarObj);
+      const newCalendarObj = getCalendarFromDate(
+        val,
+        this.localCalendarObj,
+        this.referenceDate
+      );
       this.localCalendarObj = newCalendarObj;
     });
   }

@@ -41,7 +41,6 @@ export class CalendarComponent implements OnInit, OnChanges {
   }
 
   onDateChange(date: any): void {
-    console.log('RUNNING ON CHANGE');
     if (!date) {
       return;
     }
@@ -70,13 +69,6 @@ export class CalendarComponent implements OnInit, OnChanges {
       const newDate = new Date(changes['dateVal'].currentValue);
       const dayOfWeek = newDate.getDay();
       newDate.setHours(0, 0, 0, 0);
-
-      console.log({
-        changes,
-        weekly: this.weekly,
-        baseDay: this.baseDay,
-        dayOfWeek,
-      });
 
       if (this.weekly && this.baseDay !== dayOfWeek) {
         const dayDiff = dayOfWeek - this.baseDay;
