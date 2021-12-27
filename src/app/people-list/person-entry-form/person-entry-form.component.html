@@ -43,10 +43,39 @@
   </div>
 
   <div [ngClass]="getFieldClasses('tags')">
-    <i class="bi bi-plus clickable add-tag"></i>
-    <ul *ngFor="let tag of tags" class="tag-list flex flex-ver-ctr">
-      <li class="badge bg-secondary btn-inactive">{{ tag.value }}</li>
-    </ul>
+    <div class="tag-list flex flex-ver-ctr">
+      <ul class="tag-list flex flex-ver-ctr">
+        <li
+          *ngFor="let tag of tags"
+          class="badge btn-inactive"
+          [class.bg-primary-light]="tag.type === 'ind'"
+          [class.bg-secondary-light]="tag.type === 'fun'"
+        >
+          {{ tag.value }}
+          <i
+            class="bi bi-x-lg tag-delete clickable"
+            (click)="onTagDelete(tag.value)"
+          ></i>
+        </li>
+        <li>
+          <i
+            *ngIf="!showAddTag"
+            class="bi bi-plus clickable add-tag"
+            (click)="setShowAddTag(true)"
+          ></i>
+        </li>
+        <li>
+          <form *ngIf="showAddTag" (ngSubmit)="onTagSubmit()">
+            <input
+              class="form-control form-control-xs tag-input m-bot-2"
+              type="text"
+              [formControl]="tagInput"
+              [typeahead]="getTypeAhead('tag')"
+            />
+          </form>
+        </li>
+      </ul>
+    </div>
   </div>
   <select
     class="form-control section section-pdm tbl-row mr-12 mw-4"

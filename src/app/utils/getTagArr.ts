@@ -14,3 +14,9 @@ const tags = [
 export const getTagArr = (): any[] => {
   return tags;
 };
+
+export const getTagFunction = (value: string): string => {
+  const fun = tags.find((tag) => tag.value === value);
+
+  return fun ? fun.type : '';
+};

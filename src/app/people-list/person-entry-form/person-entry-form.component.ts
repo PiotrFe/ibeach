@@ -54,7 +54,6 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
 
   daysLeft!: number;
   localCalendarObj!: Week;
-  tags!: Tag[];
   pdmArr: string[] = getPDMArr();
 
   // ***************
@@ -95,8 +94,6 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
   handleDelete(): void {
     this.deleteEvent.emit(this.id);
   }
-
-  onTagSubmit(): void {}
 
   onSubmit(): void {
     if (!this.personForm.valid) {

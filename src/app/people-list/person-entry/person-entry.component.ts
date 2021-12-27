@@ -1,7 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { Person, PersonEntry } from '../person';
+import { PersonEntry } from '../person';
 import { Week } from 'src/app/shared-module/week-days/week';
-import { PAGE_SECTIONS } from '../../app.component';
 
 @Component({
   selector: 'person-entry',
@@ -13,12 +12,6 @@ export class PersonEntryComponent extends PersonEntry implements OnInit {
   @Input() editable: boolean = true;
 
   @Output() editEvent = new EventEmitter<string>();
-
-  @Output() tagChangeEvent = new EventEmitter<{
-    id: string;
-    value: string;
-    action: 'add' | 'remove';
-  }>();
 
   constructor() {
     super();
@@ -42,24 +35,6 @@ export class PersonEntryComponent extends PersonEntry implements OnInit {
     const otherClass = fieldName === 'pdm' ? ' flex-ctr-hor' : '';
 
     return `${baseClass}${sortedClass}${otherClass}`;
-  }
-
-  onTagSubmit(): void {
-    this.tagChangeEvent.emit({
-      id: this.id,
-      value: this.tagInput.value,
-      action: 'add',
-    });
-    this.tagInput.setValue('');
-    this.showAddTag = false;
-  }
-
-  onTagDelete(value: string): void {
-    this.tagChangeEvent.emit({
-      id: this.id,
-      value,
-      action: 'remove',
-    });
   }
 
   ngOnInit(): void {}

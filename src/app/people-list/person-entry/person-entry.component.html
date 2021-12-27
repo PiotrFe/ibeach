@@ -19,7 +19,9 @@
       <ul class="flex flex-ver-ctr mr-5">
         <li
           *ngFor="let tag of person.tags"
-          class="badge bg-secondary flex no-select mr-3 m-bot-2"
+          class="badge flex no-select mr-3 m-bot-2"
+          [class.bg-primary-light]="tag.type === 'ind'"
+          [class.bg-secondary-light]="tag.type === 'fun'"
         >
           {{ tag.value }}
           <i
@@ -49,7 +51,7 @@
     </div>
   </div>
   <div [ngClass]="getFieldClasses('pdm')">
-    <span>{{ person.pdm | initials }}</span>
+    <span class="bg-secondary-light">{{ person.pdm | initials }}</span>
   </div>
   <span [ngClass]="getFieldClasses('comments')">{{ person.comments }}</span>
   <i
