@@ -8,7 +8,12 @@ import {
   EventEmitter,
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import { BsLocaleService } from 'ngx-bootstrap/datepicker';
+import { defineLocale } from 'ngx-bootstrap/chronos';
+import { enGbLocale } from 'ngx-bootstrap/locale';
 import { getWeekDayDate } from '../../utils';
+
+defineLocale('uk', enGbLocale);
 
 @Component({
   selector: 'calendar',
@@ -25,6 +30,8 @@ export class CalendarComponent implements OnInit, OnChanges {
   @Output() dateChangeEvent = new EventEmitter<Date>();
 
   displayDate = new FormControl('');
+
+  constructor(private localeService: BsLocaleService) {}
 
   setNew(dir: 'prev' | 'next'): void {
     if (this.weekly) {
@@ -60,9 +67,9 @@ export class CalendarComponent implements OnInit, OnChanges {
     }
   }
 
-  constructor() {}
-
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.localeService.use('uk');
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['dateVal'].currentValue !== this.displayDate.value) {
