@@ -9,18 +9,15 @@ import { PAGE_SECTIONS } from '../../app.component';
   styleUrls: ['./person-entry.component.scss'],
 })
 export class PersonEntryComponent extends PersonEntry implements OnInit {
-  @Input() id!: string;
-  @Input() person!: Person;
   @Input() inEditMode!: boolean;
-  @Input() sortField!: string;
   @Input() editable: boolean = true;
-  @Input() currPageSection!: keyof typeof PAGE_SECTIONS;
 
   @Output() editEvent = new EventEmitter<string>();
-  @Output() deleteEvent = new EventEmitter<string>();
-  @Output() calendarChangeEvent = new EventEmitter<{
+
+  @Output() tagChangeEvent = new EventEmitter<{
     id: string;
-    calendarObj: Week;
+    value: string;
+    action: 'add' | 'remove';
   }>();
 
   constructor() {
@@ -40,11 +37,29 @@ export class PersonEntryComponent extends PersonEntry implements OnInit {
   }
 
   getFieldClasses(fieldName: string): string {
-    const baseClass = `section-${fieldName} tbl-row mr-12 flex flex-ver-ctr pl-3`;
+    const baseClass = `section section-${fieldName} tbl-row mr-12 flex flex-ver-ctr pl-3`;
     const sortedClass = fieldName === this.sortField ? ' sorted' : '';
     const otherClass = fieldName === 'pdm' ? ' flex-ctr-hor' : '';
 
     return `${baseClass}${sortedClass}${otherClass}`;
+  }
+
+  onTagSubmit(): void {
+    this.tagChangeEvent.emit({
+      id: this.id,
+      value: this.tagInput.value,
+      action: 'add',
+    });
+    this.tagInput.setValue('');
+    this.showAddTag = false;
+  }
+
+  onTagDelete(value: string): void {
+    this.tagChangeEvent.emit({
+      id: this.id,
+      value,
+      action: 'remove',
+    });
   }
 
   ngOnInit(): void {}

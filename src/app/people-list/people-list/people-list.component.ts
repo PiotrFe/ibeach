@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { v4 as uuidv4 } from 'uuid';
 import { PEOPLE } from '../people';
-import { getWeekDayDate, getNewAvailDate } from '../../utils/';
+import { getNewAvailDate, getTagArr, sortTags } from '../../utils/';
 import { PersonEditable, Tag } from '../person';
 import {
   Week,
@@ -236,6 +236,49 @@ export class PeopleListComponent implements OnInit {
       };
     });
     this.updateFilteredView();
+  }
+
+  updateTags(objParam: {
+    id: string;
+    value: string;
+    action: 'add' | 'remove';
+  }): void {
+    const { id, value, action } = objParam;
+    const tagArr: Tag[] = getTagArr();
+    let tagObj: Tag | undefined = tagArr.find((tag) => tag.value === value);
+
+    if (!tagObj) {
+      tagObj = {
+        value,
+        type: 'oth',
+      };
+    }
+
+    const personIdx: number | undefined = this.people.findIndex(
+      (person) => person.id === id
+    );
+
+    if (typeof personIdx === undefined) {
+      return;
+    }
+
+    const person = this.people[personIdx];
+    const tags = [...person.tags];
+
+    if (action === 'add') {
+      tags.push(tagObj);
+    }
+    if (action === 'remove') {
+      const tagIdx = tags.findIndex((tag) => tag.value === value);
+      tags.splice(tagIdx, 1);
+    }
+
+    this.people[personIdx] = {
+      ...person,
+      tags: sortTags(tags),
+    };
+
+    this.onChangeSaved();
   }
 
   updatePersonDetails(objParam: {

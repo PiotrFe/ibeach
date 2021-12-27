@@ -121,6 +121,7 @@
         (editEvent)="editRow($event)"
         (deleteEvent)="removeExistingRow($event)"
         (calendarChangeEvent)="updateCalendar($event)"
+        (tagChangeEvent)="updateTags($event)"
       ></person-entry>
       <person-entry-form
         *ngSwitchCase="true"

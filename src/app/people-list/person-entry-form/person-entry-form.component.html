@@ -5,7 +5,7 @@
   novalidate
 >
   <input
-    class="form-control section-name tbl-row mr-12 mw-6"
+    class="form-control section section-name tbl-row mr-12 mw-6"
     [class.is-invalid]="isFieldValid('name')"
     type="text"
     placeholder="Name"
@@ -14,7 +14,7 @@
     required
   />
   <select
-    class="form-control section-skill tbl-row mr-12 mw-3"
+    class="form-control section section-skill tbl-row mr-12 mw-3"
     [class.is-invalid]="isFieldValid('skill')"
     formControlName="skill"
   >
@@ -49,14 +49,14 @@
     </ul>
   </div>
   <select
-    class="form-control section-pdm tbl-row mr-12 mw-4"
+    class="form-control section section-pdm tbl-row mr-12 mw-4"
     formControlName="pdm"
   >
     <option *ngFor="let pdm of pdmArr" [value]="pdm">{{ pdm }}</option>
   </select>
   <input
     id="person-comments"
-    class="form-control section-comments tbl-row mr-12"
+    class="form-control section section-comments tbl-row mr-12"
     type="text"
     placeholder="Comments"
     formControlName="comments"

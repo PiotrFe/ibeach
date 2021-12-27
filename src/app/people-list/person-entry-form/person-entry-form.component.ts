@@ -28,18 +28,9 @@ import { PAGE_SECTIONS } from '../../app.component';
   styleUrls: ['./person-entry-form.component.scss'],
 })
 export class PersonEntryFormComponent extends PersonEntry implements OnInit {
-  @Input() id!: string;
-  @Input() person!: Person | undefined;
-  @Input() sortField!: string;
   @Input() referenceDate!: Date;
-  @Input() currPageSection!: keyof typeof PAGE_SECTIONS;
   @Input() dispatchToParentAndClose: boolean = false;
 
-  @Output() deleteEvent = new EventEmitter<string>();
-  @Output() calendarChangeEvent = new EventEmitter<{
-    id: string;
-    calendarObj: Week;
-  }>();
   @Output() formEditEvent = new EventEmitter<{
     id: string;
     name: string;
@@ -105,6 +96,8 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
     this.deleteEvent.emit(this.id);
   }
 
+  onTagSubmit(): void {}
+
   onSubmit(): void {
     if (!this.personForm.valid) {
       this.validateFormFields();
@@ -158,7 +151,7 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
   }
 
   getFieldClasses(fieldName: string): string {
-    const baseClass = `section-${fieldName} tbl-row mr-12 flex flex-ver-ctr pl-3`;
+    const baseClass = `section section-${fieldName} tbl-row mr-12 flex flex-ver-ctr pl-3`;
     const sortedClass = fieldName === this.sortField ? ' sorted' : '';
 
     return `${baseClass}${sortedClass}`;

@@ -15,22 +15,37 @@
   </div>
 
   <div [ngClass]="getFieldClasses('tags')">
-    <i
-      *ngIf="inEditMode"
-      class="bi bi-plus clickable add-tag"
-      (click)="setShowAddTag(true)"
-    ></i>
     <div class="tag-list flex flex-ver-ctr">
-      <ul *ngFor="let tag of person.tags" class="flex flex-ver-ctr mr-5">
-        <li class="badge bg-secondary btn-inactive">{{ tag.value }}</li>
+      <ul class="flex flex-ver-ctr mr-5">
+        <li
+          *ngFor="let tag of person.tags"
+          class="badge bg-secondary flex no-select mr-3 m-bot-2"
+        >
+          {{ tag.value }}
+          <i
+            *ngIf="inEditMode"
+            class="bi bi-x-lg tag-delete clickable"
+            (click)="onTagDelete(tag.value)"
+          ></i>
+        </li>
+        <li>
+          <i
+            *ngIf="inEditMode && !showAddTag"
+            class="bi bi-plus clickable add-tag"
+            (click)="setShowAddTag(true)"
+          ></i>
+        </li>
+        <li>
+          <form *ngIf="showAddTag" (ngSubmit)="onTagSubmit()">
+            <input
+              class="form-control form-control-xs tag-input m-bot-2"
+              type="text"
+              [formControl]="tagInput"
+              [typeahead]="getTypeAhead('tag')"
+            />
+          </form>
+        </li>
       </ul>
-      <input
-        *ngIf="showAddTag"
-        class="form-control form-control-xs tag-input tbl-row mr-12"
-        type="text"
-        formControlName="tag"
-        [typeahead]="getTypeAhead('tag')"
-      />
     </div>
   </div>
   <div [ngClass]="getFieldClasses('pdm')">
