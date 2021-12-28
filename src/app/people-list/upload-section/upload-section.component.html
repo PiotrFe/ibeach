@@ -1,11 +1,9 @@
 <nav class="main-toolbar">
   <div class="toolbar-group toolbar-group--left flex flex-ver-ctr">
-    <label
-      *ngIf="!fileSelected"
-      for="upload"
-      type="button"
-      class="btn btn-primary mr-20"
-    >
+    <button *ngIf="fileSelected" type="button" class="btn btn-success mr-20">
+      Upload
+    </button>
+    <label for="upload" type="button" class="btn btn-primary mr-20">
       Select file
     </label>
     <input
@@ -16,9 +14,7 @@
       hidden
       (change)="onFileSelected($event)"
     />
-    <button *ngIf="fileSelected" type="button" class="btn btn-success mr-20">
-      Upload
-    </button>
+
     <calendar
       [scrollable]="true"
       [weekly]="true"

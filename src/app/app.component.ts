@@ -14,7 +14,7 @@ export const PAGE_SECTIONS = {
 })
 export class AppComponent {
   title = 'client-dev-app';
-  pageSection = PAGE_SECTIONS.SUBMIT;
+  pageSection = PAGE_SECTIONS.UPLOAD;
 
   setPageSection(sectionName: keyof typeof PAGE_SECTIONS): void {
     this.pageSection = sectionName;

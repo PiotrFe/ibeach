@@ -5,6 +5,7 @@ import { getDaysLeft, getNewWeek } from 'src/app/shared-module/week-days/week';
 import { parse } from '../../utils/csv-parser/index';
 import { PersonEditable, Tag } from '../person';
 import { Week } from '../week';
+import { getTagsFromData, sortTags } from '../../utils';
 
 @Component({
   selector: 'upload-section',
@@ -22,7 +23,6 @@ export class UploadSectionComponent implements OnInit {
   constructor() {}
 
   setReferenceDate(date: Date) {
-    // correct reference period to always cover midnight-midnight
     this.referenceDateStart = date;
     this.referenceDateStart.setHours(0, 0, 0, 0);
     this.referenceDateEnd = new Date(
@@ -42,15 +42,18 @@ export class UploadSectionComponent implements OnInit {
           skill !== 'AP'
         );
       })
-      .map((entry: any) => {
+      .map((entry: any, index: number) => {
         const name: string = entry.Name;
         const skill: string = entry.Skill?.split(' - ')[0];
         const week: Week = getNewWeek();
         const daysLeft: number = getDaysLeft(week);
-        const tags: Tag[] = [];
+        const tags: Tag[] = sortTags(
+          getTagsFromData(entry['Sector experience'], 'ind')
+        );
         const availDate: Date = new Date(
           Date.parse(entry['Availability date'])
         );
+        const pdm: string = entry['Staffing manager'];
 
         return {
           id: uuidv4(),
@@ -60,6 +63,7 @@ export class UploadSectionComponent implements OnInit {
           week,
           daysLeft,
           tags,
+          pdm,
           inEditMode: false,
         };
       })
@@ -94,9 +98,6 @@ export class UploadSectionComponent implements OnInit {
           this.uploadError = String(err);
         }
         this.fileSelected = true;
-        console.log({
-          data,
-        });
         this.previewData = this.parseData(data);
       });
     };
