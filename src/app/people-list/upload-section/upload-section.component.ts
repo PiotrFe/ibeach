@@ -10,6 +10,7 @@ import {
   sortTags,
   getAffiliations,
   clearTagDuplicates,
+  getCalendarFromData,
 } from '../../utils';
 
 @Component({
@@ -50,7 +51,11 @@ export class UploadSectionComponent implements OnInit {
       .map((entry: any) => {
         const name: string = entry.Name;
         const skill: string = entry.Skill?.split(' - ')[0];
-        const week: Week = getNewWeek();
+        const week: Week = getCalendarFromData(
+          entry['Upcoming absences'],
+          entry['Upcoming trainings'],
+          this.referenceDateStart
+        );
         const daysLeft: number = getDaysLeft(week);
         const indTags = clearTagDuplicates([
           ...getTagsFromData(entry['Sector experience'], 'ind'),

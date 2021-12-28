@@ -10,3 +10,4 @@ export {
   getAffiliations,
   clearTagDuplicates,
 } from './getTagsFromData';
+export { getCalendarFromData } from './getCalendarFromData';
