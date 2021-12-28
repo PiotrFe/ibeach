@@ -5,16 +5,16 @@
   novalidate
 >
   <input
-    class="form-control section section-name tbl-row mr-12 mw-6"
+    class="form-control section section-name mr-12 mw-6"
     [class.is-invalid]="isFieldValid('name')"
     type="text"
     placeholder="Name"
     formControlName="name"
-    [typeahead]="getTypeAhead('name')"
+    [typeahead]="getTypeAhead('name', 'form')"
     required
   />
   <select
-    class="form-control section section-skill tbl-row mr-12 mw-3"
+    class="form-control section section-skill mr-12 mw-3"
     [class.is-invalid]="isFieldValid('skill')"
     formControlName="skill"
   >
@@ -33,7 +33,7 @@
 
   <span [ngClass]="getFieldClasses('days')">{{ getDaysAvailable() }}</span>
 
-  <div class="btn-group tbl-row mr-12">
+  <div class="btn-group mr-12">
     <week-days
       class="flex flex-ver-ctr"
       [weekObj]="localCalendarObj"
@@ -44,17 +44,17 @@
 
   <div [ngClass]="getFieldClasses('tags')">
     <div class="tag-list flex flex-ver-ctr">
-      <ul class="tag-list flex flex-ver-ctr">
+      <ul class="flex flex-ver-ctr mr-5">
         <li
           *ngFor="let tag of tags"
-          class="badge btn-inactive"
+          class="badge flex no-select mr-3 m-bot-2"
           [class.bg-primary-light]="tag.type === 'ind'"
           [class.bg-secondary-light]="tag.type === 'fun'"
         >
           {{ tag.value }}
           <i
             class="bi bi-x-lg tag-delete clickable"
-            (click)="onTagDelete(tag.value)"
+            (click)="onTagDelete(tag.value, 'form')"
           ></i>
         </li>
         <li>
@@ -65,12 +65,13 @@
           ></i>
         </li>
         <li>
-          <form *ngIf="showAddTag" (ngSubmit)="onTagSubmit()">
+          <form *ngIf="showAddTag" (ngSubmit)="onTagSubmit('form')">
             <input
+              #addTag
               class="form-control form-control-xs tag-input m-bot-2"
               type="text"
               [formControl]="tagInput"
-              [typeahead]="getTypeAhead('tag')"
+              [typeahead]="getTypeAhead('tag', 'form')"
             />
           </form>
         </li>
@@ -78,14 +79,14 @@
     </div>
   </div>
   <select
-    class="form-control section section-pdm tbl-row mr-12 mw-4"
+    class="form-control section section-pdm mr-12 mw-4"
     formControlName="pdm"
   >
     <option *ngFor="let pdm of pdmArr" [value]="pdm">{{ pdm }}</option>
   </select>
   <input
     id="person-comments"
-    class="form-control section section-comments tbl-row mr-12"
+    class="form-control section section-comments mr-12"
     type="text"
     placeholder="Comments"
     formControlName="comments"

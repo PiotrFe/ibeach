@@ -20,7 +20,6 @@ import {
   getNewWeek,
   getDaysLeft,
 } from 'src/app/shared-module/week-days/week';
-import { PAGE_SECTIONS } from '../../app.component';
 
 @Component({
   selector: 'person-entry-form',
@@ -145,13 +144,6 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
 
   setDaysLeft(calendarObj: Week) {
     this.daysLeft = getDaysLeft(calendarObj);
-  }
-
-  getFieldClasses(fieldName: string): string {
-    const baseClass = `section section-${fieldName} tbl-row mr-12 flex flex-ver-ctr pl-3`;
-    const sortedClass = fieldName === this.sortField ? ' sorted' : '';
-
-    return `${baseClass}${sortedClass}`;
   }
 
   // ***************

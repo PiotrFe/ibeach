@@ -1,10 +1,16 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  ViewChild,
+  ElementRef,
+} from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Week } from './week';
 import { PEOPLE } from './people';
 import { getTagArr, getTagFunction, sortTags } from '../utils/';
 import { PAGE_SECTIONS } from '../app.component';
-import { validate } from 'uuid';
 
 export const SKILLS = ['EM', 'ASC', 'FELL', 'BA', 'INT'];
 
@@ -33,6 +39,8 @@ export interface PersonEditable extends Person {
   template: '',
 })
 export class PersonEntry {
+  @ViewChild('addTag') addTagElem!: ElementRef;
+
   @Input() id!: string;
   @Input() person!: Person;
   @Input() sortField!: string;
@@ -55,13 +63,12 @@ export class PersonEntry {
   showAddTag: boolean = false;
   tagArr: string[] = getTagArr().map((item) => item.value);
 
-  getTypeAhead(key: string): any[] {
+  getTypeAhead(key: string, submittedBy: 'form' | 'entry'): any[] {
     if (key === 'pdm') {
       return this.getPDMTypeAhead(key);
     }
     if (key === 'tag') {
-      const arr = this.getTagTypeAhead();
-      console.log({ arr });
+      const arr = this.getTagTypeAhead(submittedBy);
       return arr;
     }
 
@@ -71,10 +78,11 @@ export class PersonEntry {
   getPDMTypeAhead(key: string): any[] {
     return PEOPLE.map((item) => item[key as keyof Person]);
   }
-  getTagTypeAhead(): any[] {
-    const currTags = this.person
-      ? this.person.tags.map((tag) => tag.value)
-      : [];
+  getTagTypeAhead(submittedBy: 'form' | 'entry'): any[] {
+    const currTags =
+      submittedBy === 'entry'
+        ? this.person.tags.map((tag) => tag.value)
+        : this.tags.map((tag) => tag.value);
 
     if (!currTags.length) {
       return this.tagArr;
@@ -87,17 +95,20 @@ export class PersonEntry {
 
   setShowAddTag(show: boolean): void {
     this.showAddTag = show;
+    setTimeout(() => {
+      this.addTagElem.nativeElement.focus();
+    }, 0);
   }
 
   checkIfTagLegal() {
     return this.tagArr.includes(this.tagInput.value);
   }
 
-  onTagSubmit(): void {
+  onTagSubmit(submittedBy: 'form' | 'entry'): void {
     const tagLegal: boolean = this.checkIfTagLegal();
 
     if (tagLegal) {
-      if (this.person) {
+      if (submittedBy === 'entry') {
         this.tagChangeEvent.emit({
           id: this.id,
           value: this.tagInput.value,
@@ -118,11 +129,23 @@ export class PersonEntry {
     this.showAddTag = false;
   }
 
-  onTagDelete(value: string): void {
-    this.tagChangeEvent.emit({
-      id: this.id,
-      value,
-      action: 'remove',
-    });
+  onTagDelete(value: string, submittedBy: 'form' | 'entry'): void {
+    if (submittedBy === 'entry') {
+      this.tagChangeEvent.emit({
+        id: this.id,
+        value,
+        action: 'remove',
+      });
+    } else {
+      this.tags = this.tags.filter((tag) => tag.value !== value);
+    }
+  }
+
+  getFieldClasses(fieldName: string): string {
+    const baseClass = `section section-${fieldName} mr-12 flex flex-ver-ctr pl-3`;
+    const sortedClass = fieldName === this.sortField ? ' sorted' : '';
+    const otherClass = fieldName === 'pdm' ? ' flex-ctr-hor' : '';
+
+    return `${baseClass}${sortedClass}${otherClass}`;
   }
 }

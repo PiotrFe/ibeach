@@ -5,7 +5,7 @@
     person.availDate | date: "dd-MMM"
   }}</span>
   <span [ngClass]="getFieldClasses('days')">{{ person.daysLeft }}</span>
-  <div class="btn-group tbl-row mr-12">
+  <div class="btn-group mr-12">
     <week-days
       class="flex flex-ver-ctr"
       (calendarChange)="onCalendarChange($event)"
@@ -27,7 +27,7 @@
           <i
             *ngIf="inEditMode"
             class="bi bi-x-lg tag-delete clickable"
-            (click)="onTagDelete(tag.value)"
+            (click)="onTagDelete(tag.value, 'entry')"
           ></i>
         </li>
         <li>
@@ -38,12 +38,13 @@
           ></i>
         </li>
         <li>
-          <form *ngIf="showAddTag" (ngSubmit)="onTagSubmit()">
+          <form *ngIf="showAddTag" (ngSubmit)="onTagSubmit('entry')">
             <input
+              #addTag
               class="form-control form-control-xs tag-input m-bot-2"
               type="text"
               [formControl]="tagInput"
-              [typeahead]="getTypeAhead('tag')"
+              [typeahead]="getTypeAhead('tag', 'entry')"
             />
           </form>
         </li>

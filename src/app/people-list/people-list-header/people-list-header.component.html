@@ -1,27 +1,27 @@
 <div class="person-entry-header">
   <span
-    class="section section-name tbl-row mr-12 pl-3 clickable"
+    class="section section-name mr-12 pl-3 clickable"
     (click)="handleClick('name')"
     >Name
     <i *ngIf="getSort('name', 1)" class="bi bi-sort-down-alt fs-085"></i>
     <i *ngIf="getSort('name', -1)" class="bi bi-sort-up fs-085"></i
   ></span>
   <span
-    class="section section-skill tbl-row mr-12 pl-3 clickable"
+    class="section section-skill mr-12 pl-3 clickable"
     (click)="handleClick('skill')"
     >Skill
     <i *ngIf="getSort('skill', 1)" class="bi bi-sort-down-alt fs-085"></i>
     <i *ngIf="getSort('skill', -1)" class="bi bi-sort-up fs-085"></i
   ></span>
   <span
-    class="section section-availDate tbl-row mr-12 pl-3 clickable"
+    class="section section-availDate mr-12 pl-3 clickable"
     (click)="handleClick('availDate')"
     >From
     <i *ngIf="getSort('availDate', 1)" class="bi bi-sort-down-alt fs-085"></i>
     <i *ngIf="getSort('availDate', -1)" class="bi bi-sort-up fs-085"></i
   ></span>
   <span
-    class="section section-days tbl-row mr-12 pl-3 clickable"
+    class="section section-days mr-12 pl-3 clickable"
     (click)="handleClick('days')"
     >Days
     <i
@@ -30,10 +30,10 @@
     ></i>
     <i *ngIf="getSort('days', -1)" class="bi bi-sort-up icon-offset fs-085"></i
   ></span>
-  <span class="section-week tbl-row mr-12">Week</span>
-  <span class="section-tags tbl-row pl-3 mr-12">Tags</span>
+  <span class="section-week mr-12">Week</span>
+  <span class="section-tags pl-3 mr-12">Tags</span>
   <span
-    class="section section-pdm tbl-row pl-3 mr-12 clickable"
+    class="section section-pdm pl-3 mr-12 clickable"
     (click)="handleClick('pdm')"
     >PDM<i
       *ngIf="getSort('pdm', 1)"
@@ -41,5 +41,5 @@
     ></i>
     <i *ngIf="getSort('pdm', -1)" class="bi bi-sort-up icon-offset fs-085"></i
   ></span>
-  <span class="section section-comments tbl-row pl-3">Comments</span>
+  <span class="section section-comments pl-3">Comments</span>
 </div>

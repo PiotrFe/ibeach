@@ -5,8 +5,6 @@ export const sortTags = (tags: Tag[]): Tag[] => {
   const funTags = tags.filter((tag) => tag.type === 'fun');
   const othTags = tags.filter((tag) => tag.type === 'oth');
 
-  console.log({ tags, indTags });
-
   indTags.sort(sortByVal);
   funTags.sort(sortByVal);
   othTags.sort(sortByVal);

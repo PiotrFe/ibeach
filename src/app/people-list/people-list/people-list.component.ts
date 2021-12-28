@@ -273,6 +273,13 @@ export class PeopleListComponent implements OnInit {
       tags.splice(tagIdx, 1);
     }
 
+    console.log({
+      id,
+      personIdx,
+      person: this.people[personIdx],
+      tags,
+    });
+
     this.people[personIdx] = {
       ...person,
       tags: sortTags(tags),

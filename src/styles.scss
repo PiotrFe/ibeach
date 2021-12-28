@@ -532,12 +532,9 @@ html {
   }
 }
 
-.tbl-row {
-  height: 100%;
-}
-
 .sorted {
   background-color: rgba(20, 162, 184, 0.2);
+  height: 100%;
 }
 
 // ****************
@@ -598,7 +595,6 @@ html {
     width: 4%;
     min-width: 4%;
     justify-content: center;
-    text-align: center;
   }
 
   &-tags {
@@ -666,6 +662,16 @@ ul {
   width: 100%;
   height: 100%;
   padding: 3px;
+
+  > ul {
+    width: 100%;
+    height: 100%;
+    padding-left: 0;
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    overflow-y: scroll;
+  }
 }
 
 .tag-input {
