@@ -5,7 +5,12 @@ import { getDaysLeft, getNewWeek } from 'src/app/shared-module/week-days/week';
 import { parse } from '../../utils/csv-parser/index';
 import { PersonEditable, Tag } from '../person';
 import { Week } from '../week';
-import { getTagsFromData, sortTags } from '../../utils';
+import {
+  getTagsFromData,
+  sortTags,
+  getAffiliations,
+  clearTagDuplicates,
+} from '../../utils';
 
 @Component({
   selector: 'upload-section',
@@ -42,14 +47,23 @@ export class UploadSectionComponent implements OnInit {
           skill !== 'AP'
         );
       })
-      .map((entry: any, index: number) => {
+      .map((entry: any) => {
         const name: string = entry.Name;
         const skill: string = entry.Skill?.split(' - ')[0];
         const week: Week = getNewWeek();
         const daysLeft: number = getDaysLeft(week);
-        const tags: Tag[] = sortTags(
-          getTagsFromData(entry['Sector experience'], 'ind')
-        );
+        const indTags = clearTagDuplicates([
+          ...getTagsFromData(entry['Sector experience'], 'ind'),
+          ...getAffiliations(entry['Core industry affiliations'], 'ind'),
+        ]);
+
+        const funTags = clearTagDuplicates([
+          ...getTagsFromData(entry['Functional experience'], 'fun'),
+          ...getAffiliations(entry['Core industry affiliation'], 'fun'),
+          ...getAffiliations(entry['Core growth platform affiliation'], 'fun'),
+        ]);
+
+        const tags: Tag[] = sortTags([...indTags, ...funTags]);
         const availDate: Date = new Date(
           Date.parse(entry['Availability date'])
         );

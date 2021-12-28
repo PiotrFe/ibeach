@@ -6,7 +6,7 @@ export const getTagsFromData = (
 ): Tag[] => {
   const dataArrRaw = data.split('; ');
   const regex = /\(\d{1,3}%\)/i;
-  const tagStrArr = dataArrRaw
+  const tagArr = dataArrRaw
     .filter((item) => {
       const percent = item.match(/\d{1,3}/);
 
@@ -15,48 +15,84 @@ export const getTagsFromData = (
       }
       const int = parseInt(percent[0]);
 
-      return int >= 15;
+      return int >= 10;
     })
-    .map((item) => item.toLowerCase().replace(regex, ''))
+    .map((item) => item.toLowerCase().replace(regex, '').trim())
     .map((item) => {
       const tag = {
-        value: getTagMatchForItem(item, tagType).toUpperCase(),
+        value:
+          tagType === 'ind'
+            ? getTagMatchForIndunstryItem(item).toUpperCase()
+            : getTagMatchForFunctionItem(item).toUpperCase(),
         type: tagType,
       };
 
-      return JSON.stringify(tag);
-    });
-
-  const tagsSet = new Set(tagStrArr);
-  const tagArr = Array.from(tagsSet)
-    .map((str) => JSON.parse(str))
-    .filter((tag) => tag.value !== '');
+      return tag;
+    })
+    .filter((item) => item.value !== '');
 
   return tagArr;
 };
 
-const getTagMatchForItem = (item: string, tagType: 'ind' | 'fun'): string => {
-  const tagObj = tagType === 'ind' ? ind : ind;
-  const tags = Object.keys(tagObj);
+const getTagMatchForIndunstryItem = (item: string): string => {
+  const tags = Object.keys(ind);
 
   for (let tag of tags) {
-    const keywordArr = tagObj[tag as keyof typeof tagObj];
+    const keywordArr = ind[tag as keyof typeof ind];
 
     for (let keyword of keywordArr) {
-      console.log({
-        tag,
-        keywordArr,
-        keyword,
-        item,
-        match: item.match(keyword),
-      });
-      if (item.match(keyword)) {
+      if (
+        item.match(keyword) &&
+        !(keyword === 'culture' && item === 'agriculture')
+      ) {
         return tag;
       }
     }
   }
 
   return '';
+};
+
+const getTagMatchForFunctionItem = (item: string): string => {
+  const tags = Object.keys(fun);
+
+  for (let tag of tags) {
+    const keywordArr = fun[tag as keyof typeof fun];
+
+    for (let keyword of keywordArr) {
+      if (
+        item.match(keyword) &&
+        !(keyword === 'culture' && item === 'agriculture')
+      ) {
+        return tag;
+      }
+    }
+  }
+
+  return '';
+};
+
+export const getAffiliations = (
+  affiliation: string,
+  type: 'ind' | 'fun'
+): Tag[] => {
+  if (!affiliation) {
+    return [];
+  }
+
+  const tag =
+    type === 'ind'
+      ? getTagMatchForIndunstryItem(affiliation.toLowerCase())
+      : getTagMatchForFunctionItem(affiliation.toLowerCase());
+
+  return tag ? [{ value: tag.toUpperCase(), type }] : [];
+};
+
+export const clearTagDuplicates = (tags: Tag[]): Tag[] => {
+  const tagStrArr = tags.map((tag) => JSON.stringify(tag));
+  const tagSet = new Set(tagStrArr);
+
+  return Array.from(tagSet).map((str) => JSON.parse(str));
 };
 
 const ind = {
@@ -112,7 +148,7 @@ const ind = {
   ],
   pss: [
     'government',
-    'educational org',
+    'educational',
     'nonprofit',
     'foundation',
     'ministry',
@@ -122,4 +158,41 @@ const ind = {
   tech: ['technology', 'advanced electronics', 'software'],
   tmt: ['telecom', 'media'],
   ttl: ['transport', 'logistics', 'travel'],
+};
+
+const fun = {
+  dna: [
+    'cloud',
+    'technology',
+    'agile',
+    'digital',
+    'pricing',
+    'data transformation',
+  ],
+  fin: ['finance', 'balance sheet'],
+  'm&a': ['m&a'],
+  'm&s': ['sales', 'channel', 'marketing'],
+  ops: ['procurement', 'manufacturing', 'product development'],
+  org: [
+    'organization',
+    'service operations',
+    'culture',
+    'transformational change',
+    'leadership',
+    'talent',
+  ],
+  ris: ['risk'],
+  str: [
+    'capital excellence',
+    'corporate strategy',
+    'business strategy',
+    'growth transformation',
+    'growth strategy',
+    'board strategy',
+    'future of work',
+    's&cf',
+  ],
+  inn: ['innovation'],
+  reg: ['regulatory'],
+  sus: ['sustainability', 'climate'],
 };
