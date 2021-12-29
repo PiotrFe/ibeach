@@ -29,6 +29,7 @@ export class UploadSectionComponent implements OnInit {
   ) {}
 
   setReferenceDate(date: Date) {
+    console.log({ date });
     this.referenceDateStart = date;
     this.referenceDateStart.setHours(0, 0, 0, 0);
     this.referenceDateEnd = new Date(
@@ -95,11 +96,18 @@ export class UploadSectionComponent implements OnInit {
     try {
       await this.fetchService.storeMasterList(
         this.referenceDateStart,
-        this.data
+        JSON.stringify(
+          this.previewData.map((person) => {
+            const { inEditMode, ...otherProps } = person;
+
+            return {
+              ...otherProps,
+            };
+          })
+        )
       );
       this.uploaded = true;
     } catch (e: any) {
-      console.log(e.message);
       this.uploadError = e.message;
     } finally {
       this.uploading = false;

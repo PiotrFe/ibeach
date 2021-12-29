@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import { ConnectableObservable } from 'rxjs';
+import { Person } from 'src/app/people-list/person';
 
 const config = {
   headers: {
@@ -7,6 +9,8 @@ const config = {
   },
   responseType: 'text',
 };
+
+const baseUrl = 'http://localhost:4000/api';
 
 @Injectable({
   providedIn: 'root',
@@ -19,10 +23,35 @@ export class FetchService {
 
     try {
       await axios.post(
-        `http://localhost:4000/api/master/${weekTs}`,
+        `${baseUrl}/master/${weekTs}`,
         data,
         config as AxiosRequestConfig
       );
+    } catch (err: any) {
+      throw new Error(err.message || 'Something went wrong. Please try again');
+    }
+  }
+
+  async fetchWeeklyList(weekOf: Date): Promise<{
+    people: Person[];
+    status: { pending: string[]; done: string[] };
+  }> {
+    const weekTs = weekOf.getTime();
+
+    try {
+      const response = await axios.get(`${baseUrl}/week/${weekTs}`);
+      const { data, statusSummary } = response.data;
+
+      return {
+        people: data.map((person: any) => {
+          const { availDate, ...otherProps } = person;
+          return {
+            ...otherProps,
+            availDate: new Date(Date.parse(availDate)),
+          };
+        }),
+        status: statusSummary,
+      };
     } catch (err: any) {
       throw new Error(err.message || 'Something went wrong. Please try again');
     }

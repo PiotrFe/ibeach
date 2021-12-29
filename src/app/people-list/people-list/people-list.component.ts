@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import { FetchService } from '../../shared-module/fetch.service';
 import { v4 as uuidv4 } from 'uuid';
 import { PEOPLE } from '../people';
 import { getNewAvailDate, getTagArr, sortTags } from '../../utils/';
-import { PersonEditable, Tag } from '../person';
+import { Person, PersonEditable, Tag } from '../person';
 import {
   Week,
   getNewWeek,
@@ -24,17 +25,18 @@ interface Filter {
   value?: string;
 }
 
+interface SubmissionStatus {
+  pending: string[];
+  done: string[];
+}
+
 @Component({
   selector: 'people-list',
   templateUrl: './people-list.component.html',
   styleUrls: ['./people-list.component.scss'],
 })
 export class PeopleListComponent implements OnInit {
-  people: PersonEditable[] = PEOPLE.map((person) => ({
-    ...person,
-    inEditMode: false,
-    id: uuidv4(),
-  }));
+  people!: PersonEditable[];
   newRows: PersonEditable[] = [];
   sort: { field: string; order: number } = {
     field: '',
@@ -49,9 +51,48 @@ export class PeopleListComponent implements OnInit {
   skillFilter = new FormControl('All');
   referenceDate: Date = new Date();
   showSubmitModal: boolean = false;
+  loading: boolean = false;
+  fetchError: string = '';
+
+  constructor(private fetchService: FetchService) {}
+
+  ngOnInit(): void {
+    this.peopleFilteredView = this.filterPeopleView(this.people);
+  }
 
   onDateChange(date: Date) {
     this.referenceDate = date;
+    this.referenceDate.setHours(0, 0, 0, 0);
+    this.people = [];
+    this.fetchData();
+    setTimeout(() => {
+      this.updateFilteredView();
+    }, 0);
+  }
+
+  async fetchData() {
+    this.loading = true;
+    this.fetchError = '';
+
+    try {
+      const response = await this.fetchService.fetchWeeklyList(
+        this.referenceDate
+      );
+
+      const { people, status }: { people: Person[]; status: SubmissionStatus } =
+        response;
+
+      this.people = people.map((person) => ({
+        ...person,
+        inEditMode: false,
+      }));
+
+      this.updateFilteredView();
+    } catch (e: any) {
+      this.fetchError = e.message;
+    } finally {
+      this.loading = false;
+    }
   }
 
   // *****************
@@ -458,6 +499,10 @@ export class PeopleListComponent implements OnInit {
     if (!a.availDate || !b.availDate) {
       return 0;
     }
+    console.log({
+      a,
+      b,
+    });
     const order = this.sort.order;
     const dateA = a.availDate.getTime();
     const dateB = b.availDate.getTime();
@@ -592,11 +637,5 @@ export class PeopleListComponent implements OnInit {
     if (submit) {
       alert('List has been submitted');
     }
-  }
-
-  constructor() {}
-
-  ngOnInit(): void {
-    this.peopleFilteredView = this.filterPeopleView(this.people);
   }
 }

@@ -88,6 +88,9 @@
 </nav>
 
 <ul class="people">
+  <div *ngIf="fetchError" class="alert alert-danger">
+    {{ fetchError }}
+  </div>
   <li>
     <people-list-header
       [sortable]="true"

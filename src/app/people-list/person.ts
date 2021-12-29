@@ -20,6 +20,7 @@ export interface Tag {
 }
 
 export interface Person {
+  id: string;
   name: string;
   skill: string;
   pdm?: string;
@@ -31,7 +32,6 @@ export interface Person {
 }
 
 export interface PersonEditable extends Person {
-  id: string;
   inEditMode: boolean;
 }
 

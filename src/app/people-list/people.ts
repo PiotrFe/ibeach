@@ -1,7 +1,7 @@
 import { Person } from './person';
 import { getDaysLeft } from '../shared-module/week-days/week';
 
-export const PEOPLE: Person[] = [
+export const PEOPLE: any[] = [
   {
     name: 'Piotr',
     skill: 'ASC',
