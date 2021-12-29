@@ -44,8 +44,11 @@
 </nav>
 
 <ul *ngIf="previewData.length" class="people">
-  <div *ngIf="uploadError" class="alert alert-danger d-flex align-items-center">
+  <div *ngIf="uploadError" class="alert alert-danger">
     {{ uploadError }}
+  </div>
+  <div *ngIf="uploaded" class="alert alert-success">
+    <strong>Success!</strong> Data has been uploaded
   </div>
   <li>
     <people-list-header></people-list-header>
