@@ -41,13 +41,6 @@ const checkIfPeriodsOverlap = (
   const referenceDateTS = referenceDate.getTime();
   const offsetInMs = period * 24 * 60 * 60 * 1000;
 
-  console.log({
-    baseDate,
-    referenceDate,
-    offsetInMs,
-    refPlusFive: new Date(referenceDateTS + offsetInMs),
-  });
-
   return (
     baseDateTS >= referenceDateTS && baseDateTS <= referenceDateTS + offsetInMs
   );

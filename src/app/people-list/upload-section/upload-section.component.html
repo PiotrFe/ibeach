@@ -1,7 +1,25 @@
 <nav class="main-toolbar">
   <div class="toolbar-group toolbar-group--left flex flex-ver-ctr">
-    <button *ngIf="fileSelected" type="button" class="btn btn-success mr-20">
+    <button
+      *ngIf="fileSelected && !uploading"
+      type="button"
+      class="btn btn-success mr-20"
+      (click)="onSubmit()"
+    >
       Upload
+    </button>
+    <button
+      *ngIf="uploading"
+      type="button"
+      class="btn btn-success mr-20"
+      disabled
+    >
+      <span
+        class="spinner-grow spinner-grow-sm"
+        role="status"
+        aria-hidden="true"
+      ></span>
+      Uploading...
     </button>
     <label for="upload" type="button" class="btn btn-primary mr-20">
       Select file
@@ -24,7 +42,11 @@
     ></calendar>
   </div>
 </nav>
+
 <ul *ngIf="previewData.length" class="people">
+  <div *ngIf="uploadError" class="alert alert-danger d-flex align-items-center">
+    {{ uploadError }}
+  </div>
   <li>
     <people-list-header></people-list-header>
   </li>
@@ -38,3 +60,11 @@
     </li>
   </div>
 </ul>
+<modal-window
+  *ngIf="showUploadModal"
+  [text]="'Upload data?'"
+  [btnConfirmText]="'Upload'"
+  [btnCloseText]="'Cancel'"
+  [modalType]="'CONFIRM'"
+  (closeEvent)="handleModalClose($event)"
+></modal-window>

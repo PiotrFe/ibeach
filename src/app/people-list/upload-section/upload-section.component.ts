@@ -1,17 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { v4 as uuidv4 } from 'uuid';
-import { TypeaheadOptions } from 'ngx-bootstrap/typeahead';
-import { getDaysLeft, getNewWeek } from 'src/app/shared-module/week-days/week';
+import { FetchService } from '../../shared-module/fetch.service';
+import { CsvParserService } from '../../shared-module/csv-parser.service';
 import { parse } from '../../utils/csv-parser/index';
-import { PersonEditable, Tag } from '../person';
-import { Week } from '../week';
-import {
-  getTagsFromData,
-  sortTags,
-  getAffiliations,
-  clearTagDuplicates,
-  getCalendarFromData,
-} from '../../utils';
+import { PersonEditable } from '../person';
 
 @Component({
   selector: 'upload-section',
@@ -21,103 +12,60 @@ import {
 export class UploadSectionComponent implements OnInit {
   bsInlineValue: Date = new Date();
   referenceDateStart: Date = this.bsInlineValue;
-  referenceDateEnd!: Date;
-  uploadError!: string;
+  referenceDateEnd: Date = new Date(
+    this.referenceDateStart.getTime() + 1000 * 60 * 60 * 24 * 5
+  );
   fileSelected: boolean = false;
+  data!: string;
   previewData: PersonEditable[] = [];
+  showUploadModal: boolean = false;
+  uploading: boolean = false;
+  uploaded: boolean = false;
+  uploadError: string = '';
 
-  constructor() {}
+  constructor(
+    private fetchService: FetchService,
+    private csvParserService: CsvParserService
+  ) {}
 
   setReferenceDate(date: Date) {
     this.referenceDateStart = date;
     this.referenceDateStart.setHours(0, 0, 0, 0);
     this.referenceDateEnd = new Date(
-      this.referenceDateStart.getTime() + 1000 * 60 * 60 * 24 * 7
+      this.referenceDateStart.getTime() + 1000 * 60 * 60 * 24 * 5
     );
   }
 
-  parseData(data: any): PersonEditable[] {
-    const returnData = data
-      .filter((entry: any) => {
-        const availabilityDate: number = Date.parse(entry['Availability date']);
-        const skill: string = entry.Skill?.split(' - ')[0];
-
-        return (
-          availabilityDate >= this.referenceDateStart.getTime() &&
-          availabilityDate <= this.referenceDateEnd.getTime() &&
-          skill !== 'AP'
-        );
-      })
-      .map((entry: any) => {
-        const name: string = entry.Name;
-        const skill: string = entry.Skill?.split(' - ')[0];
-        const week: Week = getCalendarFromData(
-          entry['Upcoming absences'],
-          entry['Upcoming trainings'],
-          this.referenceDateStart
-        );
-        const daysLeft: number = getDaysLeft(week);
-        const indTags = clearTagDuplicates([
-          ...getTagsFromData(entry['Sector experience'], 'ind'),
-          ...getAffiliations(entry['Core industry affiliations'], 'ind'),
-        ]);
-
-        const funTags = clearTagDuplicates([
-          ...getTagsFromData(entry['Functional experience'], 'fun'),
-          ...getAffiliations(entry['Core industry affiliation'], 'fun'),
-          ...getAffiliations(entry['Core growth platform affiliation'], 'fun'),
-        ]);
-
-        const tags: Tag[] = sortTags([...indTags, ...funTags]);
-        const availDate: Date = new Date(
-          Date.parse(entry['Availability date'])
-        );
-        const pdm: string = entry['Staffing manager'];
-
-        return {
-          id: uuidv4(),
-          name,
-          skill,
-          availDate,
-          week,
-          daysLeft,
-          tags,
-          pdm,
-          inEditMode: false,
-        };
-      })
-      .sort((a: PersonEditable, b: PersonEditable) => {
-        const nameA = a.name.toUpperCase();
-        const nameB = b.name.toUpperCase();
-
-        if (nameA < nameB) {
-          return -1;
-        }
-        if (nameA > nameB) {
-          return 1;
-        }
-        return 0;
-      });
-
-    return returnData;
+  clearUploadStatus(): void {
+    if (this.uploadError) {
+      this.uploadError = '';
+    }
+    if (this.uploaded) {
+      this.uploaded = false;
+    }
   }
 
   onFileSelected(event: any) {
     const file: File = event?.target.files[0];
     const reader = new FileReader();
 
+    this.clearUploadStatus();
+
     reader.readAsText(file);
-
     reader.onload = () => {
-      const list = reader.result as string;
+      this.data = reader.result as string;
 
-      parse(list, { columns: true }, (err, data) => {
+      parse(this.data, { columns: true }, (err, data) => {
         if (err) {
           console.log(err);
           this.uploadError = String(err);
         }
         this.fileSelected = true;
-        this.previewData = this.parseData(data);
+        this.previewData = this.csvParserService.parse(
+          data,
+          this.referenceDateStart,
+          this.referenceDateEnd
+        );
       });
     };
 
@@ -125,6 +73,37 @@ export class UploadSectionComponent implements OnInit {
       console.log(reader.error);
       this.uploadError = String(reader.error?.message);
     };
+  }
+
+  // *****************
+  // SUBMIT HANDLERS
+  // *****************
+  onSubmit() {
+    this.clearUploadStatus();
+    this.showUploadModal = true;
+  }
+  handleModalClose(submit: boolean) {
+    this.showUploadModal = false;
+    if (submit) {
+      this.uploadData();
+    }
+  }
+
+  async uploadData() {
+    this.uploading = true;
+
+    try {
+      await this.fetchService.storeMasterList(
+        this.referenceDateStart,
+        this.data
+      );
+      this.uploaded = true;
+    } catch (e: any) {
+      console.log(e.message);
+      this.uploadError = e.message;
+    } finally {
+      this.uploading = false;
+    }
   }
 
   ngOnInit(): void {}

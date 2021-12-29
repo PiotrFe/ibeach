@@ -1,16 +1,20 @@
 import { Week } from '../people-list/week';
 import { getNewWeek } from '../shared-module/week-days/week';
+import { getCalendarFromDate } from './index';
 
 export const getCalendarFromData = (
   absences: string,
   trainings: string,
-  weekOf: Date
+  weekOf: Date,
+  availFrom?: Date
 ): Week => {
+  const availableFrom = availFrom || weekOf;
   const weekObj = getNewWeek();
-  const weekDaysArr: string[] = Object.keys(weekObj);
+  const calendarObj = getCalendarFromDate(availableFrom, weekObj, weekOf);
+  const weekDaysArr: string[] = Object.keys(calendarObj);
 
   if (!absences && !trainings) {
-    return weekObj;
+    return calendarObj;
   }
 
   // Get the starting ts
@@ -54,18 +58,14 @@ export const getCalendarFromData = (
     // the current week
     absenceTSArr.forEach((absenceTS) => {
       const index = weekTSArray.findIndex((weekTs) => weekTs === absenceTS);
-      console.log({
-        absenceTSArr,
-        absenceTS,
-        index,
-      });
+
       if (index >= 0) {
         // for those that do, mark the day in calendar as unavailable
         const weekDay = weekDaysArr[index];
-        weekObj[weekDay as keyof Week] = false;
+        calendarObj[weekDay as keyof Week] = false;
       }
     });
   });
 
-  return weekObj;
+  return calendarObj;
 };

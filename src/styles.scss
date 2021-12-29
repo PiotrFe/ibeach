@@ -692,6 +692,14 @@ ul {
   right: -10px;
 }
 
+.alert-wrapper {
+  width: 100%;
+  max-width: 25rem;
+  height: 100%;
+  max-height: 5rem;
+  display: flex;
+}
+
 // ****************
 // ELEMENT VARIANTS STYLING
 // ****************
