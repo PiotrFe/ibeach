@@ -1,7 +1,7 @@
 <nav class="main-toolbar">
   <div class="toolbar-group toolbar-group--left flex flex-ver-ctr">
     <button
-      *ngIf="!inEditMode"
+      *ngIf="!inEditMode && pdmFilter.value !== 'All'"
       type="button"
       class="btn btn-success mr-20"
       (click)="onSubmit()"
@@ -9,7 +9,7 @@
       Submit
     </button>
     <button
-      *ngIf="!inEditMode"
+      *ngIf="!inEditMode && pdmFilter.value !== 'All'"
       type="button"
       class="btn btn-primary mr-20"
       (click)="setInEditMode(true)"
@@ -41,6 +41,12 @@
     >
       Cancel
     </button>
+    <span *ngIf="statusLabel === 'pending'" class="badge bg-warning text-dark"
+      >Pending</span
+    >
+    <span *ngIf="statusLabel === 'done'" class="badge bg-success"
+      >Submitted</span
+    >
   </div>
   <div class="toolbar-group toolbar-group--center flex flex-ver-ctr">
     <calendar
@@ -54,15 +60,13 @@
   <div class="toolbar-group toolbar-group--right flex flex-ver-ctr">
     <select
       class="form-select mr-10 mw-6"
-      (change)="updateSkillFilter($event)"
-      [formControl]="skillFilter"
+      (change)="updatePDMFilter($event)"
+      [formControl]="pdmFilter"
     >
       <option value="All" selected>All</option>
-      <option value="EM">EM</option>
-      <option value="ASC">ASC</option>
-      <option value="FELL">FELL</option>
-      <option value="BA">BA</option>
-      <option value="INT">INT</option>
+      <option *ngFor="let pdm of getPDMList()">
+        {{ pdm }}
+      </option>
     </select>
     <div class="form-check form-switch">
       <input

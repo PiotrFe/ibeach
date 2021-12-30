@@ -4,31 +4,17 @@ import { FetchService } from '../../shared-module/fetch.service';
 import { v4 as uuidv4 } from 'uuid';
 import { getNewAvailDate, getTagArr, sortTags } from '../../utils/';
 import { Person, PersonEditable, Tag } from '../person';
-import { PageComponent } from 'src/app/shared-module/page/page.component';
+import {
+  PageComponent,
+  SubmissionStatus,
+  Filter,
+  SKILL_INDEX,
+} from 'src/app/shared-module/page/page.component';
 import {
   Week,
   getNewWeek,
   getDaysLeft,
 } from '../../shared-module/week-days/week';
-
-const SKILL_INDEX = {
-  AP: 6,
-  EM: 5,
-  ASC: 4,
-  FELL: 3,
-  BA: 2,
-  INT: 1,
-};
-
-interface Filter {
-  field: string;
-  value?: string;
-}
-
-interface SubmissionStatus {
-  pending: string[];
-  done: string[];
-}
 
 @Component({
   selector: 'people-list',
@@ -38,26 +24,22 @@ interface SubmissionStatus {
 export class PeopleListComponent extends PageComponent implements OnInit {
   people!: PersonEditable[];
   newRows: PersonEditable[] = [];
-  sort: { field: string; order: number } = {
-    field: '',
-    order: 0,
-  };
-  filters: Filter[] = [];
-
   inEditMode: boolean = false;
   saveChangesInProgress: boolean = false;
   showAvailableOnly: boolean = false;
   peopleFilteredView = this.people;
-  skillFilter = new FormControl('All');
+  pdmFilter = new FormControl('All');
   referenceDate: Date = new Date();
   showSubmitModal: boolean = false;
+  status!: SubmissionStatus;
+  statusLabel!: string;
 
   constructor(private fetchService: FetchService) {
     super();
   }
 
   ngOnInit(): void {
-    this.peopleFilteredView = this.filterPeopleView(this.people);
+    this.updateFilteredView();
   }
 
   onDateChange(date: Date) {
@@ -88,6 +70,7 @@ export class PeopleListComponent extends PageComponent implements OnInit {
         inEditMode: false,
       }));
 
+      this.status = status;
       this.updateFilteredView();
     } catch (e: any) {
       console.log({ e });
@@ -106,34 +89,24 @@ export class PeopleListComponent extends PageComponent implements OnInit {
   // *****************
 
   updateFilteredView(): void {
-    this.peopleFilteredView = this.filterPeopleView(this.people);
+    this.peopleFilteredView = this.getFilteredView(this.people);
   }
 
-  filterPeopleView(people: PersonEditable[]): PersonEditable[] {
-    if (!this.filters.length) {
-      return people;
+  getPDMList(): string[] {
+    if (!this.status) {
+      return [];
     }
-    return this.people.filter((person) => {
-      let daysLeftPass = true;
-      let skillPass = true;
 
-      for (let filter of this.filters) {
-        if (filter.field === 'days') {
-          daysLeftPass = person.daysLeft > 0;
-        }
-        if (filter.field === 'skill') {
-          skillPass = person.skill === filter.value;
-        }
-      }
-
-      return daysLeftPass && skillPass;
-    });
+    return Object.values(this.status)
+      .reduce((arr, subArr) => (arr = [...arr, ...subArr]), [])
+      .sort();
   }
 
   clearFilters(): void {
     this.filters = [];
     this.showAvailableOnly = false;
-    this.skillFilter.setValue('All');
+    this.statusLabel = '';
+    this.pdmFilter.setValue('All');
     this.updateFilteredView();
   }
 
@@ -153,35 +126,35 @@ export class PeopleListComponent extends PageComponent implements OnInit {
     this.updateFilteredView();
   }
 
-  updateSkillFilter(event: any): void {
-    const skill = event.target.value;
+  updatePDMFilter(event: any): void {
+    const pdm = event.target.value;
 
-    this.filters = this.filters.filter(
-      (filter: Filter) => filter.field !== 'skill'
-    );
-
-    if (skill !== 'All') {
-      this.filters.push({
-        field: 'skill',
-        value: skill,
-      });
+    if (pdm === 'All') {
+      this.filters = [];
+      this.statusLabel = '';
+    } else {
+      this.updateFilter('pdm', pdm);
+      this.updateStatusLabel(pdm);
     }
 
     this.updateFilteredView();
   }
 
-  getClearFilterBtnClass(): string {
-    const baseClass = 'bi bi-x-circle-fill fs-12';
-    const otherClasses = [];
-    if (this.filters.length) {
-      otherClasses.push(' clickable');
-    } else {
-      otherClasses.push(' btn-inactive');
-      otherClasses.push('btn-greyed-out');
+  updateStatusLabel(pdm: string) {
+    if (!this.status) {
+      return;
     }
 
-    const otherClsStr = otherClasses.join(' ');
-    return `${baseClass}${otherClsStr}`;
+    try {
+      Object.entries(this.status).forEach(
+        ([status, pdmArr]: [string, string[]]) => {
+          if (pdmArr.includes(pdm)) {
+            this.statusLabel = status;
+            throw new Error('done');
+          }
+        }
+      );
+    } catch (e) {}
   }
 
   // *****************
@@ -194,7 +167,6 @@ export class PeopleListComponent extends PageComponent implements OnInit {
       this.newRows = [];
     }
   }
-
   saveChanges(): void {
     if (!this.checkIfAnyFormsOpen()) {
       this.setInEditMode(false);
@@ -319,13 +291,6 @@ export class PeopleListComponent extends PageComponent implements OnInit {
       const tagIdx = tags.findIndex((tag) => tag.value === value);
       tags.splice(tagIdx, 1);
     }
-
-    console.log({
-      id,
-      personIdx,
-      person: this.people[personIdx],
-      tags,
-    });
 
     this.people[personIdx] = {
       ...person,
