@@ -92,10 +92,6 @@
 </nav>
 
 <ul class="people">
-  <div *ngIf="fetchError" class="alert alert-danger">
-    {{ fetchError }}
-  </div>
-  <div *ngIf="noData" class="alert alert-primary">No data available</div>
   <li>
     <people-list-header
       [sortable]="true"
@@ -104,8 +100,12 @@
     ></people-list-header>
   </li>
 
-  <div class="people-content">
-    <ul *ngIf="inEditMode" class="tl-content">
+  <div class="people-content tl-content">
+    <div *ngIf="fetchError" class="alert alert-danger">
+      {{ fetchError }}
+    </div>
+    <div *ngIf="noData" class="alert alert-primary">No data available</div>
+    <ul *ngIf="inEditMode">
       <li *ngFor="let row of newRows">
         <person-entry-form
           [id]="row.id"

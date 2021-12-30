@@ -4,7 +4,7 @@ import { FetchService } from '../../shared-module/fetch.service';
 import { TypeaheadService } from '../../shared-module/typeahead.service';
 import { v4 as uuidv4 } from 'uuid';
 import { getNewAvailDate, getTagArr, sortTags } from '../../utils/';
-import { Person, PersonEditable, Tag } from '../person';
+import { Person, PersonEditable, PersonEntry, Tag } from '../person';
 import {
   PageComponent,
   SubmissionStatus,
@@ -75,10 +75,23 @@ export class PeopleListComponent extends PageComponent implements OnInit {
       }: { people: Person[]; status: SubmissionStatus; lookupTable: Person[] } =
         response;
 
-      this.people = people.map((person) => ({
-        ...person,
-        inEditMode: false,
-      }));
+      this.people = people
+        .sort((a: Person, b: Person) => {
+          const nameA = a.name.toUpperCase();
+          const nameB = b.name.toUpperCase();
+
+          if (nameA < nameB) {
+            return -1;
+          }
+          if (nameA > nameB) {
+            return 1;
+          }
+          return 0;
+        })
+        .map((person) => ({
+          ...person,
+          inEditMode: false,
+        }));
 
       this.typeaheadService.storeLookupList(
         this.typeaheadService.tableTypes.People,
@@ -195,6 +208,11 @@ export class PeopleListComponent extends PageComponent implements OnInit {
     }
   }
   saveChanges(): void {
+    this.people = this.people.map((person: PersonEditable) => ({
+      ...person,
+      inEditMode: false,
+    }));
+
     if (!this.checkIfAnyFormsOpen()) {
       this.setInEditMode(false);
       this.updateFilteredView();

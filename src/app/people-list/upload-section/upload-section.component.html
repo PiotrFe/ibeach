@@ -46,17 +46,17 @@
 </nav>
 
 <ul class="people">
-  <div *ngIf="fetchError" class="alert alert-danger">
-    {{ fetchError }}
-  </div>
-  <div *ngIf="noData" class="alert alert-primary">No data available</div>
-  <div *ngIf="uploaded" class="alert alert-success">
-    <strong>Success!</strong> Data has been uploaded
-  </div>
   <li>
     <people-list-header></people-list-header>
   </li>
   <div class="people-content">
+    <div *ngIf="fetchError" class="alert alert-danger">
+      {{ fetchError }}
+    </div>
+    <div *ngIf="noData" class="alert alert-primary">No data available</div>
+    <div *ngIf="uploaded" class="alert alert-success">
+      <strong>Success!</strong> Data has been uploaded
+    </div>
     <li *ngFor="let person of previewData; let i = index">
       <person-entry
         [id]="person.id"

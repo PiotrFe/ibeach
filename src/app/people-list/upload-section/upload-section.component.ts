@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FetchService } from '../../shared-module/fetch.service';
 import { CsvParserService } from '../../shared-module/csv-parser.service';
 import { parse } from '../../utils/csv-parser/index';
-import { Person } from '../person';
+import { Person, PersonEntry } from '../person';
 import { PageComponent } from 'src/app/shared-module/page/page.component';
 
 @Component({
@@ -45,6 +45,7 @@ export class UploadSectionComponent extends PageComponent implements OnInit {
     this.fetching = true;
     this.fetchError = '';
     this.noData = false;
+    this.uploaded = false;
 
     try {
       const response = await this.fetchService.fetchWeeklyList(
@@ -53,7 +54,18 @@ export class UploadSectionComponent extends PageComponent implements OnInit {
 
       const { people }: { people: Person[] } = response;
 
-      this.previewData = people;
+      this.previewData = people.sort((a: Person, b: Person) => {
+        const nameA = a.name.toUpperCase();
+        const nameB = b.name.toUpperCase();
+
+        if (nameA < nameB) {
+          return -1;
+        }
+        if (nameA > nameB) {
+          return 1;
+        }
+        return 0;
+      });
     } catch (e: any) {
       if (e.message === 'Error: No data') {
         this.noData = true;
@@ -98,10 +110,6 @@ export class UploadSectionComponent extends PageComponent implements OnInit {
         this.noData = false;
 
         const parsed = this.csvParserService.parse(data);
-
-        console.log({
-          parsed,
-        });
 
         this.fullData = parsed;
       });
