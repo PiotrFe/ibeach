@@ -91,6 +91,7 @@
   <div *ngIf="fetchError" class="alert alert-danger">
     {{ fetchError }}
   </div>
+  <div *ngIf="noData" class="alert alert-primary">No data available</div>
   <li>
     <people-list-header
       [sortable]="true"

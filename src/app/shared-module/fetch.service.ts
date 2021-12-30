@@ -39,7 +39,16 @@ export class FetchService {
     const weekTs = weekOf.getTime();
 
     try {
-      const response = await axios.get(`${baseUrl}/week/${weekTs}`);
+      const response = await axios.get(`${baseUrl}/week/${weekTs}`, {
+        validateStatus: (status) => {
+          return status < 500;
+        },
+      });
+
+      if (response.status === 404) {
+        throw new Error('No data');
+      }
+
       const { data, statusSummary } = response.data;
 
       return {
@@ -53,7 +62,7 @@ export class FetchService {
         status: statusSummary,
       };
     } catch (err: any) {
-      throw new Error(err.message || 'Something went wrong. Please try again');
+      throw new Error(err);
     }
   }
 }

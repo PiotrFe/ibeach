@@ -2,14 +2,15 @@ import { Component, OnInit } from '@angular/core';
 import { FetchService } from '../../shared-module/fetch.service';
 import { CsvParserService } from '../../shared-module/csv-parser.service';
 import { parse } from '../../utils/csv-parser/index';
-import { PersonEditable } from '../person';
+import { Person } from '../person';
+import { PageComponent } from 'src/app/shared-module/page/page.component';
 
 @Component({
   selector: 'upload-section',
   templateUrl: './upload-section.component.html',
   styleUrls: ['./upload-section.component.scss'],
 })
-export class UploadSectionComponent implements OnInit {
+export class UploadSectionComponent extends PageComponent implements OnInit {
   bsInlineValue: Date = new Date();
   referenceDateStart: Date = this.bsInlineValue;
   referenceDateEnd: Date = new Date(
@@ -17,29 +18,56 @@ export class UploadSectionComponent implements OnInit {
   );
   fileSelected: boolean = false;
   data!: string;
-  previewData: PersonEditable[] = [];
+  previewData: Person[] = [];
   showUploadModal: boolean = false;
   uploading: boolean = false;
   uploaded: boolean = false;
-  uploadError: string = '';
 
   constructor(
     private fetchService: FetchService,
     private csvParserService: CsvParserService
-  ) {}
+  ) {
+    super();
+  }
 
   setReferenceDate(date: Date) {
-    console.log({ date });
     this.referenceDateStart = date;
     this.referenceDateStart.setHours(0, 0, 0, 0);
     this.referenceDateEnd = new Date(
       this.referenceDateStart.getTime() + 1000 * 60 * 60 * 24 * 5
     );
+    this.previewData = [];
+    this.fetchData();
+  }
+
+  async fetchData() {
+    this.fetching = true;
+    this.fetchError = '';
+    this.noData = false;
+
+    try {
+      const response = await this.fetchService.fetchWeeklyList(
+        this.referenceDateStart
+      );
+
+      const { people }: { people: Person[] } = response;
+
+      this.previewData = people;
+    } catch (e: any) {
+      console.log({ e });
+      if (e.message === 'Error: No data') {
+        this.noData = true;
+      } else {
+        this.fetchError = e.message;
+      }
+    } finally {
+      this.fetching = false;
+    }
   }
 
   clearUploadStatus(): void {
-    if (this.uploadError) {
-      this.uploadError = '';
+    if (this.fetching) {
+      this.fetchError = '';
     }
     if (this.uploaded) {
       this.uploaded = false;
@@ -59,7 +87,7 @@ export class UploadSectionComponent implements OnInit {
       parse(this.data, { columns: true }, (err, data) => {
         if (err) {
           console.log(err);
-          this.uploadError = String(err);
+          this.fetchError = String(err);
         }
         this.fileSelected = true;
         this.previewData = this.csvParserService.parse(
@@ -72,7 +100,7 @@ export class UploadSectionComponent implements OnInit {
 
     reader.onerror = () => {
       console.log(reader.error);
-      this.uploadError = String(reader.error?.message);
+      this.fetchError = String(reader.error?.message);
     };
   }
 
@@ -96,19 +124,11 @@ export class UploadSectionComponent implements OnInit {
     try {
       await this.fetchService.storeMasterList(
         this.referenceDateStart,
-        JSON.stringify(
-          this.previewData.map((person) => {
-            const { inEditMode, ...otherProps } = person;
-
-            return {
-              ...otherProps,
-            };
-          })
-        )
+        JSON.stringify(this.previewData)
       );
       this.uploaded = true;
     } catch (e: any) {
-      this.uploadError = e.message;
+      this.fetchError = e.message;
     } finally {
       this.uploading = false;
     }

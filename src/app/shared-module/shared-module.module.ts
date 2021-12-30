@@ -7,6 +7,7 @@ import { ModalModule, BsModalRef } from 'ngx-bootstrap/modal';
 import { InitialsPipe } from './initials.pipe';
 import { CalendarComponent } from './calendar/calendar.component';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
+import { PageComponent } from './page/page.component';
 
 @NgModule({
   declarations: [
@@ -14,6 +15,7 @@ import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
     ModalWindowComponent,
     InitialsPipe,
     CalendarComponent,
+    PageComponent,
   ],
   imports: [
     BsDatepickerModule.forRoot(),
@@ -27,6 +29,7 @@ import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
     ModalWindowComponent,
     InitialsPipe,
     CalendarComponent,
+    PageComponent,
   ],
   providers: [BsModalRef],
 })

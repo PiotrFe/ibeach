@@ -43,10 +43,11 @@
   </div>
 </nav>
 
-<ul *ngIf="previewData.length" class="people">
-  <div *ngIf="uploadError" class="alert alert-danger">
-    {{ uploadError }}
+<ul class="people">
+  <div *ngIf="fetchError" class="alert alert-danger">
+    {{ fetchError }}
   </div>
+  <div *ngIf="noData" class="alert alert-primary">No data available</div>
   <div *ngIf="uploaded" class="alert alert-success">
     <strong>Success!</strong> Data has been uploaded
   </div>

@@ -2,9 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { FetchService } from '../../shared-module/fetch.service';
 import { v4 as uuidv4 } from 'uuid';
-import { PEOPLE } from '../people';
 import { getNewAvailDate, getTagArr, sortTags } from '../../utils/';
 import { Person, PersonEditable, Tag } from '../person';
+import { PageComponent } from 'src/app/shared-module/page/page.component';
 import {
   Week,
   getNewWeek,
@@ -35,7 +35,7 @@ interface SubmissionStatus {
   templateUrl: './people-list.component.html',
   styleUrls: ['./people-list.component.scss'],
 })
-export class PeopleListComponent implements OnInit {
+export class PeopleListComponent extends PageComponent implements OnInit {
   people!: PersonEditable[];
   newRows: PersonEditable[] = [];
   sort: { field: string; order: number } = {
@@ -51,10 +51,10 @@ export class PeopleListComponent implements OnInit {
   skillFilter = new FormControl('All');
   referenceDate: Date = new Date();
   showSubmitModal: boolean = false;
-  loading: boolean = false;
-  fetchError: string = '';
 
-  constructor(private fetchService: FetchService) {}
+  constructor(private fetchService: FetchService) {
+    super();
+  }
 
   ngOnInit(): void {
     this.peopleFilteredView = this.filterPeopleView(this.people);
@@ -71,8 +71,9 @@ export class PeopleListComponent implements OnInit {
   }
 
   async fetchData() {
-    this.loading = true;
+    this.fetching = true;
     this.fetchError = '';
+    this.noData = false;
 
     try {
       const response = await this.fetchService.fetchWeeklyList(
@@ -89,9 +90,14 @@ export class PeopleListComponent implements OnInit {
 
       this.updateFilteredView();
     } catch (e: any) {
-      this.fetchError = e.message;
+      console.log({ e });
+      if (e.message === 'Error: No data') {
+        this.noData = true;
+      } else {
+        this.fetchError = e.message;
+      }
     } finally {
-      this.loading = false;
+      this.fetching = false;
     }
   }
 
