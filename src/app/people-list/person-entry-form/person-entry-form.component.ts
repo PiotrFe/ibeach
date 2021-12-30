@@ -7,7 +7,8 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { Person, PersonEntry, Tag } from '../person';
+import { PersonEntry, Tag } from '../person';
+import { TypeaheadService } from '../../shared-module/typeahead.service';
 import { getPDMArr } from '../../utils/getPDMArr';
 import {
   getWeekDayDate,
@@ -29,6 +30,8 @@ import {
 export class PersonEntryFormComponent extends PersonEntry implements OnInit {
   @Input() referenceDate!: Date;
   @Input() dispatchToParentAndClose: boolean = false;
+  @Input() pdm!: string;
+  @Input() getNameTypeAhead!: Function;
 
   @Output() formEditEvent = new EventEmitter<{
     id: string;
@@ -56,6 +59,67 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
   pdmArr: string[] = getPDMArr();
 
   // ***************
+  // CONSTRUCTOR
+  // ***************
+
+  constructor(typeaheadService: TypeaheadService) {
+    super(typeaheadService);
+  }
+
+  // ***************
+  // LIFECYCLE HOOKS
+  // ***************
+
+  ngOnInit(): void {
+    if (!this.person && this.pdm) {
+      this.personForm.patchValue({
+        pdm: this.pdm,
+      });
+    }
+
+    if (this.person) {
+      const { name, skill, comments, availDate, pdm } = this.person;
+      this.personForm.setValue({
+        name,
+        skill,
+        comments: comments || '',
+        availDate: availDate || '',
+        pdm: pdm || '',
+      });
+      this.tags = this.person.tags;
+    } else {
+      this.tags = [];
+    }
+
+    if (this.person?.week) {
+      this.localCalendarObj = this.person.week;
+      this.setDaysLeft(this.person.week);
+    } else {
+      this.daysLeft = 5;
+      this.localCalendarObj = getNewWeek();
+      this.personForm.patchValue({ availDate: this.referenceDate });
+    }
+
+    this.personForm.get('availDate')!.valueChanges.subscribe((val: Date) => {
+      const newCalendarObj = getCalendarFromDate(
+        val,
+        this.localCalendarObj,
+        this.referenceDate
+      );
+      this.localCalendarObj = newCalendarObj;
+    });
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (
+      changes['dispatchToParentAndClose'] &&
+      changes['dispatchToParentAndClose'].currentValue === true
+    ) {
+      this.onSubmit();
+    }
+  }
+
+  // ***************
   // FORM GROUP
   // ***************
 
@@ -66,7 +130,7 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
       Validators.required,
     ]),
     comments: new FormControl(''),
-    pdm: new FormControl(''),
+    pdm: new FormControl(this.pdm),
   });
 
   isFieldValid(field: string) {
@@ -144,60 +208,5 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
 
   setDaysLeft(calendarObj: Week) {
     this.daysLeft = getDaysLeft(calendarObj);
-  }
-
-  // ***************
-  // CONSTRUCTOR
-  // ***************
-
-  constructor() {
-    super();
-  }
-
-  // ***************
-  // LIFECYCLE HOOKS
-  // ***************
-
-  ngOnInit(): void {
-    if (this.person) {
-      const { name, skill, comments, availDate, pdm } = this.person;
-      this.personForm.setValue({
-        name,
-        skill,
-        comments: comments || '',
-        availDate: availDate || '',
-        pdm: pdm || '',
-      });
-      this.tags = this.person.tags;
-    } else {
-      this.tags = [];
-    }
-
-    if (this.person?.week) {
-      this.localCalendarObj = this.person.week;
-      this.setDaysLeft(this.person.week);
-    } else {
-      this.daysLeft = 5;
-      this.localCalendarObj = getNewWeek();
-      this.personForm.patchValue({ availDate: this.referenceDate });
-    }
-
-    this.personForm.get('availDate')!.valueChanges.subscribe((val: Date) => {
-      const newCalendarObj = getCalendarFromDate(
-        val,
-        this.localCalendarObj,
-        this.referenceDate
-      );
-      this.localCalendarObj = newCalendarObj;
-    });
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if (
-      changes['dispatchToParentAndClose'] &&
-      changes['dispatchToParentAndClose'].currentValue === true
-    ) {
-      this.onSubmit();
-    }
   }
 }

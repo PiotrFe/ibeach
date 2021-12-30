@@ -19,6 +19,7 @@ export class UploadSectionComponent extends PageComponent implements OnInit {
   fileSelected: boolean = false;
   data!: string;
   previewData: Person[] = [];
+  fullData: Person[] = [];
   showUploadModal: boolean = false;
   uploading: boolean = false;
   uploaded: boolean = false;
@@ -54,7 +55,6 @@ export class UploadSectionComponent extends PageComponent implements OnInit {
 
       this.previewData = people;
     } catch (e: any) {
-      console.log({ e });
       if (e.message === 'Error: No data') {
         this.noData = true;
       } else {
@@ -95,6 +95,15 @@ export class UploadSectionComponent extends PageComponent implements OnInit {
           this.referenceDateStart,
           this.referenceDateEnd
         );
+        this.noData = false;
+
+        const parsed = this.csvParserService.parse(data);
+
+        console.log({
+          parsed,
+        });
+
+        this.fullData = parsed;
       });
     };
 
@@ -124,7 +133,7 @@ export class UploadSectionComponent extends PageComponent implements OnInit {
     try {
       await this.fetchService.storeMasterList(
         this.referenceDateStart,
-        JSON.stringify(this.previewData)
+        JSON.stringify({ week: this.previewData, full: this.fullData })
       );
       this.uploaded = true;
     } catch (e: any) {

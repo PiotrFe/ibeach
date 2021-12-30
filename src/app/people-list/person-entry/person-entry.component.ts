@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { PersonEntry } from '../person';
+import { TypeaheadService } from '../../shared-module/typeahead.service';
 import { Week } from 'src/app/shared-module/week-days/week';
 
 @Component({
@@ -13,8 +14,8 @@ export class PersonEntryComponent extends PersonEntry implements OnInit {
 
   @Output() editEvent = new EventEmitter<string>();
 
-  constructor() {
-    super();
+  constructor(typeaheadService: TypeaheadService) {
+    super(typeaheadService);
   }
 
   handleEdit(): void {

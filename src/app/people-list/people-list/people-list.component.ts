@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { FetchService } from '../../shared-module/fetch.service';
+import { TypeaheadService } from '../../shared-module/typeahead.service';
 import { v4 as uuidv4 } from 'uuid';
 import { getNewAvailDate, getTagArr, sortTags } from '../../utils/';
 import { Person, PersonEditable, Tag } from '../person';
@@ -33,12 +34,17 @@ export class PeopleListComponent extends PageComponent implements OnInit {
   showSubmitModal: boolean = false;
   status!: SubmissionStatus;
   statusLabel!: string;
+  boundGetNameTypeahead!: Function;
 
-  constructor(private fetchService: FetchService) {
+  constructor(
+    private fetchService: FetchService,
+    private typeaheadService: TypeaheadService
+  ) {
     super();
   }
 
   ngOnInit(): void {
+    this.boundGetNameTypeahead = this.getNameTypeAhead.bind(this);
     this.updateFilteredView();
   }
 
@@ -62,7 +68,11 @@ export class PeopleListComponent extends PageComponent implements OnInit {
         this.referenceDate
       );
 
-      const { people, status }: { people: Person[]; status: SubmissionStatus } =
+      const {
+        people,
+        status,
+        lookupTable,
+      }: { people: Person[]; status: SubmissionStatus; lookupTable: Person[] } =
         response;
 
       this.people = people.map((person) => ({
@@ -70,6 +80,10 @@ export class PeopleListComponent extends PageComponent implements OnInit {
         inEditMode: false,
       }));
 
+      this.typeaheadService.storeLookupList(
+        this.typeaheadService.tableTypes.People,
+        lookupTable
+      );
       this.status = status;
       this.updateFilteredView();
     } catch (e: any) {
@@ -102,14 +116,6 @@ export class PeopleListComponent extends PageComponent implements OnInit {
       .sort();
   }
 
-  clearFilters(): void {
-    this.filters = [];
-    this.showAvailableOnly = false;
-    this.statusLabel = '';
-    this.pdmFilter.setValue('All');
-    this.updateFilteredView();
-  }
-
   toggleShowAvailableOnly(): void {
     this.showAvailableOnly = !this.showAvailableOnly;
 
@@ -128,16 +134,30 @@ export class PeopleListComponent extends PageComponent implements OnInit {
 
   updatePDMFilter(event: any): void {
     const pdm = event.target.value;
+    this.clearEditModeOptions();
 
     if (pdm === 'All') {
       this.filters = [];
-      this.statusLabel = '';
     } else {
       this.updateFilter('pdm', pdm);
       this.updateStatusLabel(pdm);
     }
 
     this.updateFilteredView();
+  }
+
+  clearFilters(): void {
+    this.filters = [];
+    this.showAvailableOnly = false;
+    this.pdmFilter.setValue('All');
+    this.clearEditModeOptions();
+    this.updateFilteredView();
+  }
+
+  clearEditModeOptions(): void {
+    this.statusLabel = '';
+    this.inEditMode = false;
+    this.newRows = [];
   }
 
   updateStatusLabel(pdm: string) {
@@ -160,6 +180,13 @@ export class PeopleListComponent extends PageComponent implements OnInit {
   // *****************
   // EDIT HANDLERS
   // *****************
+
+  getNameTypeAhead(): string[] {
+    return this.typeaheadService.getTypeahead(
+      this.typeaheadService.fields.Name,
+      this.people
+    );
+  }
 
   setInEditMode(inEditMode: boolean): void {
     this.inEditMode = inEditMode;
@@ -260,18 +287,10 @@ export class PeopleListComponent extends PageComponent implements OnInit {
   updateTags(objParam: {
     id: string;
     value: string;
+    type: string;
     action: 'add' | 'remove';
   }): void {
-    const { id, value, action } = objParam;
-    const tagArr: Tag[] = getTagArr();
-    let tagObj: Tag | undefined = tagArr.find((tag) => tag.value === value);
-
-    if (!tagObj) {
-      tagObj = {
-        value,
-        type: 'oth',
-      };
-    }
+    const { id, value, type, action } = objParam;
 
     const personIdx: number | undefined = this.people.findIndex(
       (person) => person.id === id
@@ -285,7 +304,10 @@ export class PeopleListComponent extends PageComponent implements OnInit {
     const tags = [...person.tags];
 
     if (action === 'add') {
-      tags.push(tagObj);
+      tags.push({
+        value,
+        type,
+      });
     }
     if (action === 'remove') {
       const tagIdx = tags.findIndex((tag) => tag.value === value);
@@ -470,10 +492,7 @@ export class PeopleListComponent extends PageComponent implements OnInit {
     if (!a.availDate || !b.availDate) {
       return 0;
     }
-    console.log({
-      a,
-      b,
-    });
+
     const order = this.sort.order;
     const dateA = a.availDate.getTime();
     const dateB = b.availDate.getTime();

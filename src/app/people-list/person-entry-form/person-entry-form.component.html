@@ -1,7 +1,7 @@
 <form
   [formGroup]="personForm"
   (ngSubmit)="onSubmit()"
-  class="person-entry-form"
+  class="person-entry-form tl-row"
   novalidate
 >
   <input
@@ -10,7 +10,7 @@
     type="text"
     placeholder="Name"
     formControlName="name"
-    [typeahead]="getTypeAhead('name', 'form')"
+    [typeahead]="getNameTypeAhead()"
     required
   />
   <select
@@ -71,7 +71,7 @@
               class="form-control form-control-xs tag-input m-bot-2"
               type="text"
               [formControl]="tagInput"
-              [typeahead]="getTypeAhead('tag', 'form')"
+              [typeahead]="getTagTypeahead()"
             />
           </form>
         </li>

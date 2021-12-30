@@ -104,48 +104,53 @@
     ></people-list-header>
   </li>
 
-  <ul *ngIf="inEditMode">
-    <li *ngFor="let row of newRows">
-      <person-entry-form
-        [id]="row.id"
-        [sortField]="sort.field"
-        [currPageSection]="'ALLOCATE'"
-        [referenceDate]="referenceDate"
-        [dispatchToParentAndClose]="saveChangesInProgress"
-        (deleteEvent)="removeRow($event)"
-        (formSubmitEvent)="addPerson($event)"
-      ></person-entry-form>
+  <div class="people-content">
+    <ul *ngIf="inEditMode" class="tl-content">
+      <li *ngFor="let row of newRows">
+        <person-entry-form
+          [id]="row.id"
+          [sortField]="sort.field"
+          [currPageSection]="'ALLOCATE'"
+          [referenceDate]="referenceDate"
+          [getNameTypeAhead]="boundGetNameTypeahead"
+          [pdm]="pdmFilter.value"
+          [dispatchToParentAndClose]="saveChangesInProgress"
+          (deleteEvent)="removeRow($event)"
+          (formSubmitEvent)="addPerson($event)"
+        ></person-entry-form>
+      </li>
+    </ul>
+    <li *ngFor="let person of peopleFilteredView">
+      <ng-container [ngSwitch]="person.inEditMode">
+        <person-entry
+          *ngSwitchCase="false"
+          [id]="person.id"
+          [person]="person"
+          [inEditMode]="inEditMode"
+          [sortField]="sort.field"
+          [currPageSection]="'ALLOCATE'"
+          (editEvent)="editRow($event)"
+          (deleteEvent)="removeExistingRow($event)"
+          (calendarChangeEvent)="updateCalendar($event)"
+          (tagChangeEvent)="updateTags($event)"
+        ></person-entry>
+        <person-entry-form
+          *ngSwitchCase="true"
+          [id]="person.id"
+          [person]="person"
+          [sortField]="sort.field"
+          [currPageSection]="'ALLOCATE'"
+          [referenceDate]="referenceDate"
+          [getNameTypeAhead]="boundGetNameTypeahead"
+          [dispatchToParentAndClose]="saveChangesInProgress"
+          (deleteEvent)="removeExistingRow($event)"
+          (calendarChangeEvent)="updateCalendar($event)"
+          (formEditEvent)="updatePersonDetails($event)"
+          (tagChangeEvent)="updateTags($event)"
+        ></person-entry-form>
+      </ng-container>
     </li>
-  </ul>
-  <li *ngFor="let person of peopleFilteredView">
-    <ng-container [ngSwitch]="person.inEditMode">
-      <person-entry
-        *ngSwitchCase="false"
-        [id]="person.id"
-        [person]="person"
-        [inEditMode]="inEditMode"
-        [sortField]="sort.field"
-        [currPageSection]="'ALLOCATE'"
-        (editEvent)="editRow($event)"
-        (deleteEvent)="removeExistingRow($event)"
-        (calendarChangeEvent)="updateCalendar($event)"
-        (tagChangeEvent)="updateTags($event)"
-      ></person-entry>
-      <person-entry-form
-        *ngSwitchCase="true"
-        [id]="person.id"
-        [person]="person"
-        [sortField]="sort.field"
-        [currPageSection]="'ALLOCATE'"
-        [referenceDate]="referenceDate"
-        [dispatchToParentAndClose]="saveChangesInProgress"
-        (deleteEvent)="removeExistingRow($event)"
-        (calendarChangeEvent)="updateCalendar($event)"
-        (formEditEvent)="updatePersonDetails($event)"
-        (tagChangeEvent)="updateTags($event)"
-      ></person-entry-form>
-    </ng-container>
-  </li>
+  </div>
 </ul>
 <modal-window
   *ngIf="showSubmitModal"

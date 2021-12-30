@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
-import { v4 as uuidv4 } from 'uuid';
 import { getDaysLeft } from 'src/app/shared-module/week-days/week';
-import { PersonEditable, Tag } from 'src/app/people-list/person';
-import { Week } from 'src/app/people-list/week';
+import { Person, Tag } from 'src/app/people-list/person';
+import { Week, getNewWeek } from 'src/app/shared-module/week-days/week';
 import {
   getTagsFromData,
   sortTags,
@@ -19,11 +18,14 @@ export class CsvParserService {
 
   parse(
     data: any,
-    referenceDateStart: Date,
-    referenceDateEnd: Date
-  ): PersonEditable[] {
+    referenceDateStart?: Date,
+    referenceDateEnd?: Date
+  ): Person[] {
     const returnData = data
       .filter((entry: any) => {
+        if (!referenceDateStart || !referenceDateEnd) {
+          return entry;
+        }
         const availabilityDate: number = Date.parse(entry['Availability date']);
         const skill: string = entry.Skill?.split(' - ')[0];
 
@@ -34,14 +36,17 @@ export class CsvParserService {
         );
       })
       .map((entry: any) => {
+        const fmno: string = entry.FMNO;
         const name: string = entry.Name;
         const skill: string = entry.Skill?.split(' - ')[0];
-        const week: Week = getCalendarFromData(
-          entry['Upcoming absences'],
-          entry['Upcoming trainings'],
-          referenceDateStart,
-          new Date(Date.parse(entry['Availability date']))
-        );
+        const week: Week = referenceDateStart
+          ? getCalendarFromData(
+              entry['Upcoming absences'],
+              entry['Upcoming trainings'],
+              referenceDateStart as Date,
+              new Date(Date.parse(entry['Availability date']))
+            )
+          : getNewWeek();
         const daysLeft: number = getDaysLeft(week);
         const indTags = clearTagDuplicates([
           ...getTagsFromData(entry['Sector experience'], 'ind'),
@@ -61,7 +66,7 @@ export class CsvParserService {
         const pdm: string = entry['Staffing manager'];
 
         return {
-          id: uuidv4(),
+          id: fmno,
           name,
           skill,
           availDate,
@@ -69,10 +74,9 @@ export class CsvParserService {
           daysLeft,
           tags,
           pdm,
-          inEditMode: false,
         };
       })
-      .sort((a: PersonEditable, b: PersonEditable) => {
+      .sort((a: Person, b: Person) => {
         const nameA = a.name.toUpperCase();
         const nameB = b.name.toUpperCase();
 

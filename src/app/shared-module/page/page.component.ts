@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Person } from 'src/app/people-list/person';
 
 export interface Filter {
   field: string;

@@ -1,4 +1,4 @@
-<div class="person-entry">
+<div class="person-entry tl-row">
   <span [ngClass]="getFieldClasses('name')">{{ person.name }}</span>
   <span [ngClass]="getFieldClasses('skill')">{{ person.skill }}</span>
   <span [ngClass]="getFieldClasses('availDate')">{{
@@ -44,7 +44,7 @@
               class="form-control form-control-xs tag-input m-bot-2"
               type="text"
               [formControl]="tagInput"
-              [typeahead]="getTypeAhead('tag', 'entry')"
+              [typeahead]="getTagTypeahead()"
             />
           </form>
         </li>

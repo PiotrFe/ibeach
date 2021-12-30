@@ -11,6 +11,7 @@ import { Week } from './week';
 import { PEOPLE } from './people';
 import { getTagArr, getTagFunction, sortTags } from '../utils/';
 import { PAGE_SECTIONS } from '../app.component';
+import { TypeaheadService } from '..//shared-module/typeahead.service';
 
 export const SKILLS = ['EM', 'ASC', 'FELL', 'BA', 'INT'];
 
@@ -55,6 +56,7 @@ export class PersonEntry {
   @Output() tagChangeEvent = new EventEmitter<{
     id: string;
     value: string;
+    type: string;
     action: 'add' | 'remove';
   }>();
 
@@ -63,34 +65,19 @@ export class PersonEntry {
   showAddTag: boolean = false;
   tagArr: string[] = getTagArr().map((item) => item.value);
 
-  getTypeAhead(key: string, submittedBy: 'form' | 'entry'): any[] {
-    if (key === 'pdm') {
-      return this.getPDMTypeAhead(key);
-    }
-    if (key === 'tag') {
-      const arr = this.getTagTypeAhead(submittedBy);
-      return arr;
-    }
+  constructor(private typeaheadService: TypeaheadService) {}
 
-    return [];
+  getTagTypeahead(): string[] {
+    const tags = this.person ? this.person.tags : this.tags;
+
+    return this.typeaheadService.getTypeahead(
+      this.typeaheadService.fields.Tag,
+      tags
+    );
   }
 
   getPDMTypeAhead(key: string): any[] {
     return PEOPLE.map((item) => item[key as keyof Person]);
-  }
-  getTagTypeAhead(submittedBy: 'form' | 'entry'): any[] {
-    const currTags =
-      submittedBy === 'entry'
-        ? this.person.tags.map((tag) => tag.value)
-        : this.tags.map((tag) => tag.value);
-
-    if (!currTags.length) {
-      return this.tagArr;
-    }
-
-    const filtered = this.tagArr.filter((tag) => !currTags.includes(tag));
-
-    return filtered;
   }
 
   setShowAddTag(show: boolean): void {
@@ -100,26 +87,28 @@ export class PersonEntry {
     }, 0);
   }
 
-  checkIfTagLegal() {
-    return this.tagArr.includes(this.tagInput.value);
-  }
-
   onTagSubmit(submittedBy: 'form' | 'entry'): void {
-    const tagLegal: boolean = this.checkIfTagLegal();
+    const tagObj: Tag | undefined = this.typeaheadService.getTagByVal(
+      this.tagInput.value
+    );
 
-    if (tagLegal) {
+    console.log({
+      tagObj,
+    });
+
+    if (tagObj) {
       if (submittedBy === 'entry') {
         this.tagChangeEvent.emit({
           id: this.id,
-          value: this.tagInput.value,
+          value: tagObj.value,
+          type: tagObj.type,
           action: 'add',
         });
       } else {
         this.tags = sortTags([
           ...this.tags,
           {
-            value: this.tagInput.value,
-            type: getTagFunction(this.tagInput.value),
+            ...tagObj,
           },
         ]);
       }
@@ -134,6 +123,7 @@ export class PersonEntry {
       this.tagChangeEvent.emit({
         id: this.id,
         value,
+        type: '',
         action: 'remove',
       });
     } else {

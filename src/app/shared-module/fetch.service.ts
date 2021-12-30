@@ -35,6 +35,7 @@ export class FetchService {
   async fetchWeeklyList(weekOf: Date): Promise<{
     people: Person[];
     status: { pending: string[]; done: string[] };
+    lookupTable: Person[];
   }> {
     const weekTs = weekOf.getTime();
 
@@ -49,7 +50,7 @@ export class FetchService {
         throw new Error('No data');
       }
 
-      const { data, statusSummary } = response.data;
+      const { data, statusSummary, lookupTable } = response.data;
 
       return {
         people: data.map((person: any) => {
@@ -60,6 +61,7 @@ export class FetchService {
           };
         }),
         status: statusSummary,
+        lookupTable,
       };
     } catch (err: any) {
       throw new Error(err);
