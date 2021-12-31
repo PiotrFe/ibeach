@@ -34,6 +34,7 @@ export class PeopleListComponent extends PageComponent implements OnInit {
   showSubmitModal: boolean = false;
   status!: SubmissionStatus;
   statusLabel!: string;
+  submitted!: boolean;
   boundGetNameTypeahead!: Function;
   sortService!: SortService;
 
@@ -59,59 +60,6 @@ export class PeopleListComponent extends PageComponent implements OnInit {
     setTimeout(() => {
       this.updateFilteredView();
     }, 0);
-  }
-
-  async fetchData(forPDM: boolean = false) {
-    setTimeout(() => {
-      this.fetching = true;
-      this.fetchError = '';
-      this.noData = false;
-    }, 0);
-
-    const pdm = forPDM ? this.pdmFilter.value : null;
-
-    try {
-      const response = await this.fetchService.fetchWeeklyList(
-        this.referenceDate,
-        pdm
-      );
-
-      const {
-        people,
-        status,
-        lookupTable,
-      }: { people: Person[]; status: SubmissionStatus; lookupTable: Person[] } =
-        response;
-
-      this.people = this.sortService
-        .sortData(people, this.sortService.SORT_COLUMNS.NAME, false)
-        .map((person) => ({
-          ...person,
-          inEditMode: false,
-        }));
-
-      // lookup table only sent on first fetch, where pdm not provided as parameter
-      // if pdm provided as a parameter, he/she cancelled changes and is fetching the old list from server
-
-      if (!forPDM) {
-        this.typeaheadService.storeLookupList(
-          this.typeaheadService.tableTypes.People,
-          lookupTable
-        );
-        this.status = status;
-      }
-
-      this.updateFilteredView();
-    } catch (e: any) {
-      console.log({ e });
-      if (e.message === 'Error: No data') {
-        this.noData = true;
-      } else {
-        this.fetchError = e.message;
-      }
-    } finally {
-      this.fetching = false;
-    }
   }
 
   handleSort(colName: string) {
@@ -161,7 +109,7 @@ export class PeopleListComponent extends PageComponent implements OnInit {
       this.filters = [];
     } else {
       this.updateFilter('pdm', pdm);
-      this.updateStatusLabel(pdm);
+      this.updateStatusLabel();
     }
 
     this.updateFilteredView();
@@ -181,16 +129,23 @@ export class PeopleListComponent extends PageComponent implements OnInit {
     this.newRows = [];
   }
 
-  updateStatusLabel(pdm: string) {
-    if (!this.status) {
+  updateStatusLabel() {
+    if (!this.status && this.pdmFilter.value === 'All') {
       return;
     }
+
+    const pdm = this.pdmFilter.value;
 
     try {
       Object.entries(this.status).forEach(
         ([status, pdmArr]: [string, string[]]) => {
           if (pdmArr.includes(pdm)) {
             this.statusLabel = status;
+            if (status === 'done') {
+              this.submitted = true;
+            } else {
+              this.submitted = false;
+            }
             throw new Error('done');
           }
         }
@@ -229,30 +184,6 @@ export class PeopleListComponent extends PageComponent implements OnInit {
     }
 
     this.saveChangesInProgress = true;
-  }
-
-  async postChanges() {
-    this.uploading = true;
-
-    try {
-      await this.fetchService.saveList(
-        this.referenceDate,
-        this.pdmFilter.value,
-        this.peopleFilteredView.map((person) => {
-          const { inEditMode, ...otherProps } = person;
-
-          return {
-            ...otherProps,
-          };
-        })
-      );
-    } catch (e: any) {
-      this.fetchError = e;
-    } finally {
-      setTimeout(() => {
-        this.uploading = false;
-      }, 0);
-    }
   }
 
   checkIfAnyFormsOpen = (): boolean => {
@@ -444,13 +375,113 @@ export class PeopleListComponent extends PageComponent implements OnInit {
   // *****************
   // SUBMIT HANDLERS
   // *****************
+
+  async fetchData(forPDM: boolean = false) {
+    setTimeout(() => {
+      this.fetching = true;
+      this.fetchError = '';
+      this.noData = false;
+    }, 0);
+
+    const pdm = forPDM ? this.pdmFilter.value : null;
+
+    try {
+      const response = await this.fetchService.fetchWeeklyList(
+        this.referenceDate,
+        pdm
+      );
+
+      const {
+        people,
+        status,
+        lookupTable,
+      }: { people: Person[]; status: SubmissionStatus; lookupTable: Person[] } =
+        response;
+
+      this.people = this.sortService
+        .sortData(people, this.sortService.SORT_COLUMNS.NAME, false)
+        .map((person) => ({
+          ...person,
+          inEditMode: false,
+        }));
+
+      // lookup table only sent on first fetch, where pdm not provided as parameter
+      // if pdm provided as a parameter, he/she cancelled changes and is fetching the old list from server
+
+      if (!forPDM) {
+        this.typeaheadService.storeLookupList(
+          this.typeaheadService.tableTypes.People,
+          lookupTable
+        );
+      }
+
+      this.status = status;
+      this.updateStatusLabel();
+      this.updateFilteredView();
+    } catch (e: any) {
+      console.log({ e });
+      if (e.message === 'Error: No data') {
+        this.noData = true;
+      } else {
+        this.fetchError = e.message;
+      }
+    } finally {
+      this.fetching = false;
+    }
+  }
+
+  async postChanges() {
+    this.uploading = true;
+
+    try {
+      await this.fetchService.saveList(
+        this.referenceDate,
+        this.pdmFilter.value,
+        this.peopleFilteredView.map((person) => {
+          const { inEditMode, ...otherProps } = person;
+
+          return {
+            ...otherProps,
+          };
+        })
+      );
+      await this.fetchData(true);
+    } catch (e: any) {
+      this.fetchError = e;
+    } finally {
+      setTimeout(() => {
+        this.uploading = false;
+      }, 0);
+    }
+  }
+
   onSubmit() {
     this.showSubmitModal = true;
   }
-  handleModalClose(submit: boolean) {
+
+  async handleModalClose(submit: boolean) {
     this.showSubmitModal = false;
     if (submit) {
-      alert('List has been submitted');
+      this.uploading = true;
+
+      try {
+        await this.fetchService.submitList(
+          this.referenceDate,
+          this.pdmFilter.value,
+          this.peopleFilteredView.map((person) => {
+            const { inEditMode, ...otherProps } = person;
+
+            return {
+              ...otherProps,
+            };
+          })
+        );
+        await this.fetchData(true);
+      } catch (e: any) {
+        this.fetchError = e;
+      } finally {
+        this.uploading = false;
+      }
     }
   }
 }

@@ -78,8 +78,24 @@ export class FetchService {
     const pdmParam = encodeURIComponent(pdm);
 
     try {
-      await axios.post(
+      return await axios.post(
         `${baseUrl}/week/${weekTs}/${pdmParam}`,
+        JSON.stringify(data),
+        config as AxiosRequestConfig
+      );
+    } catch (e: any) {
+      console.log(e);
+      return e.message;
+    }
+  }
+
+  async submitList(weekOf: Date, pdm: string, data: Person[]): Promise<void> {
+    const weekTs = weekOf.getTime();
+    const pdmParam = encodeURIComponent(pdm);
+
+    try {
+      return await axios.post(
+        `${baseUrl}/week/${weekTs}/${pdmParam}/submit`,
         JSON.stringify(data),
         config as AxiosRequestConfig
       );

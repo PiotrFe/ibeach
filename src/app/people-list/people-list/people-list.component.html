@@ -1,7 +1,7 @@
 <nav class="main-toolbar">
   <div class="toolbar-group toolbar-group--left flex flex-ver-ctr">
     <button
-      *ngIf="!inEditMode && pdmFilter.value !== 'All'"
+      *ngIf="!inEditMode && pdmFilter.value !== 'All' && !submitted"
       type="button"
       class="btn btn-success mr-20"
       (click)="onSubmit()"
@@ -9,7 +9,7 @@
       Submit
     </button>
     <button
-      *ngIf="!inEditMode && pdmFilter.value !== 'All'"
+      *ngIf="!inEditMode && pdmFilter.value !== 'All' && !submitted"
       type="button"
       class="btn btn-primary mr-20"
       (click)="setInEditMode(true)"
@@ -41,12 +41,6 @@
     >
       Cancel
     </button>
-    <span *ngIf="statusLabel === 'pending'" class="badge bg-warning text-dark"
-      >Pending</span
-    >
-    <span *ngIf="statusLabel === 'done'" class="badge bg-success"
-      >Submitted</span
-    >
   </div>
   <div class="toolbar-group toolbar-group--center flex flex-ver-ctr">
     <calendar
@@ -58,8 +52,14 @@
     ></calendar>
   </div>
   <div class="toolbar-group toolbar-group--right flex flex-ver-ctr">
+    <span *ngIf="statusLabel === 'pending'" class="badge bg-warning text-dark"
+      >Pending</span
+    >
+    <span *ngIf="statusLabel === 'done'" class="badge bg-success"
+      >Submitted</span
+    >
     <select
-      class="form-select mr-10 mw-12"
+      class="form-select mr-10 mw-12 ml-12"
       (change)="updatePDMFilter($event)"
       [formControl]="pdmFilter"
     >

@@ -142,6 +142,7 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
     if (person) {
       this.personForm.patchValue({
         skill: person.skill,
+        pdm: person.pdm,
       });
       this.tags = person.tags;
       this.fmno = person.id;
