@@ -40,10 +40,12 @@ export class UploadSectionComponent extends PageComponent implements OnInit {
   }
 
   async fetchData() {
-    this.fetching = true;
-    this.fetchError = '';
-    this.noData = false;
-    this.uploaded = false;
+    setTimeout(() => {
+      this.fetching = true;
+      this.fetchError = '';
+      this.noData = false;
+      this.uploaded = false;
+    }, 0);
 
     try {
       const response = await this.fetchService.fetchWeeklyList(
@@ -71,7 +73,9 @@ export class UploadSectionComponent extends PageComponent implements OnInit {
         this.fetchError = e.message;
       }
     } finally {
-      this.fetching = false;
+      setTimeout(() => {
+        this.fetching = false;
+      }, 0);
     }
   }
 

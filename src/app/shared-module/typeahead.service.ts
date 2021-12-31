@@ -67,12 +67,12 @@ export class TypeaheadService {
         const idx = dataSet.findIndex(
           (displayedPerson: Person) => displayedPerson.id === person.id
         );
-        console.log({
-          list: this._peopleList,
-          dataSet,
-          person,
-          idx,
-        });
+        // console.log({
+        //   list: this._peopleList,
+        //   dataSet,
+        //   person,
+        //   idx,
+        // });
         return idx < 0;
       })
       .map((person: Person) => person.name);

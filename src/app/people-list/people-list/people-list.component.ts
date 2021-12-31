@@ -61,16 +61,19 @@ export class PeopleListComponent extends PageComponent implements OnInit {
     }, 0);
   }
 
-  async fetchData() {
+  async fetchData(forPDM: boolean = false) {
     setTimeout(() => {
       this.fetching = true;
       this.fetchError = '';
       this.noData = false;
     }, 0);
 
+    const pdm = forPDM ? this.pdmFilter.value : null;
+
     try {
       const response = await this.fetchService.fetchWeeklyList(
-        this.referenceDate
+        this.referenceDate,
+        pdm
       );
 
       const {
@@ -87,11 +90,17 @@ export class PeopleListComponent extends PageComponent implements OnInit {
           inEditMode: false,
         }));
 
-      this.typeaheadService.storeLookupList(
-        this.typeaheadService.tableTypes.People,
-        lookupTable
-      );
-      this.status = status;
+      // lookup table only sent on first fetch, where pdm not provided as parameter
+      // if pdm provided as a parameter, he/she cancelled changes and is fetching the old list from server
+
+      if (!forPDM) {
+        this.typeaheadService.storeLookupList(
+          this.typeaheadService.tableTypes.People,
+          lookupTable
+        );
+        this.status = status;
+      }
+
       this.updateFilteredView();
     } catch (e: any) {
       console.log({ e });
@@ -224,6 +233,7 @@ export class PeopleListComponent extends PageComponent implements OnInit {
 
   async postChanges() {
     this.uploading = true;
+
     try {
       await this.fetchService.saveList(
         this.referenceDate,
@@ -239,7 +249,9 @@ export class PeopleListComponent extends PageComponent implements OnInit {
     } catch (e: any) {
       this.fetchError = e;
     } finally {
-      this.uploading = false;
+      setTimeout(() => {
+        this.uploading = false;
+      }, 0);
     }
   }
 
@@ -253,9 +265,10 @@ export class PeopleListComponent extends PageComponent implements OnInit {
 
   onChangeSaved(): void {
     if (this.saveChangesInProgress && !this.checkIfAnyFormsOpen()) {
+      this.saveChangesInProgress = false;
+      this.setInEditMode(false);
       setTimeout(() => {
-        this.saveChangesInProgress = false;
-        this.setInEditMode(false);
+        this.postChanges();
       });
     }
 
@@ -268,8 +281,8 @@ export class PeopleListComponent extends PageComponent implements OnInit {
       inEditMode: false,
     }));
 
+    this.fetchData(true);
     this.setInEditMode(false);
-    this.updateFilteredView();
   }
 
   addNewRow(): void {

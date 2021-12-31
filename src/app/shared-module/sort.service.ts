@@ -4,9 +4,13 @@ import { Person, PersonEditable } from 'src/app/people-list/person';
 const SKILL_INDEX = {
   AP: 6,
   EM: 5,
+  PSSM: 4.9,
   ASC: 4,
+  PSSA: 3.6,
+  SFDS: 3.5,
   FELL: 3,
   BA: 2,
+  SA: 1.1,
   INT: 1,
 };
 

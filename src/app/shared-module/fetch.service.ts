@@ -32,15 +32,20 @@ export class FetchService {
     }
   }
 
-  async fetchWeeklyList(weekOf: Date): Promise<{
+  async fetchWeeklyList(
+    weekOf: Date,
+    pdm?: string
+  ): Promise<{
     people: Person[];
     status: { pending: string[]; done: string[] };
     lookupTable: Person[];
   }> {
     const weekTs = weekOf.getTime();
+    const weekUrl = `${baseUrl}/week/${weekTs}`;
+    const finalUrl = pdm ? `${weekUrl}/${encodeURIComponent(pdm)}` : weekUrl;
 
     try {
-      const response = await axios.get(`${baseUrl}/week/${weekTs}`, {
+      const response = await axios.get(finalUrl, {
         validateStatus: (status) => {
           return status < 500;
         },

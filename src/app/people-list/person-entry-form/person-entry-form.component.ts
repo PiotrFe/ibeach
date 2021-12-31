@@ -58,6 +58,7 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
   daysLeft!: number;
   localCalendarObj!: Week;
   pdmArr: string[] = getPDMArr();
+  fmno!: string;
 
   // ***************
   // CONSTRUCTOR
@@ -143,6 +144,7 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
         skill: person.skill,
       });
       this.tags = person.tags;
+      this.fmno = person.id;
     }
   }
 
@@ -181,7 +183,7 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
 
     if (this.person) {
       this.formEditEvent.emit({
-        id: this.id,
+        id: this.fmno || this.id,
         name,
         skill,
         comments,
@@ -192,7 +194,7 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
       });
     } else {
       this.formSubmitEvent.emit({
-        id: this.id,
+        id: this.fmno || this.id,
         name,
         skill,
         comments,
