@@ -2,14 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { FetchService } from '../../shared-module/fetch.service';
 import { TypeaheadService } from '../../shared-module/typeahead.service';
+import { SortService } from 'src/app/shared-module/sort.service';
 import { v4 as uuidv4 } from 'uuid';
-import { getNewAvailDate, getTagArr, sortTags } from '../../utils/';
-import { Person, PersonEditable, PersonEntry, Tag } from '../person';
+import { getNewAvailDate, sortTags } from '../../utils/';
+import { Person, PersonEditable, Tag } from '../person';
 import {
   PageComponent,
   SubmissionStatus,
   Filter,
-  SKILL_INDEX,
 } from 'src/app/shared-module/page/page.component';
 import {
   Week,
@@ -35,12 +35,15 @@ export class PeopleListComponent extends PageComponent implements OnInit {
   status!: SubmissionStatus;
   statusLabel!: string;
   boundGetNameTypeahead!: Function;
+  sortService!: SortService;
 
   constructor(
     private fetchService: FetchService,
-    private typeaheadService: TypeaheadService
+    private typeaheadService: TypeaheadService,
+    sortService: SortService
   ) {
     super();
+    this.sortService = sortService;
   }
 
   ngOnInit(): void {
@@ -59,9 +62,11 @@ export class PeopleListComponent extends PageComponent implements OnInit {
   }
 
   async fetchData() {
-    this.fetching = true;
-    this.fetchError = '';
-    this.noData = false;
+    setTimeout(() => {
+      this.fetching = true;
+      this.fetchError = '';
+      this.noData = false;
+    }, 0);
 
     try {
       const response = await this.fetchService.fetchWeeklyList(
@@ -75,19 +80,8 @@ export class PeopleListComponent extends PageComponent implements OnInit {
       }: { people: Person[]; status: SubmissionStatus; lookupTable: Person[] } =
         response;
 
-      this.people = people
-        .sort((a: Person, b: Person) => {
-          const nameA = a.name.toUpperCase();
-          const nameB = b.name.toUpperCase();
-
-          if (nameA < nameB) {
-            return -1;
-          }
-          if (nameA > nameB) {
-            return 1;
-          }
-          return 0;
-        })
+      this.people = this.sortService
+        .sortData(people, this.sortService.SORT_COLUMNS.NAME, false)
         .map((person) => ({
           ...person,
           inEditMode: false,
@@ -109,6 +103,11 @@ export class PeopleListComponent extends PageComponent implements OnInit {
     } finally {
       this.fetching = false;
     }
+  }
+
+  handleSort(colName: string) {
+    this.people = this.sortService.sortData(this.people, colName);
+    this.updateFilteredView();
   }
 
   // *****************
@@ -229,7 +228,7 @@ export class PeopleListComponent extends PageComponent implements OnInit {
       await this.fetchService.saveList(
         this.referenceDate,
         this.pdmFilter.value,
-        this.people.map((person) => {
+        this.peopleFilteredView.map((person) => {
           const { inEditMode, ...otherProps } = person;
 
           return {
@@ -405,7 +404,7 @@ export class PeopleListComponent extends PageComponent implements OnInit {
     week: Week;
     tags: Tag[];
   }) {
-    this.clearSort();
+    this.sortService.clearSort();
     const { id, name, skill, comments, week, tags, availDate, pdm } = objParam;
 
     this.people.unshift({
@@ -428,233 +427,6 @@ export class PeopleListComponent extends PageComponent implements OnInit {
     this.newRows.splice(indexToRemove, 1);
     this.onChangeSaved();
   }
-
-  // *****************
-  // SORT HANDLERS
-  // *****************
-
-  clearSort() {
-    this.sort.field = '';
-    this.sort.order = 0;
-  }
-
-  getSort(colName: string, order: number): boolean {
-    if (this.sort.field === colName) {
-      return this.sort.order === order;
-    }
-    return false;
-  }
-
-  updateSortIcon(colName: string): void {
-    if (this.sort.field === colName) {
-      if (this.sort.order === 0) {
-        this.sort.order = 1;
-      } else if (this.sort.order === 1) {
-        this.sort.order = -1;
-      } else if (this.sort.order === -1) {
-        this.sort.order = 1;
-      }
-    } else {
-      this.sort.field = colName;
-      this.sort.order = ['skill', 'days'].includes(colName) ? -1 : 1;
-    }
-  }
-
-  sortValsByName = (
-    a: PersonEditable,
-    b: PersonEditable,
-    asc: boolean = false
-  ): number => {
-    const order = this.sort.order;
-
-    const nameA = a.name.toUpperCase();
-    const nameB = b.name.toUpperCase();
-
-    if (nameA < nameB) {
-      return asc ? -1 : order * -1;
-    }
-    if (nameA > nameB) {
-      return asc ? 1 : order;
-    }
-
-    return 0;
-  };
-
-  sortValsByDays = (
-    a: PersonEditable,
-    b: PersonEditable,
-    asc: boolean = false
-  ): number => {
-    const order = this.sort.order;
-    const daysA = a.daysLeft;
-    const daysB = b.daysLeft;
-
-    if (daysA < daysB) {
-      return asc ? -1 : order * -1;
-    }
-    if (daysA > daysB) {
-      return asc ? 1 : order;
-    }
-
-    return 0;
-  };
-
-  sortValsBySkill = (
-    a: PersonEditable,
-    b: PersonEditable,
-    asc: boolean = false
-  ): number => {
-    const order = this.sort.order;
-    const skillA = a.skill;
-    const skillB = b.skill;
-
-    if (
-      SKILL_INDEX[skillA as keyof typeof SKILL_INDEX] <
-      SKILL_INDEX[skillB as keyof typeof SKILL_INDEX]
-    ) {
-      return asc ? -1 : order * -1;
-    }
-    if (
-      SKILL_INDEX[skillA as keyof typeof SKILL_INDEX] >
-      SKILL_INDEX[skillB as keyof typeof SKILL_INDEX]
-    ) {
-      return asc ? 1 : order;
-    }
-
-    return 0;
-  };
-
-  sortValsByDate = (
-    a: PersonEditable,
-    b: PersonEditable,
-    asc: boolean = false
-  ): number => {
-    if (!a.availDate || !b.availDate) {
-      return 0;
-    }
-
-    const order = this.sort.order;
-    const dateA = a.availDate.getTime();
-    const dateB = b.availDate.getTime();
-
-    if (dateA < dateB) {
-      return asc ? -1 : order * -1;
-    }
-    if (dateA > dateB) {
-      return asc ? 1 : order;
-    }
-
-    return 0;
-  };
-
-  sortValsByPDM = (
-    a: PersonEditable,
-    b: PersonEditable,
-    asc: boolean = false
-  ): number => {
-    if (!a.pdm || !b.pdm) {
-      return 0;
-    }
-    const order = this.sort.order;
-
-    const nameA = a.pdm.toUpperCase();
-    const nameB = b.pdm.toUpperCase();
-
-    if (nameA < nameB) {
-      return asc ? -1 : order * -1;
-    }
-    if (nameA > nameB) {
-      return asc ? 1 : order;
-    }
-
-    return 0;
-  };
-
-  handleSort = (colName: string): void => {
-    this.updateSortIcon(colName);
-    const order = this.sort.order;
-    const sortValsBySkill = this.sortValsBySkill;
-    const sortValsByName = this.sortValsByName;
-    const sortValsByDays = this.sortValsByDays;
-    const sortValsByDate = this.sortValsByDate;
-    const sortValsByPDM = this.sortValsByPDM;
-
-    if (colName === 'name') {
-      this.people.sort(function (a, b) {
-        return sortValsByName(a, b);
-      });
-    }
-
-    if (colName === 'skill') {
-      this.people.sort(function (a, b) {
-        // (1) sort by skill
-        let returnVal: number = sortValsBySkill(a, b);
-
-        if (returnVal !== 0) {
-          return returnVal;
-        }
-        // (2) sort by days (asc)
-        returnVal = sortValsByDays(a, b, true);
-
-        if (returnVal !== 0) {
-          return returnVal;
-        }
-
-        // (3) sort by name (asc)
-        return sortValsByName(a, b, true);
-      });
-    }
-
-    if (colName === 'days') {
-      this.people.sort(function (a, b) {
-        // (1) sort by days
-        let returnVal: number = sortValsByDays(a, b);
-
-        if (returnVal !== 0) {
-          return returnVal;
-        }
-
-        // (2) sort by name (skill)
-        returnVal = sortValsBySkill(a, b, true);
-
-        if (returnVal !== 0) {
-          return returnVal;
-        }
-
-        // (3) sort by name (asc)
-        return sortValsByName(a, b, true);
-      });
-    }
-    if (colName === 'availDate') {
-      this.people.sort(function (a, b) {
-        let returnVal: number = sortValsByDate(a, b);
-
-        if (returnVal !== 0) {
-          return returnVal;
-        }
-        // (2) sort by name (skill)
-        returnVal = sortValsBySkill(a, b, true);
-
-        if (returnVal !== 0) {
-          return returnVal;
-        }
-        // (3) sort by name (asc)
-        return sortValsByName(a, b, true);
-      });
-    }
-
-    if (colName === 'pdm') {
-      this.people.sort(function (a, b) {
-        let returnVal: number = sortValsByPDM(a, b);
-
-        if (returnVal !== 0) {
-          return returnVal;
-        }
-        return sortValsBySkill(a, b, true);
-      });
-    }
-    this.updateFilteredView();
-  };
 
   // *****************
   // SUBMIT HANDLERS

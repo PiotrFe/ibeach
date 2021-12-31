@@ -12,15 +12,6 @@ export interface SubmissionStatus {
   done: string[];
 }
 
-export const SKILL_INDEX = {
-  AP: 6,
-  EM: 5,
-  ASC: 4,
-  FELL: 3,
-  BA: 2,
-  INT: 1,
-};
-
 @Component({
   template: '',
 })
@@ -31,10 +22,6 @@ export class PageComponent {
   uploaded: boolean = false;
   noData: boolean = false;
   filters: Filter[] = [];
-  sort: { field: string; order: number } = {
-    field: '',
-    order: 0,
-  };
 
   constructor() {}
 

@@ -95,7 +95,7 @@
   <li>
     <people-list-header
       [sortable]="true"
-      [currentSort]="sort"
+      [currentSort]="sortService.sort"
       (newSortEvent)="handleSort($event)"
     ></people-list-header>
   </li>
@@ -109,7 +109,7 @@
       <li *ngFor="let row of newRows">
         <person-entry-form
           [id]="row.id"
-          [sortField]="sort.field"
+          [sortField]="sortService.sort.field"
           [currPageSection]="'ALLOCATE'"
           [referenceDate]="referenceDate"
           [getNameTypeAhead]="boundGetNameTypeahead"
@@ -127,7 +127,7 @@
           [id]="person.id"
           [person]="person"
           [inEditMode]="inEditMode"
-          [sortField]="sort.field"
+          [sortField]="sortService.sort.field"
           [currPageSection]="'ALLOCATE'"
           (editEvent)="editRow($event)"
           (deleteEvent)="removeExistingRow($event)"
@@ -138,7 +138,7 @@
           *ngSwitchCase="true"
           [id]="person.id"
           [person]="person"
-          [sortField]="sort.field"
+          [sortField]="sortService.sort.field"
           [currPageSection]="'ALLOCATE'"
           [referenceDate]="referenceDate"
           [getNameTypeAhead]="boundGetNameTypeahead"
