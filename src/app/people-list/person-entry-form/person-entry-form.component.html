@@ -11,6 +11,7 @@
     placeholder="Name"
     formControlName="name"
     [typeahead]="getNameTypeAhead()"
+    (typeaheadOnSelect)="onNameSelect($event)"
     required
   />
   <select

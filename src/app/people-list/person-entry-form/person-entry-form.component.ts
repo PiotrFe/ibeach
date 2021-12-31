@@ -7,6 +7,7 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { TypeaheadMatch } from 'ngx-bootstrap/typeahead';
 import { PersonEntry, Tag } from '../person';
 import { TypeaheadService } from '../../shared-module/typeahead.service';
 import { getPDMArr } from '../../utils/getPDMArr';
@@ -132,6 +133,18 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
     comments: new FormControl(''),
     pdm: new FormControl(this.pdm),
   });
+
+  onNameSelect(name: TypeaheadMatch) {
+    const { value } = name;
+    const person = this.typeaheadService.getPersonByName(value);
+
+    if (person) {
+      this.personForm.patchValue({
+        skill: person.skill,
+      });
+      this.tags = person.tags;
+    }
+  }
 
   isFieldValid(field: string) {
     return (

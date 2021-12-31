@@ -8,6 +8,7 @@ import { InitialsPipe } from './initials.pipe';
 import { CalendarComponent } from './calendar/calendar.component';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { PageComponent } from './page/page.component';
+import { LoadingOverlayComponent } from './loading-overlay/loading-overlay.component';
 
 @NgModule({
   declarations: [
@@ -16,6 +17,7 @@ import { PageComponent } from './page/page.component';
     InitialsPipe,
     CalendarComponent,
     PageComponent,
+    LoadingOverlayComponent,
   ],
   imports: [
     BsDatepickerModule.forRoot(),
@@ -30,6 +32,7 @@ import { PageComponent } from './page/page.component';
     InitialsPipe,
     CalendarComponent,
     PageComponent,
+    LoadingOverlayComponent,
   ],
   providers: [BsModalRef],
 })

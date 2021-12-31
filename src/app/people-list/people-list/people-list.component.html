@@ -59,7 +59,7 @@
   </div>
   <div class="toolbar-group toolbar-group--right flex flex-ver-ctr">
     <select
-      class="form-select mr-10 mw-6"
+      class="form-select mr-10 mw-12"
       (change)="updatePDMFilter($event)"
       [formControl]="pdmFilter"
     >
@@ -160,3 +160,4 @@
   [modalType]="'CONFIRM'"
   (closeEvent)="handleModalClose($event)"
 ></modal-window>
+<loading-overlay *ngIf="fetching || uploading"> </loading-overlay>

@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { fakeAsync } from '@angular/core/testing';
 import { Person } from 'src/app/people-list/person';
 
 export interface Filter {
@@ -26,6 +27,8 @@ export const SKILL_INDEX = {
 export class PageComponent {
   fetching: boolean = false;
   fetchError: string = '';
+  uploading: boolean = false;
+  uploaded: boolean = false;
   noData: boolean = false;
   filters: Filter[] = [];
   sort: { field: string; order: number } = {

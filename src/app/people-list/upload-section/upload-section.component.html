@@ -74,3 +74,4 @@
   [modalType]="'CONFIRM'"
   (closeEvent)="handleModalClose($event)"
 ></modal-window>
+<loading-overlay *ngIf="fetching || uploading"> </loading-overlay>

@@ -21,8 +21,6 @@ export class UploadSectionComponent extends PageComponent implements OnInit {
   previewData: Person[] = [];
   fullData: Person[] = [];
   showUploadModal: boolean = false;
-  uploading: boolean = false;
-  uploaded: boolean = false;
 
   constructor(
     private fetchService: FetchService,

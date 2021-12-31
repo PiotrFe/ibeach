@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { ConnectableObservable } from 'rxjs';
-import { Person } from 'src/app/people-list/person';
+import { Person, PersonEditable } from 'src/app/people-list/person';
 
 const config = {
   headers: {
@@ -65,6 +65,22 @@ export class FetchService {
       };
     } catch (err: any) {
       throw new Error(err);
+    }
+  }
+
+  async saveList(weekOf: Date, pdm: string, data: Person[]): Promise<void> {
+    const weekTs = weekOf.getTime();
+    const pdmParam = encodeURIComponent(pdm);
+
+    try {
+      await axios.post(
+        `${baseUrl}/week/${weekTs}/${pdmParam}`,
+        JSON.stringify(data),
+        config as AxiosRequestConfig
+      );
+    } catch (e: any) {
+      console.log(e);
+      return e.message;
     }
   }
 }

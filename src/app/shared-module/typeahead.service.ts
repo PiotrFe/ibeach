@@ -54,8 +54,12 @@ export class TypeaheadService {
     return this._tagList.find((tag) => tag.value === val);
   }
 
+  getPersonByName(name: string): Person | undefined {
+    return this._peopleList.find((person) => person.name === name);
+  }
+
   _getNameTypeahead(dataSet?: any[]): string[] {
-    return this._peopleList
+    const retVal = this._peopleList
       .filter((person: Person) => {
         if (!dataSet) {
           return person;
@@ -63,9 +67,17 @@ export class TypeaheadService {
         const idx = dataSet.findIndex(
           (displayedPerson: Person) => displayedPerson.id === person.id
         );
+        console.log({
+          list: this._peopleList,
+          dataSet,
+          person,
+          idx,
+        });
         return idx < 0;
       })
       .map((person: Person) => person.name);
+
+    return retVal;
   }
 
   _getTagTypeahead(dataSet?: Tag[]): string[] {

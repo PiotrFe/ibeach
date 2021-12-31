@@ -216,10 +216,32 @@ export class PeopleListComponent extends PageComponent implements OnInit {
     if (!this.checkIfAnyFormsOpen()) {
       this.setInEditMode(false);
       this.updateFilteredView();
+      this.postChanges();
       return;
     }
 
     this.saveChangesInProgress = true;
+  }
+
+  async postChanges() {
+    this.uploading = true;
+    try {
+      await this.fetchService.saveList(
+        this.referenceDate,
+        this.pdmFilter.value,
+        this.people.map((person) => {
+          const { inEditMode, ...otherProps } = person;
+
+          return {
+            ...otherProps,
+          };
+        })
+      );
+    } catch (e: any) {
+      this.fetchError = e;
+    } finally {
+      this.uploading = false;
+    }
   }
 
   checkIfAnyFormsOpen = (): boolean => {

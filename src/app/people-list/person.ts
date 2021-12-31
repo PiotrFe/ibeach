@@ -64,8 +64,11 @@ export class PersonEntry {
   tagInput = new FormControl('');
   showAddTag: boolean = false;
   tagArr: string[] = getTagArr().map((item) => item.value);
+  typeaheadService: TypeaheadService;
 
-  constructor(private typeaheadService: TypeaheadService) {}
+  constructor(typeaheadService: TypeaheadService) {
+    this.typeaheadService = typeaheadService;
+  }
 
   getTagTypeahead(): string[] {
     const tags = this.person ? this.person.tags : this.tags;
