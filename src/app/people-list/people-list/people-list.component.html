@@ -1,7 +1,12 @@
 <nav class="main-toolbar">
   <div class="toolbar-group toolbar-group--left flex flex-ver-ctr">
     <button
-      *ngIf="!inEditMode && pdmFilter.value !== 'All' && !submitted"
+      *ngIf="
+        !inEditMode &&
+        pdmFilter.value !== 'All' &&
+        !submitted &&
+        displayedIn !== 'ALLOCATE'
+      "
       type="button"
       class="btn btn-success mr-20"
       (click)="onSubmit()"
@@ -9,7 +14,11 @@
       Submit
     </button>
     <button
-      *ngIf="!inEditMode && pdmFilter.value !== 'All' && !submitted"
+      *ngIf="
+        !inEditMode &&
+        (displayedIn === 'ALLOCATE' ||
+          (pdmFilter.value !== 'All' && !submitted))
+      "
       type="button"
       class="btn btn-primary mr-20"
       (click)="setInEditMode(true)"
@@ -59,6 +68,7 @@
       >Submitted</span
     >
     <select
+      *ngIf="displayedIn === 'SUBMIT'"
       class="form-select mr-10 mw-12 ml-12"
       (change)="updatePDMFilter($event)"
       [formControl]="pdmFilter"
@@ -67,6 +77,20 @@
       <option *ngFor="let pdm of getPDMList()">
         {{ pdm }}
       </option>
+    </select>
+    <select
+      *ngIf="displayedIn === 'ALLOCATE'"
+      class="form-select mr-10 mw-12 ml-12"
+      (change)="updateSkillFilter($event)"
+      [formControl]="pdmFilter"
+    >
+      <option value="All" selected>All</option>
+      <option value="EM" selected>EM</option>
+      <option value="SRAS" selected>SRAS</option>
+      <option value="ASC" selected>ASC</option>
+      <option value="FELL" selected>FELL</option>
+      <option value="BA" selected>BA</option>
+      <option value="INT" selected>INT</option>
     </select>
     <div class="form-check form-switch">
       <input
@@ -95,6 +119,7 @@
   <li>
     <people-list-header
       [sortable]="true"
+      [displayedIn]="displayedIn"
       [currentSort]="sortService.sort"
       (newSortEvent)="handleSort($event)"
     ></people-list-header>
@@ -109,6 +134,7 @@
       <li *ngFor="let row of newRows">
         <person-entry-form
           [id]="row.id"
+          [displayedIn]="displayedIn"
           [sortField]="sortService.sort.field"
           [currPageSection]="'ALLOCATE'"
           [referenceDate]="referenceDate"
@@ -125,6 +151,7 @@
         <person-entry
           *ngSwitchCase="false"
           [id]="person.id"
+          [displayedIn]="displayedIn"
           [person]="person"
           [inEditMode]="inEditMode"
           [sortField]="sortService.sort.field"
@@ -137,6 +164,7 @@
         <person-entry-form
           *ngSwitchCase="true"
           [id]="person.id"
+          [displayedIn]="displayedIn"
           [person]="person"
           [sortField]="sortService.sort.field"
           [currPageSection]="'ALLOCATE'"

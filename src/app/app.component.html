@@ -63,7 +63,7 @@
               active: pageSection === 'ARCHIVE'
             }"
             (click)="setPageSection('ARCHIVE')"
-            >Archive</span
+            >Stats</span
           >
         </li>
       </ul>
@@ -71,7 +71,10 @@
   </div>
 </nav>
 <div class="content-container">
-  <people-list *ngIf="pageSection === 'SUBMIT'"></people-list>
+  <people-list
+    *ngIf="pageSection === 'SUBMIT'"
+    [displayedIn]="'SUBMIT'"
+  ></people-list>
   <upload-section *ngIf="pageSection === 'UPLOAD'"></upload-section>
   <allocate-section *ngIf="pageSection === 'ALLOCATE'"></allocate-section>
 </div>

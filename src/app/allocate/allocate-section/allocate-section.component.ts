@@ -43,11 +43,7 @@ export class AllocateSectionComponent implements OnInit {
       document.removeEventListener('pointerup', onPointerUp);
     };
 
-    const moveListener = document.addEventListener(
-      'pointermove',
-      onPointerMove
-    );
-
-    const upListener = document.addEventListener('pointerup', onPointerUp);
+    document.addEventListener('pointermove', onPointerMove);
+    document.addEventListener('pointerup', onPointerUp);
   }
 }

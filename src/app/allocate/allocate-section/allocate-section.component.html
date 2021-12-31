@@ -1,5 +1,7 @@
 <div class="allocate-section">
-  <div #peopleSide class="people-side"></div>
+  <div #peopleSide class="people-side">
+    <people-list [displayedIn]="'ALLOCATE'"></people-list>
+  </div>
   <div
     #dragHandle
     class="drag-handle"

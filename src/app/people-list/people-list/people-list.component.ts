@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { FetchService } from '../../shared-module/fetch.service';
 import { TypeaheadService } from '../../shared-module/typeahead.service';
@@ -23,6 +23,8 @@ import {
   styleUrls: ['./people-list.component.scss'],
 })
 export class PeopleListComponent extends PageComponent implements OnInit {
+  @Input() displayedIn!: 'SUBMIT' | 'ALLOCATE';
+
   people!: PersonEditable[];
   newRows: PersonEditable[] = [];
   inEditMode: boolean = false;
@@ -30,6 +32,7 @@ export class PeopleListComponent extends PageComponent implements OnInit {
   showAvailableOnly: boolean = false;
   peopleFilteredView = this.people;
   pdmFilter = new FormControl('All');
+  skillFilter = new FormControl('All');
   referenceDate: Date = new Date();
   showSubmitModal: boolean = false;
   status!: SubmissionStatus;
@@ -110,6 +113,18 @@ export class PeopleListComponent extends PageComponent implements OnInit {
     } else {
       this.updateFilter('pdm', pdm);
       this.updateStatusLabel();
+    }
+
+    this.updateFilteredView();
+  }
+
+  updateSkillFilter(event: any): void {
+    const skill = event.target.value;
+
+    if (skill === 'All') {
+      this.filters = [];
+    } else {
+      this.updateFilter('skill', skill);
     }
 
     this.updateFilteredView();

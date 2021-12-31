@@ -7,10 +7,12 @@ import { PAGE_SECTIONS } from '../../app.component';
   styleUrls: ['./people-list-header.component.scss'],
 })
 export class PeopleListHeaderComponent implements OnInit {
-  @Output() newSortEvent = new EventEmitter<string>();
+  @Input() displayedIn!: 'SUBMIT' | 'ALLOCATE';
   @Input() sortable: boolean = false;
   @Input() currentSort!: { field: string; order: number };
   @Input() currPageSection!: keyof typeof PAGE_SECTIONS;
+
+  @Output() newSortEvent = new EventEmitter<string>();
 
   constructor() {}
 

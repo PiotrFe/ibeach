@@ -29,6 +29,7 @@ import {
   styleUrls: ['./person-entry-form.component.scss'],
 })
 export class PersonEntryFormComponent extends PersonEntry implements OnInit {
+  @Input() displayedIn!: 'SUBMIT' | 'ALLOCATE';
   @Input() referenceDate!: Date;
   @Input() dispatchToParentAndClose: boolean = false;
   @Input() pdm!: string;

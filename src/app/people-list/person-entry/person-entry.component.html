@@ -1,9 +1,11 @@
 <div class="person-entry tl-row">
   <span [ngClass]="getFieldClasses('name')">{{ person.name }}</span>
   <span [ngClass]="getFieldClasses('skill')">{{ person.skill }}</span>
-  <span [ngClass]="getFieldClasses('availDate')">{{
-    person.availDate | date: "dd-MMM"
-  }}</span>
+  <span
+    *ngIf="displayedIn === 'SUBMIT'"
+    [ngClass]="getFieldClasses('availDate')"
+    >{{ person.availDate | date: "dd-MMM" }}</span
+  >
   <span [ngClass]="getFieldClasses('days')">{{ person.daysLeft }}</span>
   <div class="btn-group mr-12">
     <week-days
@@ -14,7 +16,7 @@
     ></week-days>
   </div>
 
-  <div [ngClass]="getFieldClasses('tags')">
+  <div *ngIf="displayedIn === 'SUBMIT'" [ngClass]="getFieldClasses('tags')">
     <div class="tag-list flex flex-ver-ctr">
       <ul class="flex flex-ver-ctr mr-5">
         <li
@@ -51,7 +53,7 @@
       </ul>
     </div>
   </div>
-  <div [ngClass]="getFieldClasses('pdm')">
+  <div *ngIf="displayedIn === 'SUBMIT'" [ngClass]="getFieldClasses('pdm')">
     <span class="bg-secondary-light">{{ person.pdm | initials }}</span>
   </div>
   <span [ngClass]="getFieldClasses('comments')">{{ person.comments }}</span>

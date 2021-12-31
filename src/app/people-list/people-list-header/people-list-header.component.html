@@ -14,6 +14,7 @@
     <i *ngIf="getSort('skill', -1)" class="bi bi-sort-up fs-085"></i
   ></span>
   <span
+    *ngIf="displayedIn === 'SUBMIT'"
     class="section section-availDate mr-12 pl-3 clickable"
     (click)="handleClick('availDate')"
     >From
@@ -31,8 +32,11 @@
     <i *ngIf="getSort('days', -1)" class="bi bi-sort-up icon-offset fs-085"></i
   ></span>
   <span class="section-week mr-12">Week</span>
-  <span class="section-tags pl-3 mr-12">Tags</span>
+  <span *ngIf="displayedIn === 'SUBMIT'" class="section-tags pl-3 mr-12"
+    >Tags</span
+  >
   <span
+    *ngIf="displayedIn === 'SUBMIT'"
     class="section section-pdm pl-3 mr-12 clickable"
     (click)="handleClick('pdm')"
     >PDM<i
@@ -41,5 +45,7 @@
     ></i>
     <i *ngIf="getSort('pdm', -1)" class="bi bi-sort-up icon-offset fs-085"></i
   ></span>
-  <span class="section section-comments pl-3">Comments</span>
+  <span *ngIf="displayedIn === 'SUBMIT'" class="section section-comments pl-3"
+    >Comments</span
+  >
 </div>
