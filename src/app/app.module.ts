@@ -5,6 +5,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule } from '@angular/forms';
 import { AppComponent } from './app.component';
 import { PeopleListModule } from './people-list/people-list.module';
+import { AllocateModule } from './allocate/allocate.module';
 
 @NgModule({
   declarations: [AppComponent],
@@ -14,6 +15,7 @@ import { PeopleListModule } from './people-list/people-list.module';
     FormsModule,
     HttpClientModule,
     PeopleListModule,
+    AllocateModule,
   ],
   providers: [],
   bootstrap: [AppComponent],
