@@ -4,6 +4,10 @@
   justify-content: space-between;
   align-items: center;
   border-bottom: 0.8px dashed rgba(0, 0, 0, 0.3);
+
+  &--uncollapsed {
+    border-bottom: none;
+  }
 }
 
 .section-pdm {

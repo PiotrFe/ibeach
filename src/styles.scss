@@ -81,22 +81,23 @@ a:hover {
 
   &-name {
     width: 11%;
-    min-width: 5.5rem;
+    min-width: max(5.5rem, 11%);
   }
 
   &-skill {
     width: 7%;
-    min-width: 3.5rem;
+    min-width: max(3.5rem, 7%);
   }
 
   &-availDate {
     width: 7%;
     min-width: 4rem;
+    min-width: max(4rem, 7%);
   }
 
   &-days {
     width: 5%;
-    min-width: 2rem;
+    min-width: max(2rem, 5%);
     justify-content: center;
     text-align: center;
   }
@@ -107,14 +108,19 @@ a:hover {
 
   &-pdm {
     width: 4%;
-    min-width: 2.1rem;
+    min-width: max(2.1rem, 4%);
     justify-content: center;
   }
 
   &-tags {
     width: 17%;
-    min-width: 12rem;
+    min-width: max(10rem, 17%);
     position: relative;
+    font-size: 0.8rem;
+
+    &-small {
+      min-width: 10rem;
+    }
   }
 }
 
@@ -130,7 +136,7 @@ a:hover {
 
 .collapsed-section {
   height: 3rem;
-  font-size: 80%;
+  font-size: 0.8rem;
   width: 100%;
   display: flex;
   flex-direction: row;

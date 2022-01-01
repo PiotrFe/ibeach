@@ -1,6 +1,7 @@
 import {
   Component,
   OnInit,
+  AfterViewInit,
   Input,
   Output,
   EventEmitter,
@@ -74,6 +75,8 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
   // ***************
 
   ngOnInit(): void {
+    this.isCollapsed = false;
+
     if (!this.person && this.pdm) {
       this.personForm.patchValue({
         pdm: this.pdm,
@@ -112,6 +115,8 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
       this.localCalendarObj = newCalendarObj;
     });
   }
+
+  ngAfterViewInit(): void {}
 
   ngOnChanges(changes: SimpleChanges): void {
     if (

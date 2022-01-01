@@ -1,7 +1,45 @@
+<ng-template #tagList>
+  <div class="tag-list flex flex-ver-ctr">
+    <ul class="flex flex-ver-ctr mr-5">
+      <li
+        *ngFor="let tag of tags"
+        class="badge flex no-select mr-3 m-bot-2"
+        [class.bg-primary-light]="tag.type === 'ind'"
+        [class.bg-secondary-light]="tag.type === 'fun'"
+      >
+        {{ tag.value }}
+        <i
+          class="bi bi-x-lg tag-delete clickable"
+          (click)="onTagDelete(tag.value, 'form')"
+        ></i>
+      </li>
+      <li>
+        <i
+          *ngIf="!showAddTag"
+          class="bi bi-plus clickable add-tag"
+          (click)="setShowAddTag(true)"
+        ></i>
+      </li>
+      <li>
+        <form *ngIf="showAddTag" (ngSubmit)="onTagSubmit('form')">
+          <input
+            #addTag
+            class="form-control form-control-xs tag-input m-bot-2"
+            type="text"
+            [formControl]="tagInput"
+            [typeahead]="getTagTypeahead()"
+          />
+        </form>
+      </li>
+    </ul>
+  </div>
+</ng-template>
+
 <form
   [formGroup]="personForm"
   (ngSubmit)="onSubmit()"
   class="person-entry-form tl-row"
+  [class.person-entry-form--uncollapsed]="!isCollapsed"
   novalidate
 >
   <input
@@ -26,6 +64,7 @@
     <option value="INT">INT</option>
   </select>
   <calendar
+    *ngIf="displayedIn !== 'ALLOCATE'"
     [ngClass]="getFieldClasses('availDate')"
     [dateVal]="personForm.get('availDate')!.value"
     [showError]="isFieldValid('availDate')"
@@ -43,49 +82,18 @@
     ></week-days>
   </div>
 
-  <div [ngClass]="getFieldClasses('tags')">
-    <div class="tag-list flex flex-ver-ctr">
-      <ul class="flex flex-ver-ctr mr-5">
-        <li
-          *ngFor="let tag of tags"
-          class="badge flex no-select mr-3 m-bot-2"
-          [class.bg-primary-light]="tag.type === 'ind'"
-          [class.bg-secondary-light]="tag.type === 'fun'"
-        >
-          {{ tag.value }}
-          <i
-            class="bi bi-x-lg tag-delete clickable"
-            (click)="onTagDelete(tag.value, 'form')"
-          ></i>
-        </li>
-        <li>
-          <i
-            *ngIf="!showAddTag"
-            class="bi bi-plus clickable add-tag"
-            (click)="setShowAddTag(true)"
-          ></i>
-        </li>
-        <li>
-          <form *ngIf="showAddTag" (ngSubmit)="onTagSubmit('form')">
-            <input
-              #addTag
-              class="form-control form-control-xs tag-input m-bot-2"
-              type="text"
-              [formControl]="tagInput"
-              [typeahead]="getTagTypeahead()"
-            />
-          </form>
-        </li>
-      </ul>
-    </div>
+  <div *ngIf="displayedIn !== 'ALLOCATE'" [ngClass]="getFieldClasses('tags')">
+    <ng-container *ngTemplateOutlet="tagList"></ng-container>
   </div>
   <select
+    *ngIf="displayedIn !== 'ALLOCATE'"
     class="form-control section section-pdm mr-12 mw-4"
     formControlName="pdm"
   >
     <option *ngFor="let pdm of pdmArr" [value]="pdm">{{ pdm }}</option>
   </select>
   <input
+    *ngIf="displayedIn !== 'ALLOCATE'"
     id="person-comments"
     class="form-control section section-comments mr-12"
     type="text"
@@ -101,3 +109,31 @@
     <button id="{{ 'submit-form-' + id }}" type="submit" hidden></button>
   </div>
 </form>
+
+<div
+  *ngIf="displayedIn === 'ALLOCATE'"
+  id="{{ 'collapse-' + id }}"
+  [collapse]="isCollapsed"
+  [isAnimated]="true"
+>
+  <div class="collapsed-section no-select" [formGroup]="personForm">
+    <select
+      class="form-control section section-pdm mr-12 mw-4"
+      formControlName="pdm"
+    >
+      <option *ngFor="let pdm of pdmArr" [value]="pdm">{{ pdm }}</option>
+    </select>
+    <span class="break-ver fs-12 mr-3"> | </span>
+    <div [ngClass]="getFieldClasses('tags')">
+      <ng-container *ngTemplateOutlet="tagList"></ng-container>
+    </div>
+    <span class="break-ver fs-12 mr-3"> | </span>
+    <input
+      id="person-comments"
+      class="form-control section section-comments mr-12"
+      type="text"
+      placeholder="Comments"
+      formControlName="comments"
+    />
+  </div>
+</div>

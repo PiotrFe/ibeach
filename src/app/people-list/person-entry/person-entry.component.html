@@ -1,4 +1,4 @@
-<ng-template #tags>
+<ng-template #tagList>
   <div class="tag-list flex flex-ver-ctr">
     <ul class="flex flex-ver-ctr mr-5">
       <li
@@ -36,7 +36,10 @@
   </div>
 </ng-template>
 
-<div class="person-entry tl-row no-select">
+<div
+  class="person-entry tl-row no-select"
+  [class.person-entry--uncollapsed]="!isCollapsed"
+>
   <span
     *ngIf="displayedIn !== 'ALLOCATE'"
     [ngClass]="getFieldClasses('name')"
@@ -70,7 +73,7 @@
   </div>
 
   <div *ngIf="displayedIn !== 'ALLOCATE'" [ngClass]="getFieldClasses('tags')">
-    <ng-container *ngTemplateOutlet="tags"></ng-container>
+    <ng-container *ngTemplateOutlet="tagList"></ng-container>
   </div>
   <div *ngIf="displayedIn !== 'ALLOCATE'" [ngClass]="getFieldClasses('pdm')">
     <span class="bg-secondary-light"> {{ person.pdm | initials }}</span>
@@ -98,16 +101,17 @@
   *ngIf="displayedIn === 'ALLOCATE'"
   id="{{ 'collapse-' + id }}"
   [collapse]="isCollapsed"
+  [isAnimated]="true"
 >
   <div class="collapsed-section no-select">
     <div [ngClass]="getFieldClasses('pdm')">
       <span class="bg-secondary-light"> {{ person.pdm | initials }}</span>
     </div>
-    <span class="break-ver fs-12"> | </span>
-    <div [ngClass]="getFieldClasses('tags')">
-      <ng-container *ngTemplateOutlet="tags"></ng-container>
+    <span class="break-ver fs-12 mr-3"> | </span>
+    <div [ngClass]="getFieldClasses('tags')" [class.section-tags-small]="true">
+      <ng-container *ngTemplateOutlet="tagList"></ng-container>
     </div>
-    <span class="break-ver fs-12"> | </span>
+    <span class="break-ver fs-12 mr-3"> | </span>
     <span [ngClass]="getFieldClasses('comments')">
       {{ person.comments }}
     </span>
