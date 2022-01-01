@@ -5,6 +5,7 @@ const SKILL_INDEX = {
   AP: 6,
   EM: 5,
   PSSM: 4.9,
+  SRAS: 4.5,
   ASC: 4,
   PSSA: 3.6,
   SFDS: 3.5,

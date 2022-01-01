@@ -399,11 +399,13 @@ export class PeopleListComponent extends PageComponent implements OnInit {
     }, 0);
 
     const pdm = forPDM ? this.pdmFilter.value : null;
+    const submittedOnly = this.displayedIn === 'ALLOCATE';
 
     try {
       const response = await this.fetchService.fetchWeeklyList(
         this.referenceDate,
-        pdm
+        pdm,
+        submittedOnly
       );
 
       const {

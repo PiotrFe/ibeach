@@ -34,7 +34,8 @@ export class FetchService {
 
   async fetchWeeklyList(
     weekOf: Date,
-    pdm?: string
+    pdm?: string,
+    submittedOnly?: boolean
   ): Promise<{
     people: Person[];
     status: { pending: string[]; done: string[] };
@@ -42,10 +43,16 @@ export class FetchService {
   }> {
     const weekTs = weekOf.getTime();
     const weekUrl = `${baseUrl}/week/${weekTs}`;
-    const finalUrl = pdm ? `${weekUrl}/${encodeURIComponent(pdm)}` : weekUrl;
+    const finalUrl = pdm
+      ? new URL(`${weekUrl}/${encodeURIComponent(pdm)}`)
+      : new URL(weekUrl);
+
+    if (submittedOnly) {
+      finalUrl.searchParams.append('submitted', 'true');
+    }
 
     try {
-      const response = await axios.get(finalUrl, {
+      const response = await axios.get(finalUrl.href, {
         validateStatus: (status) => {
           return status < 500;
         },
