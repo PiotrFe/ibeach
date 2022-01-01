@@ -7,6 +7,7 @@ import { PersonEntryFormComponent } from './person-entry-form/person-entry-form.
 import { SharedModuleModule } from '../shared-module/shared-module.module';
 import { TypeaheadModule } from 'ngx-bootstrap/typeahead';
 import { TooltipModule } from 'ngx-bootstrap/tooltip';
+import { CollapseModule } from 'ngx-bootstrap/collapse';
 import { UploadSectionComponent } from './upload-section/upload-section.component';
 import { PeopleListHeaderComponent } from './people-list-header/people-list-header.component';
 
@@ -26,6 +27,7 @@ import { PeopleListHeaderComponent } from './people-list-header/people-list-head
     SharedModuleModule,
     TypeaheadModule.forRoot(),
     TooltipModule.forRoot(),
+    CollapseModule.forRoot(),
   ],
 })
 export class PeopleListModule {}

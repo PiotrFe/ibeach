@@ -1,13 +1,66 @@
-<div class="person-entry tl-row">
-  <span [ngClass]="getFieldClasses('name')">{{ person.name }}</span>
+<ng-template #tags>
+  <div class="tag-list flex flex-ver-ctr">
+    <ul class="flex flex-ver-ctr mr-5">
+      <li
+        *ngFor="let tag of person.tags"
+        class="badge flex no-select mr-3 m-bot-2"
+        [class.bg-primary-light]="tag.type === 'ind'"
+        [class.bg-secondary-light]="tag.type === 'fun'"
+      >
+        {{ tag.value }}
+        <i
+          *ngIf="inEditMode"
+          class="bi bi-x-lg tag-delete clickable"
+          (click)="onTagDelete(tag.value, 'entry')"
+        ></i>
+      </li>
+      <li>
+        <i
+          *ngIf="inEditMode && !showAddTag"
+          class="bi bi-plus clickable add-tag"
+          (click)="setShowAddTag(true)"
+        ></i>
+      </li>
+      <li>
+        <form *ngIf="showAddTag" (ngSubmit)="onTagSubmit('entry')">
+          <input
+            #addTag
+            class="form-control form-control-xs tag-input m-bot-2"
+            type="text"
+            [formControl]="tagInput"
+            [typeahead]="getTagTypeahead()"
+          />
+        </form>
+      </li>
+    </ul>
+  </div>
+</ng-template>
+
+<div class="person-entry tl-row no-select">
+  <span
+    *ngIf="displayedIn !== 'ALLOCATE'"
+    [ngClass]="getFieldClasses('name')"
+    >{{ person.name }}</span
+  >
+  <span
+    type="button"
+    *ngIf="displayedIn === 'ALLOCATE'"
+    [ngClass]="getFieldClasses('name')"
+    role="button"
+    (click)="isCollapsed = !isCollapsed"
+    [attr.aria-expanded]="isCollapsed"
+    [attr.aria-controls]="'collapse-' + id"
+  >
+    {{ person.name }}
+  </span>
   <span [ngClass]="getFieldClasses('skill')">{{ person.skill }}</span>
   <span
-    *ngIf="displayedIn === 'SUBMIT'"
+    *ngIf="displayedIn !== 'ALLOCATE'"
     [ngClass]="getFieldClasses('availDate')"
     >{{ person.availDate | date: "dd-MMM" }}</span
   >
   <span [ngClass]="getFieldClasses('days')">{{ person.daysLeft }}</span>
-  <div class="btn-group mr-12">
+  <div class="calendar-group mr-12">
     <week-days
       class="flex flex-ver-ctr"
       (calendarChange)="onCalendarChange($event)"
@@ -16,55 +69,47 @@
     ></week-days>
   </div>
 
-  <div *ngIf="displayedIn === 'SUBMIT'" [ngClass]="getFieldClasses('tags')">
-    <div class="tag-list flex flex-ver-ctr">
-      <ul class="flex flex-ver-ctr mr-5">
-        <li
-          *ngFor="let tag of person.tags"
-          class="badge flex no-select mr-3 m-bot-2"
-          [class.bg-primary-light]="tag.type === 'ind'"
-          [class.bg-secondary-light]="tag.type === 'fun'"
-        >
-          {{ tag.value }}
-          <i
-            *ngIf="inEditMode"
-            class="bi bi-x-lg tag-delete clickable"
-            (click)="onTagDelete(tag.value, 'entry')"
-          ></i>
-        </li>
-        <li>
-          <i
-            *ngIf="inEditMode && !showAddTag"
-            class="bi bi-plus clickable add-tag"
-            (click)="setShowAddTag(true)"
-          ></i>
-        </li>
-        <li>
-          <form *ngIf="showAddTag" (ngSubmit)="onTagSubmit('entry')">
-            <input
-              #addTag
-              class="form-control form-control-xs tag-input m-bot-2"
-              type="text"
-              [formControl]="tagInput"
-              [typeahead]="getTagTypeahead()"
-            />
-          </form>
-        </li>
-      </ul>
+  <div *ngIf="displayedIn !== 'ALLOCATE'" [ngClass]="getFieldClasses('tags')">
+    <ng-container *ngTemplateOutlet="tags"></ng-container>
+  </div>
+  <div *ngIf="displayedIn !== 'ALLOCATE'" [ngClass]="getFieldClasses('pdm')">
+    <span class="bg-secondary-light"> {{ person.pdm | initials }}</span>
+  </div>
+  <span
+    *ngIf="displayedIn !== 'ALLOCATE'"
+    [ngClass]="getFieldClasses('comments')"
+  >
+    {{ person.comments }}
+  </span>
+  <div class="edit-entry-icons">
+    <i
+      *ngIf="editable && inEditMode"
+      class="bi bi-pencil i-active mr-8"
+      (click)="handleEdit()"
+    ></i>
+    <i
+      *ngIf="editable && inEditMode"
+      class="bi bi-trash i-active"
+      (click)="handleDelete()"
+    ></i>
+  </div>
+</div>
+<div
+  *ngIf="displayedIn === 'ALLOCATE'"
+  id="{{ 'collapse-' + id }}"
+  [collapse]="isCollapsed"
+>
+  <div class="collapsed-section no-select">
+    <div [ngClass]="getFieldClasses('pdm')">
+      <span class="bg-secondary-light"> {{ person.pdm | initials }}</span>
     </div>
+    <span class="break-ver fs-12"> | </span>
+    <div [ngClass]="getFieldClasses('tags')">
+      <ng-container *ngTemplateOutlet="tags"></ng-container>
+    </div>
+    <span class="break-ver fs-12"> | </span>
+    <span [ngClass]="getFieldClasses('comments')">
+      {{ person.comments }}
+    </span>
   </div>
-  <div *ngIf="displayedIn === 'SUBMIT'" [ngClass]="getFieldClasses('pdm')">
-    <span class="bg-secondary-light">{{ person.pdm | initials }}</span>
-  </div>
-  <span [ngClass]="getFieldClasses('comments')">{{ person.comments }}</span>
-  <i
-    *ngIf="editable && inEditMode"
-    class="bi bi-pencil i-active mr-8"
-    (click)="handleEdit()"
-  ></i>
-  <i
-    *ngIf="editable && inEditMode"
-    class="bi bi-trash i-active"
-    (click)="handleDelete()"
-  ></i>
 </div>

@@ -3,23 +3,35 @@
     class="section section-name mr-12 pl-3 clickable"
     (click)="handleClick('name')"
     >Name
-    <i *ngIf="getSort('name', 1)" class="bi bi-sort-down-alt fs-085"></i>
-    <i *ngIf="getSort('name', -1)" class="bi bi-sort-up fs-085"></i
+    <i
+      *ngIf="getSort('name', 1)"
+      class="bi bi-sort-down-alt fs-085 ptop-3 ml-2"
+    ></i>
+    <i *ngIf="getSort('name', -1)" class="bi bi-sort-up fs-085 ptop-3 ml-2"></i
   ></span>
   <span
     class="section section-skill mr-12 pl-3 clickable"
     (click)="handleClick('skill')"
     >Skill
-    <i *ngIf="getSort('skill', 1)" class="bi bi-sort-down-alt fs-085"></i>
-    <i *ngIf="getSort('skill', -1)" class="bi bi-sort-up fs-085"></i
+    <i
+      *ngIf="getSort('skill', 1)"
+      class="bi bi-sort-down-alt fs-085 ptop-3 ml-2"
+    ></i>
+    <i *ngIf="getSort('skill', -1)" class="bi bi-sort-up fs-085 ptop-3 ml-2"></i
   ></span>
   <span
-    *ngIf="displayedIn === 'SUBMIT'"
+    *ngIf="displayedIn !== 'ALLOCATE'"
     class="section section-availDate mr-12 pl-3 clickable"
     (click)="handleClick('availDate')"
     >From
-    <i *ngIf="getSort('availDate', 1)" class="bi bi-sort-down-alt fs-085"></i>
-    <i *ngIf="getSort('availDate', -1)" class="bi bi-sort-up fs-085"></i
+    <i
+      *ngIf="getSort('availDate', 1)"
+      class="bi bi-sort-down-alt fs-085 ptop-3 ml-2"
+    ></i>
+    <i
+      *ngIf="getSort('availDate', -1)"
+      class="bi bi-sort-up fs-085 ptop-3 ml-2"
+    ></i
   ></span>
   <span
     class="section section-days mr-12 pl-3 clickable"
@@ -27,25 +39,30 @@
     >Days
     <i
       *ngIf="getSort('days', 1)"
-      class="bi bi-sort-down-alt icon-offset fs-085"
+      class="bi bi-sort-down-alt fs-085 ptop-3 ml-2"
     ></i>
-    <i *ngIf="getSort('days', -1)" class="bi bi-sort-up icon-offset fs-085"></i
+    <i *ngIf="getSort('days', -1)" class="bi bi-sort-up fs-085 ptop-3 ml-2"></i
   ></span>
-  <span class="section-week mr-12">Week</span>
-  <span *ngIf="displayedIn === 'SUBMIT'" class="section-tags pl-3 mr-12"
+  <span class="calendar-group txt-center mr-12">Week</span>
+  <span
+    *ngIf="displayedIn !== 'ALLOCATE'"
+    class="section-tags txt-center pl-3 mr-12"
     >Tags</span
   >
   <span
-    *ngIf="displayedIn === 'SUBMIT'"
+    *ngIf="displayedIn !== 'ALLOCATE'"
     class="section section-pdm pl-3 mr-12 clickable"
     (click)="handleClick('pdm')"
     >PDM<i
       *ngIf="getSort('pdm', 1)"
-      class="bi bi-sort-down-alt icon-offset fs-085"
+      class="bi bi-sort-down-alt fs-085 ptop-3 ml-2"
     ></i>
-    <i *ngIf="getSort('pdm', -1)" class="bi bi-sort-up icon-offset fs-085"></i
+    <i *ngIf="getSort('pdm', -1)" class="bi bi-sort-up fs-085 ptop-3 ml-2"></i
   ></span>
-  <span *ngIf="displayedIn === 'SUBMIT'" class="section section-comments pl-3"
+  <span
+    *ngIf="displayedIn !== 'ALLOCATE'"
+    class="section section-comments txt-center pl-3"
     >Comments</span
   >
+  <div class="edit-entry-icons"></div>
 </div>

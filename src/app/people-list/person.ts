@@ -64,7 +64,9 @@ export class PersonEntry {
   tagInput = new FormControl('');
   showAddTag: boolean = false;
   tagArr: string[] = getTagArr().map((item) => item.value);
+
   typeaheadService: TypeaheadService;
+  isCollapsed: boolean = true;
 
   constructor(typeaheadService: TypeaheadService) {
     this.typeaheadService = typeaheadService;
