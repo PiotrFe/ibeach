@@ -449,11 +449,15 @@ export class PeopleListComponent extends PageComponent implements OnInit {
 
   async postChanges() {
     this.uploading = true;
+    const pdmParam =
+      this.displayedIn !== 'ALLOCATE' ? this.pdmFilter.value : 'allocator';
+    const fetchFullDataOnUpdate =
+      this.displayedIn === 'ALLOCATE' ? true : false;
 
     try {
       await this.fetchService.saveList(
         this.referenceDate,
-        this.pdmFilter.value,
+        pdmParam,
         this.peopleFilteredView.map((person) => {
           const { inEditMode, ...otherProps } = person;
 
@@ -462,7 +466,7 @@ export class PeopleListComponent extends PageComponent implements OnInit {
           };
         })
       );
-      await this.fetchData(true);
+      await this.fetchData(!fetchFullDataOnUpdate);
     } catch (e: any) {
       this.fetchError = e;
     } finally {

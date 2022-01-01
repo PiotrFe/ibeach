@@ -38,7 +38,6 @@ export class AllocateSectionComponent implements OnInit {
     };
 
     const onPointerUp = (e: any) => {
-      console.log('UP!');
       document.removeEventListener('pointermove', onPointerMove);
       document.removeEventListener('pointerup', onPointerUp);
     };
