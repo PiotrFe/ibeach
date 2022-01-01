@@ -9,7 +9,7 @@ import {
 import { FormControl } from '@angular/forms';
 import { Week } from './week';
 import { PEOPLE } from './people';
-import { getTagArr, getTagFunction, sortTags } from '../utils/';
+import { getTagArr, sortTags } from '../utils/';
 import { PAGE_SECTIONS } from '../app.component';
 import { TypeaheadService } from '..//shared-module/typeahead.service';
 
@@ -46,6 +46,8 @@ export class PersonEntry {
   @Input() person!: Person;
   @Input() sortField!: string;
   @Input() currPageSection!: keyof typeof PAGE_SECTIONS;
+  @Input() isCollapsed!: boolean;
+  @Input() displayedIn!: 'SUBMIT' | 'ALLOCATE';
 
   @Output() deleteEvent = new EventEmitter<string>();
   @Output() calendarChangeEvent = new EventEmitter<{
@@ -60,13 +62,17 @@ export class PersonEntry {
     action: 'add' | 'remove';
   }>();
 
+  @Output() collapseEvent = new EventEmitter<{
+    id: string;
+    collapsed: boolean;
+  }>();
+
   tags!: Tag[];
   tagInput = new FormControl('');
   showAddTag: boolean = false;
   tagArr: string[] = getTagArr().map((item) => item.value);
 
   typeaheadService: TypeaheadService;
-  isCollapsed: boolean = true;
 
   constructor(typeaheadService: TypeaheadService) {
     this.typeaheadService = typeaheadService;
@@ -96,10 +102,6 @@ export class PersonEntry {
     const tagObj: Tag | undefined = this.typeaheadService.getTagByVal(
       this.tagInput.value
     );
-
-    console.log({
-      tagObj,
-    });
 
     if (tagObj) {
       if (submittedBy === 'entry') {
@@ -142,5 +144,12 @@ export class PersonEntry {
     const otherClass = fieldName === 'pdm' ? ' flex-ctr-hor' : '';
 
     return `${baseClass}${sortedClass}${otherClass}`;
+  }
+
+  handleCollapse(): void {
+    this.collapseEvent.emit({
+      id: this.id,
+      collapsed: !this.isCollapsed,
+    });
   }
 }

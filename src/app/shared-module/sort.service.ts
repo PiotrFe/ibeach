@@ -175,8 +175,12 @@ export class SortService {
   sortData = (
     dataSet: any[],
     colName: string,
-    showHighlight: boolean = true
+    showHighlight: boolean = true,
+    freshStart: boolean = false
   ): any[] => {
+    if (freshStart) {
+      this.clearSort();
+    }
     this.updateSortCriteria(colName);
     const sortBySkill = this.sortBySkill;
     const sortByName = this.sortByName;

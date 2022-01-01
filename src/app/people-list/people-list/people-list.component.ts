@@ -186,17 +186,17 @@ export class PeopleListComponent extends PageComponent implements OnInit {
     }
   }
   saveChanges(): void {
-    this.people = this.people.map((person: PersonEditable) => ({
-      ...person,
-      inEditMode: false,
-    }));
-
     if (!this.checkIfAnyFormsOpen()) {
       this.setInEditMode(false);
       this.updateFilteredView();
       this.postChanges();
       return;
     }
+
+    // this.people = this.people.map((person: PersonEditable) => ({
+    //   ...person,
+    //   inEditMode: false,
+    // }));
 
     this.saveChangesInProgress = true;
   }
@@ -332,6 +332,8 @@ export class PeopleListComponent extends PageComponent implements OnInit {
   }) {
     const { id, name, skill, comments, availDate, pdm, week, tags } = objParam;
 
+    console.log({ objParam });
+
     this.people = this.people.map((person) => {
       if (person.id !== id) {
         return person;
@@ -416,7 +418,7 @@ export class PeopleListComponent extends PageComponent implements OnInit {
         response;
 
       this.people = this.sortService
-        .sortData(people, this.sortService.SORT_COLUMNS.NAME, false)
+        .sortData(people, this.sortService.SORT_COLUMNS.NAME, false, true)
         .map((person) => ({
           ...person,
           inEditMode: false,

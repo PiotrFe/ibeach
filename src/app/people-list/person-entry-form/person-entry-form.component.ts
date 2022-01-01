@@ -1,7 +1,6 @@
 import {
   Component,
   OnInit,
-  AfterViewInit,
   Input,
   Output,
   EventEmitter,
@@ -30,7 +29,6 @@ import {
   styleUrls: ['./person-entry-form.component.scss'],
 })
 export class PersonEntryFormComponent extends PersonEntry implements OnInit {
-  @Input() displayedIn!: 'SUBMIT' | 'ALLOCATE';
   @Input() referenceDate!: Date;
   @Input() dispatchToParentAndClose: boolean = false;
   @Input() pdm!: string;
@@ -61,6 +59,7 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
   localCalendarObj!: Week;
   pdmArr: string[] = getPDMArr();
   fmno!: string;
+  ignoreNextDateChange: boolean = false;
 
   // ***************
   // CONSTRUCTOR
@@ -75,7 +74,9 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
   // ***************
 
   ngOnInit(): void {
-    this.isCollapsed = false;
+    if (this.displayedIn === 'ALLOCATE') {
+      this.isCollapsed = false;
+    }
 
     if (!this.person && this.pdm) {
       this.personForm.patchValue({
@@ -105,15 +106,6 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
       this.localCalendarObj = getNewWeek();
       this.personForm.patchValue({ availDate: this.referenceDate });
     }
-
-    this.personForm.get('availDate')!.valueChanges.subscribe((val: Date) => {
-      const newCalendarObj = getCalendarFromDate(
-        val,
-        this.localCalendarObj,
-        this.referenceDate
-      );
-      this.localCalendarObj = newCalendarObj;
-    });
   }
 
   ngAfterViewInit(): void {}
@@ -214,16 +206,23 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
   }
 
   onDateChange(date: Date) {
-    this.personForm.patchValue({ availDate: date });
+    if (this.ignoreNextDateChange) {
+      this.ignoreNextDateChange = false;
+    } else {
+      this.personForm.patchValue({ availDate: date });
+      const newCalendarObj = getCalendarFromDate(
+        date,
+        this.localCalendarObj,
+        this.referenceDate
+      );
+      this.localCalendarObj = newCalendarObj;
+    }
   }
 
   onCalendarChange(calendarObj: Week) {
+    this.ignoreNextDateChange = true;
     const newAvailDate = getNewAvailDate(calendarObj, this.referenceDate);
     this.personForm.patchValue({ availDate: newAvailDate });
-    this.updateCalendarView(calendarObj);
-  }
-
-  updateCalendarView(calendarObj: Week) {
     this.localCalendarObj = calendarObj;
     this.setDaysLeft(calendarObj);
   }

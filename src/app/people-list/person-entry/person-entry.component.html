@@ -29,6 +29,7 @@
             type="text"
             [formControl]="tagInput"
             [typeahead]="getTagTypeahead()"
+            (typeaheadOnSelect)="onTagSubmit('entry')"
           />
         </form>
       </li>
@@ -38,7 +39,7 @@
 
 <div
   class="person-entry tl-row no-select"
-  [class.person-entry--uncollapsed]="!isCollapsed"
+  [class.person-entry--uncollapsed]="displayedIn === 'ALLOCATE' && !isCollapsed"
 >
   <span
     *ngIf="displayedIn !== 'ALLOCATE'"
@@ -50,7 +51,7 @@
     *ngIf="displayedIn === 'ALLOCATE'"
     [ngClass]="getFieldClasses('name')"
     role="button"
-    (click)="isCollapsed = !isCollapsed"
+    (click)="handleCollapse()"
     [attr.aria-expanded]="isCollapsed"
     [attr.aria-controls]="'collapse-' + id"
   >

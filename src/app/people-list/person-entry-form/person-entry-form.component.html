@@ -28,6 +28,7 @@
             type="text"
             [formControl]="tagInput"
             [typeahead]="getTagTypeahead()"
+            (typeaheadOnSelect)="onTagSubmit('form')"
           />
         </form>
       </li>
@@ -39,7 +40,9 @@
   [formGroup]="personForm"
   (ngSubmit)="onSubmit()"
   class="person-entry-form tl-row"
-  [class.person-entry-form--uncollapsed]="!isCollapsed"
+  [class.person-entry-form--uncollapsed]="
+    displayedIn === 'ALLOCATE' && !isCollapsed
+  "
   novalidate
 >
   <input

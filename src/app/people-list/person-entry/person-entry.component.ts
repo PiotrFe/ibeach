@@ -9,7 +9,6 @@ import { Week } from 'src/app/shared-module/week-days/week';
   styleUrls: ['./person-entry.component.scss'],
 })
 export class PersonEntryComponent extends PersonEntry implements OnInit {
-  @Input() displayedIn!: 'SUBMIT' | 'ALLOCATE';
   @Input() inEditMode!: boolean;
   @Input() editable: boolean = true;
 

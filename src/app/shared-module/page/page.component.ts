@@ -22,6 +22,7 @@ export class PageComponent {
   uploaded: boolean = false;
   noData: boolean = false;
   filters: Filter[] = [];
+  uncollapsed: Set<string> = new Set();
 
   constructor() {}
 
@@ -72,5 +73,19 @@ export class PageComponent {
 
     const otherClsStr = otherClasses.join(' ');
     return `${baseClass}${otherClsStr}`;
+  }
+
+  handleCollapse(event: { id: string; collapsed: boolean }): void {
+    const { id, collapsed } = event;
+    const newVal = !collapsed;
+
+    if (!newVal) {
+      this.uncollapsed.delete(id);
+    } else {
+      this.uncollapsed.add(id);
+    }
+  }
+  isCollapsed(id: string): boolean {
+    return !this.uncollapsed.has(id);
   }
 }

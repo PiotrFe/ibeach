@@ -1,8 +1,6 @@
 import {
   Component,
   OnInit,
-  AfterViewInit,
-  OnChanges,
   EventEmitter,
   Input,
   Output,

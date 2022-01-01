@@ -156,10 +156,12 @@
           [inEditMode]="inEditMode"
           [sortField]="sortService.sort.field"
           [currPageSection]="'ALLOCATE'"
+          [isCollapsed]="isCollapsed(person.id)"
           (editEvent)="editRow($event)"
           (deleteEvent)="removeExistingRow($event)"
           (calendarChangeEvent)="updateCalendar($event)"
           (tagChangeEvent)="updateTags($event)"
+          (collapseEvent)="handleCollapse($event)"
         ></person-entry>
         <person-entry-form
           *ngSwitchCase="true"
