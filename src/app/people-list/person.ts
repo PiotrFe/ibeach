@@ -5,13 +5,17 @@ import {
   EventEmitter,
   ViewChild,
   ElementRef,
+  AfterViewInit,
+  OnDestroy,
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Week } from './week';
 import { PEOPLE } from './people';
-import { getTagArr, sortTags } from '../utils/';
+import { sortTags } from '../utils/';
 import { PAGE_SECTIONS } from '../app.component';
-import { TypeaheadService } from '..//shared-module/typeahead.service';
+import { TypeaheadService } from '../shared-module/typeahead.service';
+import { ResizeObserverService } from '../shared-module/resize-observer.service';
+import { Observer } from 'rxjs';
 
 export const SKILLS = ['EM', 'ASC', 'FELL', 'BA', 'INT'];
 
@@ -39,8 +43,9 @@ export interface PersonEditable extends Person {
 @Component({
   template: '',
 })
-export class PersonEntry {
+export class PersonEntry implements AfterViewInit, OnDestroy {
   @ViewChild('addTag') addTagElem!: ElementRef;
+  @ViewChild('entryContainer') entryContainer!: ElementRef;
 
   @Input() id!: string;
   @Input() person!: Person;
@@ -54,14 +59,12 @@ export class PersonEntry {
     id: string;
     calendarObj: Week;
   }>();
-
   @Output() tagChangeEvent = new EventEmitter<{
     id: string;
     value: string;
     type: string;
     action: 'add' | 'remove';
   }>();
-
   @Output() collapseEvent = new EventEmitter<{
     id: string;
     collapsed: boolean;
@@ -70,12 +73,21 @@ export class PersonEntry {
   tags!: Tag[];
   tagInput = new FormControl('');
   showAddTag: boolean = false;
-  tagArr: string[] = getTagArr().map((item) => item.value);
-
+  tagArr!: string[];
   typeaheadService: TypeaheadService;
 
   constructor(typeaheadService: TypeaheadService) {
     this.typeaheadService = typeaheadService;
+  }
+
+  ngAfterViewInit(): void {}
+
+  ngOnDestroy(): void {
+    // this.resizeObserverService.unsubscribe(
+    //   this.id,
+    //   this.resizeObserverService.Fields.WIDTH,
+    //   this.resizeObserver
+    // );
   }
 
   getTagTypeahead(): string[] {

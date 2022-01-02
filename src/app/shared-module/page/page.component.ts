@@ -1,6 +1,16 @@
-import { Component } from '@angular/core';
-import { fakeAsync } from '@angular/core/testing';
+import {
+  Component,
+  NgZone,
+  AfterViewInit,
+  ViewChild,
+  ElementRef,
+  OnDestroy,
+  OnChanges,
+} from '@angular/core';
+import { Subject, pipe, takeUntil } from 'rxjs';
 import { Person } from 'src/app/people-list/person';
+import { ResizeObserverService } from 'src/app/shared-module/resize-observer.service';
+import { PersonEntry } from 'src/app/people-list/person';
 
 export interface Filter {
   field: string;
@@ -15,7 +25,9 @@ export interface SubmissionStatus {
 @Component({
   template: '',
 })
-export class PageComponent {
+export class PageComponent implements AfterViewInit, OnDestroy {
+  @ViewChild('page') pageContainer!: ElementRef;
+
   fetching: boolean = false;
   fetchError: string = '';
   uploading: boolean = false;
@@ -24,7 +36,34 @@ export class PageComponent {
   filters: Filter[] = [];
   uncollapsed: Set<string> = new Set();
 
-  constructor() {}
+  ngZone: NgZone;
+  resizeObserverService: ResizeObserverService;
+  entryContainerWidth!: number;
+
+  constructor(ngZone: NgZone, resizeObserverService: ResizeObserverService) {
+    this.ngZone = ngZone;
+    this.resizeObserverService = resizeObserverService;
+  }
+
+  ngAfterViewInit(): void {
+    this.resizeObserverService.registerElem(this.pageContainer.nativeElement);
+    this.resizeObserverService.currentWidth$.subscribe((width: number) => {
+      console.log({ width });
+      this.ngZone.run(() => {
+        if (this.entryContainerWidth !== width) {
+          setTimeout(() => {
+            this.entryContainerWidth = width;
+          }, 0);
+        }
+      });
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.resizeObserverService.deregisterElemAndUnsubscribe(
+      this.pageContainer.nativeElement
+    );
+  }
 
   updateFilter(field: string, value: string) {
     this.filters = this.filters.filter(

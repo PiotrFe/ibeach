@@ -45,9 +45,11 @@
   <div class="toolbar-group toolbar-group--right flex flex-ver-ctr">&nbsp;</div>
 </nav>
 
-<ul class="people">
+<ul class="people" id="page-upload" #page>
   <li>
-    <people-list-header></people-list-header>
+    <people-list-header
+      [entryContainerWidth]="entryContainerWidth"
+    ></people-list-header>
   </li>
   <div class="people-content">
     <div *ngIf="fetchError" class="alert alert-danger">
@@ -62,6 +64,9 @@
         [id]="person.id"
         [person]="person"
         [editable]="false"
+        [entryContainerWidth]="entryContainerWidth"
+        [isCollapsed]="isCollapsed(person.id)"
+        (collapseEvent)="handleCollapse($event)"
       ></person-entry>
     </li>
   </div>

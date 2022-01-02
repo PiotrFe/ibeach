@@ -1,7 +1,8 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, NgZone, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { FetchService } from '../../shared-module/fetch.service';
 import { TypeaheadService } from '../../shared-module/typeahead.service';
+import { ResizeObserverService } from 'src/app/shared-module/resize-observer.service';
 import { SortService } from 'src/app/shared-module/sort.service';
 import { v4 as uuidv4 } from 'uuid';
 import { getNewAvailDate, sortTags } from '../../utils/';
@@ -44,9 +45,11 @@ export class PeopleListComponent extends PageComponent implements OnInit {
   constructor(
     private fetchService: FetchService,
     private typeaheadService: TypeaheadService,
-    sortService: SortService
+    sortService: SortService,
+    resizeObserverService: ResizeObserverService,
+    ngZone: NgZone
   ) {
-    super();
+    super(ngZone, resizeObserverService);
     this.sortService = sortService;
   }
 

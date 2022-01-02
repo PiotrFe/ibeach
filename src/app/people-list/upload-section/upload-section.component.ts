@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, NgZone } from '@angular/core';
 import { FetchService } from '../../shared-module/fetch.service';
 import { CsvParserService } from '../../shared-module/csv-parser.service';
+import { ResizeObserverService } from 'src/app/shared-module/resize-observer.service';
 import { parse } from '../../utils/csv-parser/index';
-import { Person, PersonEntry } from '../person';
+import { Person } from '../person';
 import { PageComponent } from 'src/app/shared-module/page/page.component';
 
 @Component({
@@ -23,10 +24,12 @@ export class UploadSectionComponent extends PageComponent implements OnInit {
   showUploadModal: boolean = false;
 
   constructor(
+    ngZone: NgZone,
+    resizeObserverService: ResizeObserverService,
     private fetchService: FetchService,
     private csvParserService: CsvParserService
   ) {
-    super();
+    super(ngZone, resizeObserverService);
   }
 
   setReferenceDate(date: Date) {

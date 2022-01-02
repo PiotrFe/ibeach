@@ -38,17 +38,16 @@
 </ng-template>
 
 <div
+  #entryContainer
   class="person-entry tl-row no-select"
-  [class.person-entry--uncollapsed]="displayedIn === 'ALLOCATE' && !isCollapsed"
+  [class.person-entry--uncollapsed]="entryContainerWidth < 4 && !isCollapsed"
 >
-  <span
-    *ngIf="displayedIn !== 'ALLOCATE'"
-    [ngClass]="getFieldClasses('name')"
-    >{{ person.name }}</span
-  >
+  <span *ngIf="entryContainerWidth === 4" [ngClass]="getFieldClasses('name')">{{
+    person.name
+  }}</span>
   <span
     type="button"
-    *ngIf="displayedIn === 'ALLOCATE'"
+    *ngIf="entryContainerWidth < 4"
     [ngClass]="getFieldClasses('name')"
     role="button"
     (click)="handleCollapse()"
@@ -73,14 +72,20 @@
     ></week-days>
   </div>
 
-  <div *ngIf="displayedIn !== 'ALLOCATE'" [ngClass]="getFieldClasses('tags')">
+  <div
+    *ngIf="entryContainerWidth === 2 || entryContainerWidth > 2"
+    [ngClass]="getFieldClasses('tags')"
+  >
     <ng-container *ngTemplateOutlet="tagList"></ng-container>
   </div>
-  <div *ngIf="displayedIn !== 'ALLOCATE'" [ngClass]="getFieldClasses('pdm')">
+  <div
+    *ngIf="entryContainerWidth === 3 || entryContainerWidth > 3"
+    [ngClass]="getFieldClasses('pdm')"
+  >
     <span class="bg-secondary-light"> {{ person.pdm | initials }}</span>
   </div>
   <span
-    *ngIf="displayedIn !== 'ALLOCATE'"
+    *ngIf="entryContainerWidth === 4 || entryContainerWidth > 4"
     [ngClass]="getFieldClasses('comments')"
   >
     {{ person.comments }}
@@ -99,21 +104,30 @@
   </div>
 </div>
 <div
-  *ngIf="displayedIn === 'ALLOCATE'"
+  *ngIf="entryContainerWidth < 4"
   id="{{ 'collapse-' + id }}"
   [collapse]="isCollapsed"
   [isAnimated]="true"
 >
   <div class="collapsed-section no-select">
-    <div [ngClass]="getFieldClasses('pdm')">
+    <div *ngIf="entryContainerWidth < 3" [ngClass]="getFieldClasses('pdm')">
       <span class="bg-secondary-light"> {{ person.pdm | initials }}</span>
     </div>
     <span class="break-ver fs-12 mr-3"> | </span>
-    <div [ngClass]="getFieldClasses('tags')" [class.section-tags-small]="true">
+    <div
+      *ngIf="entryContainerWidth < 2"
+      [ngClass]="getFieldClasses('tags')"
+      [class.section-tags-small]="true"
+    >
       <ng-container *ngTemplateOutlet="tagList"></ng-container>
     </div>
-    <span class="break-ver fs-12 mr-3"> | </span>
-    <span [ngClass]="getFieldClasses('comments')">
+    <span *ngIf="entryContainerWidth === 1" class="break-ver fs-12 mr-3">
+      |
+    </span>
+    <span
+      *ngIf="entryContainerWidth < 4"
+      [ngClass]="getFieldClasses('comments')"
+    >
       {{ person.comments }}
     </span>
   </div>

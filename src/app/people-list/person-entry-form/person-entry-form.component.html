@@ -37,11 +37,12 @@
 </ng-template>
 
 <form
+  #entryContainer
   [formGroup]="personForm"
   (ngSubmit)="onSubmit()"
   class="person-entry-form tl-row"
   [class.person-entry-form--uncollapsed]="
-    displayedIn === 'ALLOCATE' && !isCollapsed
+    entryContainerWidth < 4 && !isCollapsed
   "
   novalidate
 >
@@ -85,18 +86,21 @@
     ></week-days>
   </div>
 
-  <div *ngIf="displayedIn !== 'ALLOCATE'" [ngClass]="getFieldClasses('tags')">
+  <div
+    *ngIf="entryContainerWidth === 2 || entryContainerWidth > 2"
+    [ngClass]="getFieldClasses('tags')"
+  >
     <ng-container *ngTemplateOutlet="tagList"></ng-container>
   </div>
   <select
-    *ngIf="displayedIn !== 'ALLOCATE'"
+    *ngIf="entryContainerWidth === 3 || entryContainerWidth > 3"
     class="form-control section section-pdm mr-12 mw-4"
     formControlName="pdm"
   >
     <option *ngFor="let pdm of pdmArr" [value]="pdm">{{ pdm }}</option>
   </select>
   <input
-    *ngIf="displayedIn !== 'ALLOCATE'"
+    *ngIf="entryContainerWidth === 4 || entryContainerWidth > 4"
     id="person-comments"
     class="form-control section section-comments mr-12"
     type="text"
@@ -114,24 +118,28 @@
 </form>
 
 <div
-  *ngIf="displayedIn === 'ALLOCATE'"
+  *ngIf="entryContainerWidth < 4"
   id="{{ 'collapse-' + id }}"
   [collapse]="isCollapsed"
   [isAnimated]="true"
 >
   <div class="collapsed-section no-select" [formGroup]="personForm">
     <select
+      *ngIf="entryContainerWidth < 3"
       class="form-control section section-pdm mr-12 mw-4"
       formControlName="pdm"
     >
       <option *ngFor="let pdm of pdmArr" [value]="pdm">{{ pdm }}</option>
     </select>
     <span class="break-ver fs-12 mr-3"> | </span>
-    <div [ngClass]="getFieldClasses('tags')">
+    <div *ngIf="entryContainerWidth < 2" [ngClass]="getFieldClasses('tags')">
       <ng-container *ngTemplateOutlet="tagList"></ng-container>
     </div>
-    <span class="break-ver fs-12 mr-3"> | </span>
+    <span *ngIf="entryContainerWidth === 1" class="break-ver fs-12 mr-3">
+      |
+    </span>
     <input
+      *ngIf="entryContainerWidth < 4"
       id="person-comments"
       class="form-control section section-comments mr-12"
       type="text"

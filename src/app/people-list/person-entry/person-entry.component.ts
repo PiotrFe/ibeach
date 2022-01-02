@@ -1,6 +1,14 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  Input,
+  Output,
+  EventEmitter,
+  AfterViewInit,
+} from '@angular/core';
 import { PersonEntry } from '../person';
 import { TypeaheadService } from '../../shared-module/typeahead.service';
+import { ResizeObserverService } from 'src/app/shared-module/resize-observer.service';
 import { Week } from 'src/app/shared-module/week-days/week';
 
 @Component({
@@ -11,12 +19,17 @@ import { Week } from 'src/app/shared-module/week-days/week';
 export class PersonEntryComponent extends PersonEntry implements OnInit {
   @Input() inEditMode!: boolean;
   @Input() editable: boolean = true;
+  @Input() entryContainerWidth!: number;
 
   @Output() editEvent = new EventEmitter<string>();
 
   constructor(typeaheadService: TypeaheadService) {
     super(typeaheadService);
   }
+
+  ngOnInit(): void {}
+
+  ngOnChanges() {}
 
   handleEdit(): void {
     this.editEvent.emit(this.id);
@@ -29,6 +42,4 @@ export class PersonEntryComponent extends PersonEntry implements OnInit {
   onCalendarChange(calendarObj: Week) {
     this.calendarChangeEvent.emit({ calendarObj, id: this.id });
   }
-
-  ngOnInit(): void {}
 }

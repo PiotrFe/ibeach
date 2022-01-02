@@ -45,12 +45,12 @@
   ></span>
   <span class="calendar-group txt-center mr-12">Week</span>
   <span
-    *ngIf="displayedIn !== 'ALLOCATE'"
-    class="section-tags txt-center pl-3 mr-12"
+    *ngIf="entryContainerWidth === 2 || entryContainerWidth > 2"
+    class="section-tags section-tags-header txt-center pl-3 mr-12"
     >Tags</span
   >
   <span
-    *ngIf="displayedIn !== 'ALLOCATE'"
+    *ngIf="entryContainerWidth === 3 || entryContainerWidth > 3"
     class="section section-pdm pl-3 mr-12 clickable"
     (click)="handleClick('pdm')"
     >PDM<i
@@ -60,7 +60,7 @@
     <i *ngIf="getSort('pdm', -1)" class="bi bi-sort-up fs-085 ptop-3 ml-2"></i
   ></span>
   <span
-    *ngIf="displayedIn !== 'ALLOCATE'"
+    *ngIf="entryContainerWidth === 4 || entryContainerWidth > 4"
     class="section section-comments txt-center pl-3"
     >Comments</span
   >

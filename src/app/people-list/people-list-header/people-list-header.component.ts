@@ -1,4 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { HeaderComponent } from 'src/app/shared-module/header/header.component';
 import { PAGE_SECTIONS } from '../../app.component';
 
 @Component({
@@ -6,15 +7,21 @@ import { PAGE_SECTIONS } from '../../app.component';
   templateUrl: './people-list-header.component.html',
   styleUrls: ['./people-list-header.component.scss'],
 })
-export class PeopleListHeaderComponent implements OnInit {
+export class PeopleListHeaderComponent
+  extends HeaderComponent
+  implements OnInit
+{
   @Input() displayedIn!: 'SUBMIT' | 'ALLOCATE';
   @Input() sortable: boolean = false;
   @Input() currentSort!: { field: string; order: number };
   @Input() currPageSection!: keyof typeof PAGE_SECTIONS;
+  @Input() entryContainerWidth!: number;
 
   @Output() newSortEvent = new EventEmitter<string>();
 
-  constructor() {}
+  constructor() {
+    super();
+  }
 
   handleClick(val: string) {
     if (this.sortable) {

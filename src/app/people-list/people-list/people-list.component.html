@@ -115,12 +115,13 @@
   </div>
 </nav>
 
-<ul class="people">
+<ul class="people" #page id="page-submit">
   <li>
     <people-list-header
       [sortable]="true"
       [displayedIn]="displayedIn"
       [currentSort]="sortService.sort"
+      [entryContainerWidth]="entryContainerWidth"
       (newSortEvent)="handleSort($event)"
     ></people-list-header>
   </li>
@@ -140,6 +141,7 @@
           [referenceDate]="referenceDate"
           [getNameTypeAhead]="boundGetNameTypeahead"
           [pdm]="pdmFilter.value"
+          [entryContainerWidth]="entryContainerWidth"
           [dispatchToParentAndClose]="saveChangesInProgress"
           (deleteEvent)="removeRow($event)"
           (formSubmitEvent)="addPerson($event)"
@@ -157,6 +159,7 @@
           [sortField]="sortService.sort.field"
           [currPageSection]="'ALLOCATE'"
           [isCollapsed]="isCollapsed(person.id)"
+          [entryContainerWidth]="entryContainerWidth"
           (editEvent)="editRow($event)"
           (deleteEvent)="removeExistingRow($event)"
           (calendarChangeEvent)="updateCalendar($event)"
@@ -172,6 +175,7 @@
           [currPageSection]="'ALLOCATE'"
           [referenceDate]="referenceDate"
           [getNameTypeAhead]="boundGetNameTypeahead"
+          [entryContainerWidth]="entryContainerWidth"
           [dispatchToParentAndClose]="saveChangesInProgress"
           (deleteEvent)="removeExistingRow($event)"
           (calendarChangeEvent)="updateCalendar($event)"
