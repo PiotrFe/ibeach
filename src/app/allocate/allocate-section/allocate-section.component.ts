@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, Input } from '@angular/core';
 
 @Component({
   selector: 'allocate-section',
@@ -9,6 +9,8 @@ export class AllocateSectionComponent implements OnInit {
   @ViewChild('peopleSide') peopleSide!: ElementRef;
   @ViewChild('dragHandle') dragHandle!: ElementRef;
   @ViewChild('projectSide') projectSide!: ElementRef;
+
+  @Input() referenceDate: Date = new Date();
 
   constructor() {}
 

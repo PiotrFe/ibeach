@@ -7,6 +7,7 @@ import { AppComponent } from './app.component';
 import { PeopleListModule } from './people-list/people-list.module';
 import { ProjectListModule } from './project-list/project-list.module';
 import { AllocateModule } from './allocate/allocate.module';
+import { SharedModuleModule } from './shared-module/shared-module.module';
 
 @NgModule({
   declarations: [AppComponent],
@@ -18,6 +19,7 @@ import { AllocateModule } from './allocate/allocate.module';
     PeopleListModule,
     ProjectListModule,
     AllocateModule,
+    SharedModuleModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

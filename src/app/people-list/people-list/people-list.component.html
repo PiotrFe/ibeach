@@ -51,15 +51,7 @@
       Cancel
     </button>
   </div>
-  <div class="toolbar-group toolbar-group--center flex flex-ver-ctr">
-    <calendar
-      [scrollable]="true"
-      [weekly]="true"
-      [baseDay]="1"
-      [dateVal]="referenceDate"
-      (dateChangeEvent)="handleDateChange($event)"
-    ></calendar>
-  </div>
+  <div class="toolbar-group toolbar-group--center flex flex-ver-ctr"></div>
   <div class="toolbar-group toolbar-group--right flex flex-ver-ctr">
     <span *ngIf="statusLabel === 'pending'" class="badge bg-warning text-dark"
       >Pending</span

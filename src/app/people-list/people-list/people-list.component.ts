@@ -1,4 +1,11 @@
-import { Component, OnInit, Input, NgZone } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  Input,
+  NgZone,
+  OnChanges,
+  SimpleChanges,
+} from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { FetchService } from '../../shared-module/fetch.service';
 import { TypeaheadService } from '../../shared-module/typeahead.service';
@@ -19,7 +26,10 @@ import { getNewWeek, getDaysLeft } from '../../shared-module/week-days/week';
   templateUrl: './people-list.component.html',
   styleUrls: ['./people-list.component.scss'],
 })
-export class PeopleListComponent extends PageComponent implements OnInit {
+export class PeopleListComponent
+  extends PageComponent
+  implements OnInit, OnChanges
+{
   @Input() displayedIn!: 'SUBMIT' | 'ALLOCATE';
 
   pdmFilter = new FormControl('All');
@@ -43,6 +53,17 @@ export class PeopleListComponent extends PageComponent implements OnInit {
   ngOnInit(): void {
     this.boundGetNameTypeahead = this.getNameTypeAhead.bind(this);
     this.updateFilteredView();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['referenceDate']) {
+      const { currentValue } = changes['referenceDate'];
+      const mil = currentValue.getMilliseconds();
+      const secs = currentValue.getSeconds();
+      if (mil === 0 && secs === 0) {
+        this.handleDateChange(currentValue as Date);
+      }
+    }
   }
 
   getPDMList(): string[] {

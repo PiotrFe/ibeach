@@ -1,6 +1,9 @@
 <div class="allocate-section">
   <div #peopleSide class="people-side">
-    <people-list [displayedIn]="'ALLOCATE'"></people-list>
+    <people-list
+      [displayedIn]="'ALLOCATE'"
+      [referenceDate]="referenceDate"
+    ></people-list>
   </div>
   <div
     #dragHandle
@@ -8,6 +11,6 @@
     (pointerdown)="onDragHandleClick($event)"
   ></div>
   <div #projectSide class="project-side">
-    <project-list></project-list>
+    <project-list [referenceDate]="referenceDate"></project-list>
   </div>
 </div>

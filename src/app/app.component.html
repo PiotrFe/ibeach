@@ -16,6 +16,17 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
   <div class="container-fluid">
     <a class="navbar-brand" href="#">SWO Client Dev 2.0</a>
+    <div class="container-fluid">
+      <div class="toolbar-group toolbar-group--center flex flex-ver-ctr">
+        <calendar
+          [scrollable]="true"
+          [weekly]="true"
+          [baseDay]="1"
+          [dateVal]="referenceDate"
+          (dateChangeEvent)="handleDateChange($event)"
+        ></calendar>
+      </div>
+    </div>
     <div class="navbar-expand">
       <ul class="navbar-nav">
         <li class="nav-item">
@@ -74,9 +85,16 @@
   <people-list
     *ngIf="pageSection === 'SUBMIT'"
     [displayedIn]="'SUBMIT'"
+    [referenceDate]="referenceDate"
   ></people-list>
-  <upload-section *ngIf="pageSection === 'UPLOAD'"></upload-section>
-  <allocate-section *ngIf="pageSection === 'ALLOCATE'"></allocate-section>
+  <upload-section
+    *ngIf="pageSection === 'UPLOAD'"
+    [referenceDate]="referenceDate"
+  ></upload-section>
+  <allocate-section
+    *ngIf="pageSection === 'ALLOCATE'"
+    [referenceDate]="referenceDate"
+  ></allocate-section>
 </div>
 <!-- <script
   src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"

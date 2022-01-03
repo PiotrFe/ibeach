@@ -6,6 +6,7 @@ import {
   ElementRef,
   OnDestroy,
   OnChanges,
+  Input,
 } from '@angular/core';
 import { ResizeObserverService } from 'src/app/shared-module/resize-observer.service';
 import { PersonEntry, PersonEditable } from 'src/app/people-list/person';
@@ -36,6 +37,7 @@ export const PAGE_TYPES = {
 })
 export class PageComponent implements AfterViewInit, OnDestroy {
   @ViewChild('page') pageContainer!: ElementRef;
+  @Input() referenceDate: Date = new Date();
 
   dataSet: (PersonEditable | ProjectEditable)[] = [];
   filteredDataset: (PersonEditable | ProjectEditable)[] = this.dataSet;
@@ -48,7 +50,7 @@ export class PageComponent implements AfterViewInit, OnDestroy {
 
   noData: boolean = false;
   showAvailableOnly: boolean = false;
-  referenceDate: Date = new Date();
+
   saveChangesInProgress: boolean = false;
   uncollapsed: Set<string> = new Set();
   uploading: boolean = false;
@@ -83,7 +85,6 @@ export class PageComponent implements AfterViewInit, OnDestroy {
     this.resizeObserverService.registerElem(this.pageContainer.nativeElement);
     this.resizeObserverService.currentWidth$.subscribe(
       ([elemID, width]: [string, number]) => {
-        console.log({ elemID, width });
         this.ngZone.run(() => {
           if (thisID === elemID && this.entryContainerWidth !== width) {
             setTimeout(() => {
