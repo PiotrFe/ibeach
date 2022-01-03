@@ -2,7 +2,7 @@
   <div class="tag-list flex flex-ver-ctr">
     <ul class="flex flex-ver-ctr mr-5">
       <li
-        *ngFor="let tag of person.tags"
+        *ngFor="let tag of project.tags"
         class="badge flex no-select mr-3 m-bot-2"
         [class.bg-primary-light]="tag.type === 'ind'"
         [class.bg-secondary-light]="tag.type === 'fun'"
@@ -40,10 +40,10 @@
 <div
   #entryContainer
   class="entry-item tl-row no-select"
-  [class.entry-item--uncollapsed]="entryContainerWidth < 4 && !isCollapsed"
+  [class.person-entry--uncollapsed]="entryContainerWidth < 4 && !isCollapsed"
 >
   <span *ngIf="entryContainerWidth === 4" [ngClass]="getFieldClasses('name')">{{
-    person.name
+    project.client
   }}</span>
   <span
     type="button"
@@ -54,20 +54,18 @@
     [attr.aria-expanded]="isCollapsed"
     [attr.aria-controls]="'collapse-' + id"
   >
-    {{ person.name }}
+    {{ project.client }}
   </span>
-  <span [ngClass]="getFieldClasses('skill')">{{ person.skill }}</span>
-  <span
-    *ngIf="displayedIn !== 'ALLOCATE'"
-    [ngClass]="getFieldClasses('availDate')"
-    >{{ person.availDate | date: "dd-MMM" }}</span
-  >
-  <span [ngClass]="getFieldClasses('days')">{{ person.daysLeft }}</span>
+  <span [ngClass]="getFieldClasses('skill')">{{ project.type }}</span>
+  <span [ngClass]="getFieldClasses('availDate')">{{
+    project.availDate | date: "dd-MMM"
+  }}</span>
+  <span [ngClass]="getFieldClasses('days')">{{ project.daysLeft }}</span>
   <div class="calendar-group mr-12">
     <week-days
       class="flex flex-ver-ctr"
       (calendarChange)="onCalendarChange($event)"
-      [weekObj]="person.week"
+      [weekObj]="project.week"
       [inEditMode]="inEditMode"
     ></week-days>
   </div>
@@ -82,13 +80,13 @@
     *ngIf="entryContainerWidth === 3 || entryContainerWidth > 3"
     [ngClass]="getFieldClasses('pdm')"
   >
-    <span class="bg-secondary-light"> {{ person.pdm | initials }}</span>
+    <span class="bg-secondary-light"> {{ project.leadership }}</span>
   </div>
   <span
     *ngIf="entryContainerWidth === 4 || entryContainerWidth > 4"
     [ngClass]="getFieldClasses('comments')"
   >
-    {{ person.comments }}
+    {{ project.comments }}
   </span>
   <div class="edit-entry-icons">
     <i
@@ -111,7 +109,7 @@
 >
   <div class="collapsed-section no-select">
     <div *ngIf="entryContainerWidth < 3" [ngClass]="getFieldClasses('pdm')">
-      <span class="bg-secondary-light"> {{ person.pdm | initials }}</span>
+      <span class="bg-secondary-light"> {{ project.leadership }}</span>
     </div>
     <span class="break-ver fs-12 mr-3"> | </span>
     <div
@@ -128,7 +126,7 @@
       *ngIf="entryContainerWidth < 4"
       [ngClass]="getFieldClasses('comments')"
     >
-      {{ person.comments }}
+      {{ project.comments }}
     </span>
   </div>
 </div>

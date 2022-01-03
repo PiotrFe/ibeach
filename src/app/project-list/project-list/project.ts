@@ -7,7 +7,7 @@ import { Tag } from 'src/app/shared-module/entry/entry.component';
 export interface Project {
   id: string;
   client: string;
-  type: 'LOP' | 'workshop' | 'warroom' | 'other';
+  type: string;
   leadership: string[];
   availDate?: Date;
   week: Week;

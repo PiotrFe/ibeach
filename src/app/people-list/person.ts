@@ -30,6 +30,7 @@ export interface PersonEditable extends Person {
 export class PersonEntry extends EntryComponent {
   @Input() currPageSection!: keyof typeof PAGE_SECTIONS;
   @Input() displayedIn!: 'SUBMIT' | 'ALLOCATE';
+  @Input() entryContainerWidth!: number;
 
   person!: PersonEditable;
 

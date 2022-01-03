@@ -11,11 +11,8 @@ import { Week } from 'src/app/people-list/week';
 import {
   PageComponent,
   SubmissionStatus,
-  Filter,
 } from 'src/app/shared-module/page/page.component';
-import { sortTags } from 'src/app/utils';
 import { getNewWeek, getDaysLeft } from '../../shared-module/week-days/week';
-import { ProjectEditable } from 'src/app/project-list/project-list/project';
 
 @Component({
   selector: 'people-list',

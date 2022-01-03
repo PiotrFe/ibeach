@@ -35,7 +35,6 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
   @Input() dispatchToParentAndClose: boolean = false;
   @Input() pdm!: string;
   @Input() getNameTypeAhead!: Function;
-  @Input() entryContainerWidth!: number;
 
   @Output() formEditEvent = new EventEmitter<{
     id: string;

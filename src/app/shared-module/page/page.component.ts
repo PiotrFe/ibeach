@@ -79,17 +79,20 @@ export class PageComponent implements AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
+    const thisID = this.pageContainer.nativeElement.id;
     this.resizeObserverService.registerElem(this.pageContainer.nativeElement);
-    this.resizeObserverService.currentWidth$.subscribe((width: number) => {
-      console.log({ width });
-      this.ngZone.run(() => {
-        if (this.entryContainerWidth !== width) {
-          setTimeout(() => {
-            this.entryContainerWidth = width;
-          }, 0);
-        }
-      });
-    });
+    this.resizeObserverService.currentWidth$.subscribe(
+      ([elemID, width]: [string, number]) => {
+        console.log({ elemID, width });
+        this.ngZone.run(() => {
+          if (thisID === elemID && this.entryContainerWidth !== width) {
+            setTimeout(() => {
+              this.entryContainerWidth = width;
+            }, 0);
+          }
+        });
+      }
+    );
   }
 
   ngOnDestroy(): void {

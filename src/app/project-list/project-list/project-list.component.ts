@@ -5,22 +5,37 @@ import { TypeaheadService } from '../../shared-module/typeahead.service';
 import { ResizeObserverService } from 'src/app/shared-module/resize-observer.service';
 import { SortService } from 'src/app/shared-module/sort.service';
 import { v4 as uuidv4 } from 'uuid';
-import { getNewAvailDate, sortTags } from '../../utils/';
 import {
   Project,
   ProjectEditable,
 } from 'src/app/project-list/project-list/project';
-import {
-  PageComponent,
-  SubmissionStatus,
-  Filter,
-} from 'src/app/shared-module/page/page.component';
-import {
-  Week,
-  getNewWeek,
-  getDaysLeft,
-} from '../../shared-module/week-days/week';
-import { timingSafeEqual } from 'crypto';
+import { PageComponent } from 'src/app/shared-module/page/page.component';
+import { getNewWeek } from '../../shared-module/week-days/week';
+
+const projects = [
+  {
+    id: '123',
+    client: 'client 1',
+    type: 'LOP',
+    leadership: ['John Smith', 'Mary Bane'],
+    availDate: new Date(),
+    week: getNewWeek(),
+    daysLeft: 5,
+    comments: 'Not comments',
+    tags: [],
+  },
+  {
+    id: '345',
+    client: 'client 2',
+    type: 'LOP',
+    leadership: ['Patrick Swayze', 'Brock Lesnar'],
+    availDate: new Date(),
+    week: getNewWeek(),
+    daysLeft: 5,
+    comments: 'Yes, comments',
+    tags: [],
+  },
+];
 
 @Component({
   selector: 'project-list',
@@ -28,7 +43,7 @@ import { timingSafeEqual } from 'crypto';
   styleUrls: ['./project-list.component.scss'],
 })
 export class ProjectListComponent extends PageComponent implements OnInit {
-  projects!: Project[];
+  projects: Project[] = projects;
   projectFilteredView = this.projects;
 
   projectFilter = new FormControl('All');

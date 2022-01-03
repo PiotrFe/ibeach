@@ -17,12 +17,6 @@ import { Week } from 'src/app/shared-module/week-days/week';
   styleUrls: ['./person-entry.component.scss'],
 })
 export class PersonEntryComponent extends PersonEntry {
-  @Input() inEditMode!: boolean;
-  @Input() editable: boolean = true;
-  @Input() entryContainerWidth!: number;
-
-  @Output() editEvent = new EventEmitter<string>();
-
   constructor(typeaheadService: TypeaheadService) {
     super(typeaheadService);
   }

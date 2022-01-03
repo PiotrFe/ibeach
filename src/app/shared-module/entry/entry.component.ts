@@ -33,7 +33,10 @@ export class EntryComponent {
   @Input() sortField!: string;
   @Input() isCollapsed!: boolean;
   @Input() entryData!: Person | Project;
+  @Input() inEditMode!: boolean;
+  @Input() editable: boolean = true;
 
+  @Output() editEvent = new EventEmitter<string>();
   @Output() deleteEvent = new EventEmitter<string>();
   @Output() calendarChangeEvent = new EventEmitter<{
     id: string;

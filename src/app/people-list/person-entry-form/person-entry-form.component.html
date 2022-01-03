@@ -40,10 +40,8 @@
   #entryContainer
   [formGroup]="personForm"
   (ngSubmit)="onSubmit()"
-  class="person-entry-form tl-row"
-  [class.person-entry-form--uncollapsed]="
-    entryContainerWidth < 4 && !isCollapsed
-  "
+  class="entry-item tl-row"
+  [class.entry-item--uncollapsed]="entryContainerWidth < 4 && !isCollapsed"
   novalidate
 >
   <input

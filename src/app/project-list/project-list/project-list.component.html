@@ -66,3 +66,42 @@
     ></i>
   </div>
 </nav>
+<ul class="people" #page id="page-projects">
+  <li>
+    <project-list-header
+      [sortable]="true"
+      [currentSort]="sortService.sort"
+      [entryContainerWidth]="entryContainerWidth"
+      (newSortEvent)="handleSort($event)"
+    ></project-list-header>
+  </li>
+
+  <div class="project content tl-content">
+    <div *ngIf="fetchError" class="alert alert-danger">
+      {{ fetchError }}
+    </div>
+    <div *ngIf="noData" class="alert alert-primary">No data available</div>
+    <ul *ngIf="inEditMode">
+      <li *ngFor="let row of newRows">
+        <project-entry></project-entry>
+      </li>
+    </ul>
+    <li *ngFor="let project of projects">
+      <ng-container>
+        <project-entry
+          [id]="project.id"
+          [entryData]="project"
+          [inEditMode]="inEditMode"
+          [sortField]="sortService.sort.field"
+          [isCollapsed]="isCollapsed(project.id)"
+          [entryContainerWidth]="entryContainerWidth"
+          (editEvent)="editRow($event)"
+          (deleteEvent)="removeExistingRow($event)"
+          (calendarChangeEvent)="updateCalendar($event)"
+          (tagChangeEvent)="handleUpdateTags($event)"
+          (collapseEvent)="handleCollapse($event)"
+        ></project-entry>
+      </ng-container>
+    </li>
+  </div>
+</ul>
