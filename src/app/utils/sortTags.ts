@@ -1,4 +1,4 @@
-import { Tag } from 'src/app/people-list/person';
+import { Tag } from 'src/app/shared-module/entry/entry.component';
 
 export const sortTags = (tags: Tag[]): Tag[] => {
   const indTags = tags.filter((tag) => tag.type === 'ind');

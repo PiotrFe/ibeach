@@ -57,7 +57,7 @@
       [weekly]="true"
       [baseDay]="1"
       [dateVal]="referenceDate"
-      (dateChangeEvent)="onDateChange($event)"
+      (dateChangeEvent)="handleDateChange($event)"
     ></calendar>
   </div>
   <div class="toolbar-group toolbar-group--right flex flex-ver-ctr">
@@ -148,13 +148,13 @@
         ></person-entry-form>
       </li>
     </ul>
-    <li *ngFor="let person of peopleFilteredView">
+    <li *ngFor="let person of filteredDataset">
       <ng-container [ngSwitch]="person.inEditMode">
         <person-entry
           *ngSwitchCase="false"
           [id]="person.id"
           [displayedIn]="displayedIn"
-          [person]="person"
+          [entryData]="person"
           [inEditMode]="inEditMode"
           [sortField]="sortService.sort.field"
           [currPageSection]="'ALLOCATE'"
@@ -163,14 +163,14 @@
           (editEvent)="editRow($event)"
           (deleteEvent)="removeExistingRow($event)"
           (calendarChangeEvent)="updateCalendar($event)"
-          (tagChangeEvent)="updateTags($event)"
+          (tagChangeEvent)="handleUpdateTags($event)"
           (collapseEvent)="handleCollapse($event)"
         ></person-entry>
         <person-entry-form
           *ngSwitchCase="true"
           [id]="person.id"
           [displayedIn]="displayedIn"
-          [person]="person"
+          [entryData]="person"
           [sortField]="sortService.sort.field"
           [currPageSection]="'ALLOCATE'"
           [referenceDate]="referenceDate"
@@ -180,7 +180,7 @@
           (deleteEvent)="removeExistingRow($event)"
           (calendarChangeEvent)="updateCalendar($event)"
           (formEditEvent)="updatePersonDetails($event)"
-          (tagChangeEvent)="updateTags($event)"
+          (tagChangeEvent)="handleUpdateTags($event)"
         ></person-entry-form>
       </ng-container>
     </li>

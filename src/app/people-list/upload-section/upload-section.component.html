@@ -62,7 +62,7 @@
     <li *ngFor="let person of previewData; let i = index">
       <person-entry
         [id]="person.id"
-        [person]="person"
+        [entryData]="person"
         [editable]="false"
         [entryContainerWidth]="entryContainerWidth"
         [isCollapsed]="isCollapsed(person.id)"

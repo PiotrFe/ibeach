@@ -1,0 +1,68 @@
+<nav class="main-toolbar">
+  <div class="toolbar-group toolbar-group--left flex flex-ver-ctr">
+    <button
+      *ngIf="!inEditMode"
+      type="button"
+      class="btn btn-primary mr-20"
+      (click)="setInEditMode(true)"
+    >
+      Edit
+    </button>
+
+    <button
+      *ngIf="inEditMode"
+      type="button"
+      class="btn btn-primary btn-main-action"
+      (click)="addNewRow()"
+    >
+      Add
+    </button>
+    <button
+      *ngIf="inEditMode"
+      type="button"
+      class="btn btn-primary btn-main-action"
+      (click)="saveChanges()"
+    >
+      Save
+    </button>
+    <button
+      *ngIf="inEditMode"
+      type="button"
+      class="btn btn-secondary btn-main-action"
+      (click)="cancelChanges()"
+    >
+      Cancel
+    </button>
+  </div>
+  <div class="toolbar-group toolbar-group--center flex flex-ver-ctr">
+    <calendar
+      [scrollable]="true"
+      [weekly]="true"
+      [baseDay]="1"
+      [dateVal]="referenceDate"
+      (dateChangeEvent)="onDateChange($event)"
+    ></calendar>
+  </div>
+  <div class="toolbar-group toolbar-group--right flex flex-ver-ctr">
+    <div class="form-check form-switch">
+      <input
+        class="form-check-input"
+        type="checkbox"
+        role="switch"
+        id="flexSwitchCheckChecked"
+        [checked]="showAvailableOnly"
+        (click)="toggleShowAvailableOnly()"
+        tooltip="Show available only"
+        placement="top"
+        [delay]="600"
+      />
+    </div>
+    <i
+      [ngClass]="getClearFilterBtnClass()"
+      tooltip="Clear filters"
+      placement="top"
+      [delay]="600"
+      (click)="clearFilters()"
+    ></i>
+  </div>
+</nav>

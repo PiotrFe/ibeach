@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { timeStamp } from 'console';
-import { Person, Tag } from 'src/app/people-list/person';
+import { Person } from 'src/app/people-list/person';
+import { Tag } from 'src/app/shared-module/entry/entry.component';
 
 enum TableTypes {
   People,

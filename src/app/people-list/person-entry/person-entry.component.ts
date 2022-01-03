@@ -6,7 +6,7 @@ import {
   EventEmitter,
   AfterViewInit,
 } from '@angular/core';
-import { PersonEntry } from '../person';
+import { PersonEditable, PersonEntry, Person } from '../person';
 import { TypeaheadService } from '../../shared-module/typeahead.service';
 import { ResizeObserverService } from 'src/app/shared-module/resize-observer.service';
 import { Week } from 'src/app/shared-module/week-days/week';
@@ -16,7 +16,7 @@ import { Week } from 'src/app/shared-module/week-days/week';
   templateUrl: './person-entry.component.html',
   styleUrls: ['./person-entry.component.scss'],
 })
-export class PersonEntryComponent extends PersonEntry implements OnInit {
+export class PersonEntryComponent extends PersonEntry {
   @Input() inEditMode!: boolean;
   @Input() editable: boolean = true;
   @Input() entryContainerWidth!: number;
@@ -26,8 +26,6 @@ export class PersonEntryComponent extends PersonEntry implements OnInit {
   constructor(typeaheadService: TypeaheadService) {
     super(typeaheadService);
   }
-
-  ngOnInit(): void {}
 
   ngOnChanges() {}
 

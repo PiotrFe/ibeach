@@ -1,22 +1,21 @@
-import { Component, OnInit, Input, NgZone, ViewChild } from '@angular/core';
+import { Component, OnInit, Input, NgZone } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { FetchService } from '../../shared-module/fetch.service';
 import { TypeaheadService } from '../../shared-module/typeahead.service';
 import { ResizeObserverService } from 'src/app/shared-module/resize-observer.service';
 import { SortService } from 'src/app/shared-module/sort.service';
 import { v4 as uuidv4 } from 'uuid';
-import { getNewAvailDate, sortTags } from '../../utils/';
-import { Person, PersonEditable, Tag } from '../person';
+import { Person, PersonEditable } from '../person';
+import { Tag } from 'src/app/shared-module/entry/entry.component';
+import { Week } from 'src/app/people-list/week';
 import {
   PageComponent,
   SubmissionStatus,
   Filter,
 } from 'src/app/shared-module/page/page.component';
-import {
-  Week,
-  getNewWeek,
-  getDaysLeft,
-} from '../../shared-module/week-days/week';
+import { sortTags } from 'src/app/utils';
+import { getNewWeek, getDaysLeft } from '../../shared-module/week-days/week';
+import { ProjectEditable } from 'src/app/project-list/project-list/project';
 
 @Component({
   selector: 'people-list',
@@ -26,59 +25,27 @@ import {
 export class PeopleListComponent extends PageComponent implements OnInit {
   @Input() displayedIn!: 'SUBMIT' | 'ALLOCATE';
 
-  people!: PersonEditable[];
-  newRows: PersonEditable[] = [];
-  inEditMode: boolean = false;
-  saveChangesInProgress: boolean = false;
-  showAvailableOnly: boolean = false;
-  peopleFilteredView = this.people;
   pdmFilter = new FormControl('All');
   skillFilter = new FormControl('All');
-  referenceDate: Date = new Date();
   showSubmitModal: boolean = false;
   status!: SubmissionStatus;
   statusLabel!: string;
   submitted!: boolean;
   boundGetNameTypeahead!: Function;
-  sortService!: SortService;
 
   constructor(
     private fetchService: FetchService,
-    private typeaheadService: TypeaheadService,
+    typeaheadService: TypeaheadService,
     sortService: SortService,
     resizeObserverService: ResizeObserverService,
     ngZone: NgZone
   ) {
-    super(ngZone, resizeObserverService);
-    this.sortService = sortService;
+    super(ngZone, resizeObserverService, typeaheadService, sortService);
   }
 
   ngOnInit(): void {
     this.boundGetNameTypeahead = this.getNameTypeAhead.bind(this);
     this.updateFilteredView();
-  }
-
-  onDateChange(date: Date) {
-    this.referenceDate = date;
-    this.referenceDate.setHours(0, 0, 0, 0);
-    this.people = [];
-    this.fetchData();
-    setTimeout(() => {
-      this.updateFilteredView();
-    }, 0);
-  }
-
-  handleSort(colName: string) {
-    this.people = this.sortService.sortData(this.people, colName);
-    this.updateFilteredView();
-  }
-
-  // *****************
-  // FILTER HANDLERS
-  // *****************
-
-  updateFilteredView(): void {
-    this.peopleFilteredView = this.getFilteredView(this.people);
   }
 
   getPDMList(): string[] {
@@ -89,22 +56,6 @@ export class PeopleListComponent extends PageComponent implements OnInit {
     return Object.values(this.status)
       .reduce((arr, subArr) => (arr = [...arr, ...subArr]), [])
       .sort();
-  }
-
-  toggleShowAvailableOnly(): void {
-    this.showAvailableOnly = !this.showAvailableOnly;
-
-    if (this.showAvailableOnly) {
-      this.filters.push({
-        field: 'days',
-      });
-    } else {
-      this.filters = this.filters.filter(
-        (filter: Filter) => filter.field !== 'days'
-      );
-    }
-
-    this.updateFilteredView();
   }
 
   updatePDMFilter(event: any): void {
@@ -175,65 +126,6 @@ export class PeopleListComponent extends PageComponent implements OnInit {
   // EDIT HANDLERS
   // *****************
 
-  getNameTypeAhead(): string[] {
-    return this.typeaheadService.getTypeahead(
-      this.typeaheadService.fields.Name,
-      this.people
-    );
-  }
-
-  setInEditMode(inEditMode: boolean): void {
-    this.inEditMode = inEditMode;
-    if (!inEditMode) {
-      this.newRows = [];
-    }
-  }
-  saveChanges(): void {
-    if (!this.checkIfAnyFormsOpen()) {
-      this.setInEditMode(false);
-      this.updateFilteredView();
-      this.postChanges();
-      return;
-    }
-
-    // this.people = this.people.map((person: PersonEditable) => ({
-    //   ...person,
-    //   inEditMode: false,
-    // }));
-
-    this.saveChangesInProgress = true;
-  }
-
-  checkIfAnyFormsOpen = (): boolean => {
-    const atLeastOneFormOpen =
-      this.people.find((person: PersonEditable) => person.inEditMode) ||
-      this.newRows.length > 0;
-
-    return Boolean(atLeastOneFormOpen);
-  };
-
-  onChangeSaved(): void {
-    if (this.saveChangesInProgress && !this.checkIfAnyFormsOpen()) {
-      this.saveChangesInProgress = false;
-      this.setInEditMode(false);
-      setTimeout(() => {
-        this.postChanges();
-      });
-    }
-
-    this.updateFilteredView();
-  }
-
-  cancelChanges(): void {
-    this.people = this.people.map((person: PersonEditable) => ({
-      ...person,
-      inEditMode: false,
-    }));
-
-    this.fetchData(true);
-    this.setInEditMode(false);
-  }
-
   addNewRow(): void {
     this.newRows.push({
       id: uuidv4(),
@@ -244,83 +136,7 @@ export class PeopleListComponent extends PageComponent implements OnInit {
       comments: '',
       tags: [],
       inEditMode: true,
-    });
-  }
-
-  removeRow(id: string): void {
-    this.newRows = this.newRows.filter((item) => item.id !== id);
-  }
-
-  editRow(id: string): void {
-    const idx = this.people.findIndex((person) => person.id === id);
-    this.people[idx] = {
-      ...this.people[idx],
-      inEditMode: true,
-    };
-    this.updateFilteredView();
-  }
-
-  removeExistingRow(id: string): void {
-    this.people = this.people.filter((person) => person.id !== id);
-    this.updateFilteredView();
-  }
-
-  updateCalendar(objParam: { id: string; calendarObj: Week }): void {
-    const { calendarObj, id } = objParam;
-    const newAvailDate = getNewAvailDate(calendarObj, this.referenceDate);
-
-    this.people = this.people.map((person) => {
-      if (person.id !== id) {
-        return person;
-      }
-      return {
-        ...person,
-        availDate: newAvailDate,
-        week: {
-          ...calendarObj,
-        },
-        daysLeft: getDaysLeft(calendarObj),
-      };
-    });
-    this.updateFilteredView();
-  }
-
-  updateTags(objParam: {
-    id: string;
-    value: string;
-    type: string;
-    action: 'add' | 'remove';
-  }): void {
-    const { id, value, type, action } = objParam;
-
-    const personIdx: number | undefined = this.people.findIndex(
-      (person) => person.id === id
-    );
-
-    if (typeof personIdx === undefined) {
-      return;
-    }
-
-    const person = this.people[personIdx];
-    const tags = [...person.tags];
-
-    if (action === 'add') {
-      tags.push({
-        value,
-        type,
-      });
-    }
-    if (action === 'remove') {
-      const tagIdx = tags.findIndex((tag) => tag.value === value);
-      tags.splice(tagIdx, 1);
-    }
-
-    this.people[personIdx] = {
-      ...person,
-      tags: sortTags(tags),
-    };
-
-    this.onChangeSaved();
+    } as PersonEditable);
   }
 
   updatePersonDetails(objParam: {
@@ -337,7 +153,7 @@ export class PeopleListComponent extends PageComponent implements OnInit {
 
     console.log({ objParam });
 
-    this.people = this.people.map((person) => {
+    this.dataSet = this.dataSet.map((person) => {
       if (person.id !== id) {
         return person;
       }
@@ -371,7 +187,7 @@ export class PeopleListComponent extends PageComponent implements OnInit {
     this.sortService.clearSort();
     const { id, name, skill, comments, week, tags, availDate, pdm } = objParam;
 
-    this.people.unshift({
+    this.dataSet.unshift({
       id,
       name,
       skill,
@@ -420,7 +236,7 @@ export class PeopleListComponent extends PageComponent implements OnInit {
       }: { people: Person[]; status: SubmissionStatus; lookupTable: Person[] } =
         response;
 
-      this.people = this.sortService
+      this.dataSet = this.sortService
         .sortData(people, this.sortService.SORT_COLUMNS.NAME, false, true)
         .map((person) => ({
           ...person,
@@ -463,7 +279,7 @@ export class PeopleListComponent extends PageComponent implements OnInit {
       await this.fetchService.saveList(
         this.referenceDate,
         pdmParam,
-        this.peopleFilteredView.map((person) => {
+        (this.filteredDataset as any[]).map((person) => {
           const { inEditMode, ...otherProps } = person;
 
           return {
@@ -494,7 +310,7 @@ export class PeopleListComponent extends PageComponent implements OnInit {
         await this.fetchService.submitList(
           this.referenceDate,
           this.pdmFilter.value,
-          this.peopleFilteredView.map((person) => {
+          (this.filteredDataset as any[]).map((person) => {
             const { inEditMode, ...otherProps } = person;
 
             return {
@@ -509,5 +325,49 @@ export class PeopleListComponent extends PageComponent implements OnInit {
         this.uploading = false;
       }
     }
+  }
+
+  handleDateChange(date: Date) {
+    this.onDateChange(date);
+    this.fetchData();
+  }
+
+  onChangeSaved(): void {
+    if (this.saveChangesInProgress && !this.checkIfAnyFormsOpen()) {
+      this.saveChangesInProgress = false;
+      this.setInEditMode(false);
+      setTimeout(() => {
+        this.postChanges();
+      });
+    }
+
+    this.updateFilteredView();
+  }
+
+  cancelChanges(): void {
+    this.onCancelChanges();
+    this.fetchData(true);
+    this.setInEditMode(false);
+  }
+
+  handleUpdateTags(objParam: {
+    id: string;
+    value: string;
+    type: string;
+    action: 'add' | 'remove';
+  }): void {
+    this.updateTags(objParam);
+    this.onChangeSaved();
+  }
+
+  saveChanges(): void {
+    if (!this.checkIfAnyFormsOpen()) {
+      this.setInEditMode(false);
+      this.updateFilteredView();
+      this.postChanges();
+      return;
+    }
+
+    this.saveChangesInProgress = true;
   }
 }

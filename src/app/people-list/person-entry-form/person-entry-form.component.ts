@@ -8,9 +8,11 @@ import {
 } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { TypeaheadMatch } from 'ngx-bootstrap/typeahead';
-import { PersonEntry, Tag } from '../person';
+import { PersonEntry } from '../person';
+import { Tag } from 'src/app/shared-module/entry/entry.component';
 import { TypeaheadService } from '../../shared-module/typeahead.service';
 import { getPDMArr } from '../../utils/getPDMArr';
+import { Person } from '../person';
 import {
   getWeekDayDate,
   getNewAvailDate,
@@ -74,19 +76,20 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
   // LIFECYCLE HOOKS
   // ***************
 
-  ngOnInit(): void {
+  override ngOnInit(): void {
     if (this.displayedIn === 'ALLOCATE') {
       this.isCollapsed = false;
     }
 
-    if (!this.person && this.pdm) {
+    if (!this.entryData && this.pdm) {
       this.personForm.patchValue({
         pdm: this.pdm,
       });
     }
 
-    if (this.person) {
-      const { name, skill, comments, availDate, pdm } = this.person;
+    if (this.entryData) {
+      const { name, skill, comments, availDate, pdm } = this
+        .entryData as Person;
       this.personForm.setValue({
         name,
         skill,
@@ -94,14 +97,14 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
         availDate: availDate || '',
         pdm: pdm || '',
       });
-      this.tags = this.person.tags;
+      this.tags = this.entryData.tags;
     } else {
       this.tags = [];
     }
 
-    if (this.person?.week) {
-      this.localCalendarObj = this.person.week;
-      this.setDaysLeft(this.person.week);
+    if (this.entryData?.week) {
+      this.localCalendarObj = this.entryData.week;
+      this.setDaysLeft(this.entryData.week);
     } else {
       this.daysLeft = 5;
       this.localCalendarObj = getNewWeek();
@@ -179,7 +182,7 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
 
     const { name, skill, comments, availDate, pdm } = this.personForm.value;
 
-    if (this.person) {
+    if (this.entryData) {
       this.formEditEvent.emit({
         id: this.fmno || this.id,
         name,

@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { getDaysLeft } from 'src/app/shared-module/week-days/week';
-import { Person, Tag } from 'src/app/people-list/person';
+import { Person } from 'src/app/people-list/person';
 import { Week, getNewWeek } from 'src/app/shared-module/week-days/week';
+import { Tag } from 'src/app/shared-module/entry/entry.component';
 import {
   getTagsFromData,
   sortTags,

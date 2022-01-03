@@ -22,9 +22,9 @@ import { PeopleListHeaderComponent } from './people-list-header/people-list-head
   exports: [PeopleListComponent, UploadSectionComponent],
   imports: [
     CommonModule,
+    SharedModuleModule,
     FormsModule,
     ReactiveFormsModule,
-    SharedModuleModule,
     TypeaheadModule.forRoot(),
     TooltipModule.forRoot(),
     CollapseModule.forRoot(),

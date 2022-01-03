@@ -1,28 +1,12 @@
-import {
-  Component,
-  Input,
-  Output,
-  EventEmitter,
-  ViewChild,
-  ElementRef,
-  AfterViewInit,
-  OnDestroy,
-} from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { Component, Input } from '@angular/core';
 import { Week } from './week';
+import { EntryComponent } from 'src/app/shared-module/entry/entry.component';
 import { PEOPLE } from './people';
-import { sortTags } from '../utils/';
 import { PAGE_SECTIONS } from '../app.component';
 import { TypeaheadService } from '../shared-module/typeahead.service';
-import { ResizeObserverService } from '../shared-module/resize-observer.service';
-import { Observer } from 'rxjs';
+import { Tag } from 'src/app/shared-module/entry/entry.component';
 
 export const SKILLS = ['EM', 'ASC', 'FELL', 'BA', 'INT'];
-
-export interface Tag {
-  type: string;
-  value: string;
-}
 
 export interface Person {
   id: string;
@@ -43,111 +27,26 @@ export interface PersonEditable extends Person {
 @Component({
   template: '',
 })
-export class PersonEntry implements AfterViewInit, OnDestroy {
-  @ViewChild('addTag') addTagElem!: ElementRef;
-  @ViewChild('entryContainer') entryContainer!: ElementRef;
-
-  @Input() id!: string;
-  @Input() person!: Person;
-  @Input() sortField!: string;
+export class PersonEntry extends EntryComponent {
   @Input() currPageSection!: keyof typeof PAGE_SECTIONS;
-  @Input() isCollapsed!: boolean;
   @Input() displayedIn!: 'SUBMIT' | 'ALLOCATE';
 
-  @Output() deleteEvent = new EventEmitter<string>();
-  @Output() calendarChangeEvent = new EventEmitter<{
-    id: string;
-    calendarObj: Week;
-  }>();
-  @Output() tagChangeEvent = new EventEmitter<{
-    id: string;
-    value: string;
-    type: string;
-    action: 'add' | 'remove';
-  }>();
-  @Output() collapseEvent = new EventEmitter<{
-    id: string;
-    collapsed: boolean;
-  }>();
-
-  tags!: Tag[];
-  tagInput = new FormControl('');
-  showAddTag: boolean = false;
-  tagArr!: string[];
-  typeaheadService: TypeaheadService;
+  person!: PersonEditable;
 
   constructor(typeaheadService: TypeaheadService) {
-    this.typeaheadService = typeaheadService;
+    super(typeaheadService);
   }
 
-  ngAfterViewInit(): void {}
-
-  ngOnDestroy(): void {
-    // this.resizeObserverService.unsubscribe(
-    //   this.id,
-    //   this.resizeObserverService.Fields.WIDTH,
-    //   this.resizeObserver
-    // );
-  }
-
-  getTagTypeahead(): string[] {
-    const tags = this.person ? this.person.tags : this.tags;
-
-    return this.typeaheadService.getTypeahead(
-      this.typeaheadService.fields.Tag,
-      tags
-    );
+  ngOnInit(): void {
+    const entry = this.entryData as Person;
+    this.person = {
+      ...entry,
+      inEditMode: false,
+    };
   }
 
   getPDMTypeAhead(key: string): any[] {
     return PEOPLE.map((item) => item[key as keyof Person]);
-  }
-
-  setShowAddTag(show: boolean): void {
-    this.showAddTag = show;
-    setTimeout(() => {
-      this.addTagElem.nativeElement.focus();
-    }, 0);
-  }
-
-  onTagSubmit(submittedBy: 'form' | 'entry'): void {
-    const tagObj: Tag | undefined = this.typeaheadService.getTagByVal(
-      this.tagInput.value
-    );
-
-    if (tagObj) {
-      if (submittedBy === 'entry') {
-        this.tagChangeEvent.emit({
-          id: this.id,
-          value: tagObj.value,
-          type: tagObj.type,
-          action: 'add',
-        });
-      } else {
-        this.tags = sortTags([
-          ...this.tags,
-          {
-            ...tagObj,
-          },
-        ]);
-      }
-    }
-
-    this.tagInput.setValue('');
-    this.showAddTag = false;
-  }
-
-  onTagDelete(value: string, submittedBy: 'form' | 'entry'): void {
-    if (submittedBy === 'entry') {
-      this.tagChangeEvent.emit({
-        id: this.id,
-        value,
-        type: '',
-        action: 'remove',
-      });
-    } else {
-      this.tags = this.tags.filter((tag) => tag.value !== value);
-    }
   }
 
   getFieldClasses(fieldName: string): string {
@@ -156,12 +55,5 @@ export class PersonEntry implements AfterViewInit, OnDestroy {
     const otherClass = fieldName === 'pdm' ? ' flex-ctr-hor' : '';
 
     return `${baseClass}${sortedClass}${otherClass}`;
-  }
-
-  handleCollapse(): void {
-    this.collapseEvent.emit({
-      id: this.id,
-      collapsed: !this.isCollapsed,
-    });
   }
 }

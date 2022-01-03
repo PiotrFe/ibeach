@@ -10,6 +10,7 @@ import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { PageComponent } from './page/page.component';
 import { LoadingOverlayComponent } from './loading-overlay/loading-overlay.component';
 import { HeaderComponent } from './header/header.component';
+import { EntryComponent } from './entry/entry.component';
 
 @NgModule({
   declarations: [
@@ -20,6 +21,7 @@ import { HeaderComponent } from './header/header.component';
     PageComponent,
     LoadingOverlayComponent,
     HeaderComponent,
+    EntryComponent,
   ],
   imports: [
     BsDatepickerModule.forRoot(),
@@ -36,6 +38,7 @@ import { HeaderComponent } from './header/header.component';
     PageComponent,
     LoadingOverlayComponent,
     HeaderComponent,
+    EntryComponent,
   ],
   providers: [BsModalRef],
 })

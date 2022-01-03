@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
-import { ConnectableObservable } from 'rxjs';
+import axios, { AxiosRequestConfig } from 'axios';
 import { Person, PersonEditable } from 'src/app/people-list/person';
+import { Project } from 'src/app/project-list/project-list/project';
 
 const config = {
   headers: {
@@ -110,5 +110,13 @@ export class FetchService {
       console.log(e);
       return e.message;
     }
+  }
+
+  async fetchProjectList(weekOf: Date): Promise<Project[]> {
+    return Promise.resolve([]);
+  }
+
+  async saveProjectList(weekOf: Date, data: Project[]): Promise<void> {
+    return Promise.resolve();
   }
 }

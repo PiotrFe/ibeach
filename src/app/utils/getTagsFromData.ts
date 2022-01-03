@@ -1,4 +1,4 @@
-import { Tag } from '../people-list/person';
+import { Tag } from 'src/app/shared-module/entry/entry.component';
 
 export const getTagsFromData = (
   data: string,
