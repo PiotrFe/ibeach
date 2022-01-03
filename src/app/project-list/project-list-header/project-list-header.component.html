@@ -20,19 +20,6 @@
     <i *ngIf="getSort('skill', -1)" class="bi bi-sort-up fs-085 ptop-3 ml-2"></i
   ></span>
   <span
-    class="section section-availDate mr-12 pl-3 clickable"
-    (click)="handleClick('availDate')"
-    >From
-    <i
-      *ngIf="getSort('availDate', 1)"
-      class="bi bi-sort-down-alt fs-085 ptop-3 ml-2"
-    ></i>
-    <i
-      *ngIf="getSort('availDate', -1)"
-      class="bi bi-sort-up fs-085 ptop-3 ml-2"
-    ></i
-  ></span>
-  <span
     class="section section-days mr-12 pl-3 clickable"
     (click)="handleClick('days')"
     >Days
@@ -52,7 +39,7 @@
     *ngIf="entryContainerWidth === 3 || entryContainerWidth > 3"
     class="section section-pdm pl-3 mr-12 clickable"
     (click)="handleClick('pdm')"
-    >PDM<i
+    >Leadership<i
       *ngIf="getSort('pdm', 1)"
       class="bi bi-sort-down-alt fs-085 ptop-3 ml-2"
     ></i>

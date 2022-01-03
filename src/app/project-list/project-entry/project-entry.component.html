@@ -57,9 +57,6 @@
     {{ project.client }}
   </span>
   <span [ngClass]="getFieldClasses('skill')">{{ project.type }}</span>
-  <span [ngClass]="getFieldClasses('availDate')">{{
-    project.availDate | date: "dd-MMM"
-  }}</span>
   <span [ngClass]="getFieldClasses('days')">{{ project.daysLeft }}</span>
   <div class="calendar-group mr-12">
     <week-days
