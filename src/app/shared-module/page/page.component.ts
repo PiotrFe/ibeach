@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { ResizeObserverService } from 'src/app/shared-module/resize-observer.service';
 import { PersonEntry, PersonEditable } from 'src/app/people-list/person';
-import { SortService } from 'src/app/shared-module/sort.service';
+import { SortService } from 'src/app/utils/sort.service';
 import { ProjectEditable } from 'src/app/project-list/project-list/project';
 import { Week } from 'src/app/people-list/week';
 import { getNewAvailDate, sortTags } from 'src/app/utils';
@@ -57,7 +57,7 @@ export class PageComponent implements AfterViewInit, OnDestroy {
   uploaded: boolean = false;
 
   ngZone: NgZone;
-  sortService!: SortService;
+  sortService: SortService = new SortService();
   typeaheadService!: TypeaheadService;
   resizeObserverService: ResizeObserverService;
   entryContainerWidth!: number;
@@ -65,15 +65,10 @@ export class PageComponent implements AfterViewInit, OnDestroy {
   constructor(
     ngZone: NgZone,
     resizeObserverService: ResizeObserverService,
-    typeaheadService?: TypeaheadService,
-    sortService?: SortService
+    typeaheadService?: TypeaheadService
   ) {
     this.ngZone = ngZone;
     this.resizeObserverService = resizeObserverService;
-
-    if (sortService) {
-      this.sortService = sortService;
-    }
 
     if (typeaheadService) {
       this.typeaheadService = typeaheadService;

@@ -144,6 +144,8 @@ export class FetchService {
   async saveProjectList(weekOf: Date, data: Project[]): Promise<void> {
     const weekTs = weekOf.getTime();
 
+    console.log({ data });
+
     try {
       return await axios.post(
         `${baseUrl}/projects/${weekTs}`,

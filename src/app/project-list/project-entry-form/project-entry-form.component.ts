@@ -73,6 +73,9 @@ export class ProjectEntryFormComponent
       this.id = this.entryData.id;
     } else {
       this.tags = [];
+      this.projectForm.patchValue({
+        type: 'LOP',
+      });
     }
 
     if (this.entryData?.week) {
@@ -86,8 +89,8 @@ export class ProjectEntryFormComponent
   }
 
   projectForm = new FormGroup({
-    client: new FormControl('', [Validators.required, Validators.minLength(3)]),
-    type: new FormControl('KIP', [Validators.required]),
+    client: new FormControl('', [Validators.required]),
+    type: new FormControl('', [Validators.required]),
     availDate: new FormControl(getWeekDayDate(1, 'next'), [
       Validators.required,
     ]),

@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Person, PersonEditable } from 'src/app/people-list/person';
+import { Project, ProjectEditable } from '../project-list/project-list/project';
 
 const SKILL_INDEX = {
   AP: 6,
@@ -20,9 +21,30 @@ interface SortEntry {
   order: 1 | 0 | -1;
 }
 
-@Injectable({
-  providedIn: 'root',
-})
+function isPerson(entry: any): entry is Person {
+  return entry.name !== undefined && entry.skill !== undefined;
+}
+
+function isPersonEditable(entry: any): entry is PersonEditable {
+  return (
+    entry.name !== undefined &&
+    entry.skill !== undefined &&
+    entry.isEditable !== undefined
+  );
+}
+
+function isProject(entry: any): entry is Project {
+  return entry.client !== undefined && entry.client !== undefined;
+}
+
+function isProjectEditable(entry: any): entry is ProjectEditable {
+  return (
+    entry.client !== undefined &&
+    entry.type !== undefined &&
+    entry.isEditable !== undefined
+  );
+}
+
 export class SortService {
   sort: SortEntry = {
     field: '',
@@ -63,14 +85,28 @@ export class SortService {
   }
 
   sortByName = (
-    a: Person | PersonEditable,
-    b: Person | PersonEditable,
+    a: Person | PersonEditable | Project | ProjectEditable,
+    b: Person | PersonEditable | Project | ProjectEditable,
     asc: boolean = false
   ): number => {
     const order = this.sort.order;
 
-    const nameA = a.name.toUpperCase();
-    const nameB = b.name.toUpperCase();
+    let nameA: string = '';
+    let nameB: string = '';
+
+    if (
+      (isPerson(a) && isPerson(b)) ||
+      (isPersonEditable(a) && isPersonEditable(b))
+    ) {
+      nameA = a.name.toUpperCase();
+      nameB = b.name.toUpperCase();
+    } else if (
+      (isProject(a) && isProject(b)) ||
+      (isProjectEditable(a) && isProjectEditable(b))
+    ) {
+      nameA = a.client.toUpperCase();
+      nameB = b.client.toUpperCase();
+    }
 
     if (nameA < nameB) {
       return asc ? -1 : order * -1;
@@ -83,8 +119,8 @@ export class SortService {
   };
 
   sortByDays = (
-    a: Person | PersonEditable,
-    b: Person | PersonEditable,
+    a: Person | PersonEditable | Project | ProjectEditable,
+    b: Person | PersonEditable | Project | ProjectEditable,
     asc: boolean = false
   ): number => {
     const order = this.sort.order;

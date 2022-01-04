@@ -1,7 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { Week } from './week';
 import { EntryComponent } from 'src/app/shared-module/entry/entry.component';
-import { PEOPLE } from './people';
 import { PAGE_SECTIONS } from '../app.component';
 import { TypeaheadService } from '../shared-module/typeahead.service';
 import { Tag } from 'src/app/shared-module/entry/entry.component';
@@ -47,7 +46,7 @@ export class PersonEntry extends EntryComponent {
   }
 
   getPDMTypeAhead(key: string): any[] {
-    return PEOPLE.map((item) => item[key as keyof Person]);
+    return [];
   }
 
   getFieldClasses(fieldName: string): string {

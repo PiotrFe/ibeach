@@ -57,10 +57,10 @@
     [class.is-invalid]="isFieldValid('type')"
     formControlName="type"
   >
-    <option value="EM">LOP</option>
-    <option value="ASC">WS</option>
-    <option value="FELL">PD</option>
-    <option value="BA">OTH</option>
+    <option value="LOP">LOP</option>
+    <option value="WS">WS</option>
+    <option value="PD">PD</option>
+    <option value="OTH">OTH</option>
   </select>
 
   <span [ngClass]="getFieldClasses('days')">{{ getDaysAvailable() }}</span>

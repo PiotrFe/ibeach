@@ -10,7 +10,6 @@ import { FormControl } from '@angular/forms';
 import { FetchService } from '../../shared-module/fetch.service';
 import { TypeaheadService } from '../../shared-module/typeahead.service';
 import { ResizeObserverService } from 'src/app/shared-module/resize-observer.service';
-import { SortService } from 'src/app/shared-module/sort.service';
 import { Week } from 'src/app/people-list/week';
 import { Tag } from 'src/app/shared-module/entry/entry.component';
 import { v4 as uuidv4 } from 'uuid';
@@ -35,11 +34,10 @@ export class ProjectListComponent
   constructor(
     private fetchService: FetchService,
     typeaheadService: TypeaheadService,
-    sortService: SortService,
     resizeObserverService: ResizeObserverService,
     ngZone: NgZone
   ) {
-    super(ngZone, resizeObserverService, typeaheadService, sortService);
+    super(ngZone, resizeObserverService, typeaheadService);
   }
 
   ngOnInit(): void {}
@@ -208,7 +206,7 @@ export class ProjectListComponent
     try {
       await this.fetchService.saveProjectList(
         this.referenceDate,
-        (this.filteredDataset as any[]).map((entry) => {
+        (this.dataSet as any[]).map((entry) => {
           const { inEditMode, ...otherProps } = entry;
 
           return {

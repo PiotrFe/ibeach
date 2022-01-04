@@ -40,7 +40,7 @@
 <div
   #entryContainer
   class="entry-item tl-row no-select"
-  [class.person-entry--uncollapsed]="entryContainerWidth < 4 && !isCollapsed"
+  [class.entry-item--uncollapsed]="entryContainerWidth < 4 && !isCollapsed"
 >
   <span *ngIf="entryContainerWidth === 4" [ngClass]="getFieldClasses('name')">{{
     project.client
