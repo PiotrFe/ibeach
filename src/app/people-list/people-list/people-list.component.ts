@@ -169,8 +169,6 @@ export class PeopleListComponent
   }) {
     const { id, name, skill, comments, availDate, pdm, week, tags } = objParam;
 
-    console.log({ objParam });
-
     this.dataSet = this.dataSet.map((person) => {
       if (person.id !== id) {
         return person;

@@ -10,8 +10,6 @@ import { Week } from 'src/app/people-list/week';
   styleUrls: ['./project-entry.component.scss'],
 })
 export class ProjectEntryComponent extends EntryComponent implements OnInit {
-  @Input() entryContainerWidth!: number;
-
   project!: ProjectEditable;
 
   constructor(typeaheadService: TypeaheadService) {

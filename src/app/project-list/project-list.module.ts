@@ -8,9 +8,10 @@ import { TooltipModule } from 'ngx-bootstrap/tooltip';
 import { CollapseModule } from 'ngx-bootstrap/collapse';
 import { ProjectListHeaderComponent } from './project-list-header/project-list-header.component';
 import { ProjectEntryComponent } from './project-entry/project-entry.component';
+import { ProjectEntryFormComponent } from './project-entry-form/project-entry-form.component';
 
 @NgModule({
-  declarations: [ProjectListComponent, ProjectListHeaderComponent, ProjectEntryComponent],
+  declarations: [ProjectListComponent, ProjectListHeaderComponent, ProjectEntryComponent, ProjectEntryFormComponent],
   imports: [
     CommonModule,
     SharedModuleModule,

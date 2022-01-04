@@ -9,7 +9,6 @@ import {
 } from '@angular/core';
 
 import { FormControl } from '@angular/forms';
-
 import { Week } from 'src/app/people-list/week';
 import { TypeaheadService } from 'src/app/shared-module/typeahead.service';
 import { sortTags } from 'src/app/utils';
@@ -21,9 +20,7 @@ export interface Tag {
 }
 
 @Component({
-  selector: 'app-entry',
-  templateUrl: './entry.component.html',
-  styleUrls: ['./entry.component.scss'],
+  template: '',
 })
 export class EntryComponent {
   @ViewChild('addTag') addTagElem!: ElementRef;
@@ -35,6 +32,8 @@ export class EntryComponent {
   @Input() entryData!: Person | Project;
   @Input() inEditMode!: boolean;
   @Input() editable: boolean = true;
+  @Input() entryContainerWidth!: number;
+  @Input() referenceDate!: Date;
 
   @Output() editEvent = new EventEmitter<string>();
   @Output() deleteEvent = new EventEmitter<string>();
@@ -53,6 +52,8 @@ export class EntryComponent {
     collapsed: boolean;
   }>();
 
+  daysLeft!: number;
+  localCalendarObj!: Week;
   showAddTag: boolean = false;
   tags!: Tag[];
   tagInput = new FormControl('');

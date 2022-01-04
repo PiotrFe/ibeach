@@ -69,23 +69,37 @@
   </li>
 
   <div class="project content tl-content">
-    <div *ngIf="fetchError" class="alert alert-danger">
+    <div *ngIf="fetchError && !inEditMode" class="alert alert-danger">
       {{ fetchError }}
     </div>
-    <div *ngIf="noData" class="alert alert-primary">No data available</div>
+    <div
+      *ngIf="noData && !inEditMode && dataSet.length === 0"
+      class="alert alert-primary"
+    >
+      No data available
+    </div>
     <ul *ngIf="inEditMode">
       <li *ngFor="let row of newRows">
-        <project-entry></project-entry>
+        <project-entry-form
+          [id]="row.id"
+          [referenceDate]="referenceDate"
+          [sortField]="sortService.sort.field"
+          [entryContainerWidth]="entryContainerWidth"
+          [dispatchToParentAndClose]="saveChangesInProgress"
+          (deleteEvent)="removeRow($event)"
+          (formSubmitEvent)="addProject($event)"
+        ></project-entry-form>
       </li>
     </ul>
-    <li *ngFor="let project of projects">
-      <ng-container>
+    <li *ngFor="let project of filteredDataset">
+      <ng-container [ngSwitch]="project.inEditMode">
         <project-entry
           [id]="project.id"
           [entryData]="project"
           [inEditMode]="inEditMode"
           [sortField]="sortService.sort.field"
           [isCollapsed]="isCollapsed(project.id)"
+          [referenceDate]="referenceDate"
           [entryContainerWidth]="entryContainerWidth"
           (editEvent)="editRow($event)"
           (deleteEvent)="removeExistingRow($event)"
@@ -93,6 +107,19 @@
           (tagChangeEvent)="handleUpdateTags($event)"
           (collapseEvent)="handleCollapse($event)"
         ></project-entry>
+        <project-entry-form
+          *ngSwitchCase="true"
+          [id]="project.id"
+          [entryData]="project"
+          [sortField]="sortService.sort.field"
+          [referenceDate]="referenceDate"
+          [entryContainerWidth]="entryContainerWidth"
+          [dispatchToParentAndClose]="saveChangesInProgress"
+          (deleteEvent)="removeExistingRow($event)"
+          (formEditEvent)="updateProjectDetails($event)"
+          (tagChangeEvent)="handleUpdateTags($event)"
+        >
+        </project-entry-form>
       </ng-container>
     </li>
   </div>

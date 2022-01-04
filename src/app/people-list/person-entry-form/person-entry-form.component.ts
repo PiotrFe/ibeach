@@ -31,7 +31,6 @@ import {
   styleUrls: ['./person-entry-form.component.scss'],
 })
 export class PersonEntryFormComponent extends PersonEntry implements OnInit {
-  @Input() referenceDate!: Date;
   @Input() dispatchToParentAndClose: boolean = false;
   @Input() pdm!: string;
   @Input() getNameTypeAhead!: Function;
@@ -57,8 +56,6 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
     tags: Tag[];
   }>();
 
-  daysLeft!: number;
-  localCalendarObj!: Week;
   pdmArr: string[] = getPDMArr();
   fmno!: string;
   ignoreNextDateChange: boolean = false;
@@ -97,6 +94,7 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
         pdm: pdm || '',
       });
       this.tags = this.entryData.tags;
+      this.fmno = this.entryData.id;
     } else {
       this.tags = [];
     }

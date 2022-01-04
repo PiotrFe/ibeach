@@ -1,51 +1,35 @@
-import { Component, OnInit, Input, NgZone } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  Input,
+  NgZone,
+  OnChanges,
+  SimpleChanges,
+} from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { FetchService } from '../../shared-module/fetch.service';
 import { TypeaheadService } from '../../shared-module/typeahead.service';
 import { ResizeObserverService } from 'src/app/shared-module/resize-observer.service';
 import { SortService } from 'src/app/shared-module/sort.service';
+import { Week } from 'src/app/people-list/week';
+import { Tag } from 'src/app/shared-module/entry/entry.component';
 import { v4 as uuidv4 } from 'uuid';
 import {
   Project,
   ProjectEditable,
 } from 'src/app/project-list/project-list/project';
 import { PageComponent } from 'src/app/shared-module/page/page.component';
-import { getNewWeek } from '../../shared-module/week-days/week';
-
-const projects = [
-  {
-    id: '123',
-    client: 'client 1',
-    type: 'LOP',
-    leadership: ['John Smith', 'Mary Bane'],
-    availDate: new Date(),
-    week: getNewWeek(),
-    daysLeft: 5,
-    comments: 'Not comments',
-    tags: [],
-  },
-  {
-    id: '345',
-    client: 'client 2',
-    type: 'LOP',
-    leadership: ['Patrick Swayze', 'Brock Lesnar'],
-    availDate: new Date(),
-    week: getNewWeek(),
-    daysLeft: 5,
-    comments: 'Yes, comments',
-    tags: [],
-  },
-];
+import { getNewWeek, getDaysLeft } from '../../shared-module/week-days/week';
 
 @Component({
   selector: 'project-list',
   templateUrl: './project-list.component.html',
   styleUrls: ['./project-list.component.scss'],
 })
-export class ProjectListComponent extends PageComponent implements OnInit {
-  projects: Project[] = projects;
-  projectFilteredView = this.projects;
-
+export class ProjectListComponent
+  extends PageComponent
+  implements OnInit, OnChanges
+{
   projectFilter = new FormControl('All');
 
   constructor(
@@ -59,6 +43,17 @@ export class ProjectListComponent extends PageComponent implements OnInit {
   }
 
   ngOnInit(): void {}
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['referenceDate']) {
+      const { currentValue } = changes['referenceDate'];
+      const mil = currentValue.getMilliseconds();
+      const secs = currentValue.getSeconds();
+      if (mil === 0 && secs === 0) {
+        this.handleDateChange(currentValue as Date);
+      }
+    }
+  }
 
   clearFilters(): void {
     this.filters = [];
@@ -87,7 +82,83 @@ export class ProjectListComponent extends PageComponent implements OnInit {
     } as ProjectEditable);
   }
 
-  async fetchData(forPDM: boolean = false) {
+  handleDateChange(date: Date) {
+    this.onDateChange(date);
+    this.fetchData();
+  }
+
+  updateProjectDetails(objParam: {
+    id: string;
+    client: string;
+    type: string;
+    comments: string;
+    availDate: Date;
+    week: Week;
+    tags: Tag[];
+    leadership: string[];
+  }) {
+    const { id, client, type, comments, availDate, week, tags, leadership } =
+      objParam;
+
+    this.dataSet = this.dataSet.map((project) => {
+      if (project.id !== id) {
+        return project;
+      }
+      return {
+        ...project,
+        client,
+        type,
+        comments,
+        availDate,
+        daysLeft: getDaysLeft(week),
+        leadership,
+        week,
+        tags,
+        inEditMode: false,
+      };
+    });
+
+    this.onChangeSaved();
+  }
+
+  addProject(objParam: {
+    id: string;
+    client: string;
+    type: string;
+    comments: string;
+    availDate: Date;
+    week: Week;
+    tags: Tag[];
+    leadership: string[];
+  }) {
+    this.sortService.clearSort();
+    const { id, client, type, comments, week, tags, availDate, leadership } =
+      objParam;
+
+    const projectObj = {
+      id,
+      client,
+      type,
+      availDate,
+      week,
+      comments,
+      inEditMode: false,
+      daysLeft: getDaysLeft(week),
+      tags,
+      leadership,
+    };
+
+    this.dataSet.unshift(projectObj);
+
+    const indexToRemove: number = this.newRows.findIndex(
+      (row) => row.id === id
+    );
+
+    this.newRows.splice(indexToRemove, 1);
+    this.onChangeSaved();
+  }
+
+  async fetchData() {
     setTimeout(() => {
       this.fetching = true;
       this.fetchError = '';
@@ -119,6 +190,18 @@ export class ProjectListComponent extends PageComponent implements OnInit {
     }
   }
 
+  onChangeSaved(): void {
+    if (this.saveChangesInProgress && !this.checkIfAnyFormsOpen()) {
+      this.saveChangesInProgress = false;
+      this.setInEditMode(false);
+      setTimeout(() => {
+        this.postChanges();
+      });
+    }
+
+    this.updateFilteredView();
+  }
+
   async postChanges() {
     this.uploading = true;
 
@@ -142,26 +225,10 @@ export class ProjectListComponent extends PageComponent implements OnInit {
       }, 0);
     }
   }
-  handleDateChange(date: Date) {
-    this.onDateChange(date);
-    this.fetchData();
-  }
-
-  onChangeSaved(): void {
-    if (this.saveChangesInProgress && !this.checkIfAnyFormsOpen()) {
-      this.saveChangesInProgress = false;
-      this.setInEditMode(false);
-      setTimeout(() => {
-        this.postChanges();
-      });
-    }
-
-    this.updateFilteredView();
-  }
 
   cancelChanges(): void {
     this.onCancelChanges();
-    this.fetchData(true);
+    this.fetchData();
     this.setInEditMode(false);
   }
 

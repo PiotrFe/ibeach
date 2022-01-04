@@ -42,7 +42,7 @@ export class FetchService {
     lookupTable: Person[];
   }> {
     const weekTs = weekOf.getTime();
-    const weekUrl = `${baseUrl}/week/${weekTs}`;
+    const weekUrl = `${baseUrl}/people/${weekTs}`;
     const finalUrl = pdm
       ? new URL(`${weekUrl}/${encodeURIComponent(pdm)}`)
       : new URL(weekUrl);
@@ -76,7 +76,7 @@ export class FetchService {
         lookupTable,
       };
     } catch (err: any) {
-      throw new Error(err);
+      throw new Error(err.message);
     }
   }
 
@@ -86,7 +86,7 @@ export class FetchService {
 
     try {
       return await axios.post(
-        `${baseUrl}/week/${weekTs}/${pdmParam}`,
+        `${baseUrl}/people/${weekTs}/${pdmParam}`,
         JSON.stringify(data),
         config as AxiosRequestConfig
       );
@@ -102,7 +102,7 @@ export class FetchService {
 
     try {
       return await axios.post(
-        `${baseUrl}/week/${weekTs}/${pdmParam}/submit`,
+        `${baseUrl}/people/${weekTs}/${pdmParam}/submit`,
         JSON.stringify(data),
         config as AxiosRequestConfig
       );
@@ -113,10 +113,46 @@ export class FetchService {
   }
 
   async fetchProjectList(weekOf: Date): Promise<Project[]> {
-    return Promise.resolve([]);
+    const weekTs = weekOf.getTime();
+    const weekUrl = `${baseUrl}/projects/${weekTs}`;
+
+    try {
+      const response = await axios.get(weekUrl, {
+        validateStatus: (status) => {
+          return status < 500;
+        },
+      });
+
+      if (response.status === 404) {
+        throw new Error('No data');
+      }
+
+      const { data } = response.data;
+
+      return data.map((entry: any) => {
+        const { availDate, ...otherProps } = entry;
+        return {
+          ...otherProps,
+          availDate: new Date(Date.parse(availDate)),
+        };
+      });
+    } catch (err: any) {
+      throw new Error(err.message);
+    }
   }
 
   async saveProjectList(weekOf: Date, data: Project[]): Promise<void> {
-    return Promise.resolve();
+    const weekTs = weekOf.getTime();
+
+    try {
+      return await axios.post(
+        `${baseUrl}/projects/${weekTs}`,
+        JSON.stringify(data),
+        config as AxiosRequestConfig
+      );
+    } catch (e: any) {
+      console.log(e);
+      return e.message;
+    }
   }
 }

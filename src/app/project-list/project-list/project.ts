@@ -8,10 +8,10 @@ export interface Project {
   id: string;
   client: string;
   type: string;
-  leadership: string[];
   availDate?: Date;
   week: Week;
   daysLeft: number;
+  leadership: string[];
   comments?: string;
   tags: Tag[];
 }

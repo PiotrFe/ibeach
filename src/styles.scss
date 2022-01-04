@@ -30,6 +30,19 @@ a:hover {
   color: inherit;
 }
 
+ul ul {
+  margin-left: 0;
+  padding-left: 0;
+}
+
+li {
+  list-style: none;
+}
+
+.btn-main-action {
+  margin-right: 10px;
+}
+
 .sorted {
   background-color: rgba(20, 162, 184, 0.2);
   height: 100%;
