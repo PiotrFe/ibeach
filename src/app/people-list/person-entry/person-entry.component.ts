@@ -1,15 +1,8 @@
-import {
-  Component,
-  OnInit,
-  Input,
-  Output,
-  EventEmitter,
-  AfterViewInit,
-} from '@angular/core';
-import { PersonEditable, PersonEntry, Person } from '../person';
+import { Component } from '@angular/core';
+import { PersonEntry } from '../person';
 import { TypeaheadService } from '../../shared-module/typeahead.service';
-import { ResizeObserverService } from 'src/app/shared-module/resize-observer.service';
 import { Week } from 'src/app/shared-module/week-days/week';
+import { trigger, style, animate, transition } from '@angular/animations';
 
 @Component({
   selector: 'person-entry',

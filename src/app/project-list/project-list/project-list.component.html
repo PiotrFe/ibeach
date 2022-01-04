@@ -79,7 +79,7 @@
       No data available
     </div>
     <ul *ngIf="inEditMode">
-      <li *ngFor="let row of newRows">
+      <li @insertRemoveTrigger *ngFor="let row of newRows">
         <project-entry-form
           [id]="row.id"
           [referenceDate]="referenceDate"
@@ -91,7 +91,7 @@
         ></project-entry-form>
       </li>
     </ul>
-    <li *ngFor="let project of filteredDataset">
+    <li @insertRemoveTrigger *ngFor="let project of filteredDataset">
       <ng-container [ngSwitch]="project.inEditMode">
         <project-entry
           [id]="project.id"

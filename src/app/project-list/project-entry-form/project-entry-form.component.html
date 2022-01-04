@@ -75,12 +75,14 @@
   </div>
 
   <div
+    @insertRemoveTrigger
     *ngIf="entryContainerWidth === 2 || entryContainerWidth > 2"
     [ngClass]="getFieldClasses('tags')"
   >
     <ng-container *ngTemplateOutlet="tagList"></ng-container>
   </div>
   <input
+    @insertRemoveTrigger
     *ngIf="entryContainerWidth === 4 || entryContainerWidth > 4"
     id="project-comments"
     class="form-control section section-comments mr-12"

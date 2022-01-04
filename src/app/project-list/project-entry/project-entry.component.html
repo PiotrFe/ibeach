@@ -68,18 +68,21 @@
   </div>
 
   <div
+    @insertRemoveTrigger
     *ngIf="entryContainerWidth === 2 || entryContainerWidth > 2"
     [ngClass]="getFieldClasses('tags')"
   >
     <ng-container *ngTemplateOutlet="tagList"></ng-container>
   </div>
   <div
+    @insertRemoveTrigger
     *ngIf="entryContainerWidth === 3 || entryContainerWidth > 3"
-    [ngClass]="getFieldClasses('pdm')"
+    [ngClass]="getFieldClasses('leadership')"
   >
     <span class="bg-secondary-light"> {{ project.leadership }}</span>
   </div>
   <span
+    @insertRemoveTrigger
     *ngIf="entryContainerWidth === 4 || entryContainerWidth > 4"
     [ngClass]="getFieldClasses('comments')"
   >
@@ -87,11 +90,13 @@
   </span>
   <div class="edit-entry-icons">
     <i
+      @insertRemoveTrigger
       *ngIf="editable && inEditMode"
       class="bi bi-pencil i-active mr-8"
       (click)="handleEdit()"
     ></i>
     <i
+      @insertRemoveTrigger
       *ngIf="editable && inEditMode"
       class="bi bi-trash i-active"
       (click)="handleDelete()"
@@ -105,21 +110,31 @@
   [isAnimated]="true"
 >
   <div class="collapsed-section no-select">
-    <div *ngIf="entryContainerWidth < 3" [ngClass]="getFieldClasses('pdm')">
+    <div
+      @insertRemoveTrigger
+      *ngIf="entryContainerWidth < 3"
+      [ngClass]="getFieldClasses('pdm')"
+    >
       <span class="bg-secondary-light"> {{ project.leadership }}</span>
     </div>
     <span class="break-ver fs-12 mr-3"> | </span>
     <div
+      @insertRemoveTrigger
       *ngIf="entryContainerWidth < 2"
       [ngClass]="getFieldClasses('tags')"
       [class.section-tags-small]="true"
     >
       <ng-container *ngTemplateOutlet="tagList"></ng-container>
     </div>
-    <span *ngIf="entryContainerWidth === 1" class="break-ver fs-12 mr-3">
+    <span
+      @insertRemoveTrigger
+      *ngIf="entryContainerWidth === 1"
+      class="break-ver fs-12 mr-3"
+    >
       |
     </span>
     <span
+      @insertRemoveTrigger
       *ngIf="entryContainerWidth < 4"
       [ngClass]="getFieldClasses('comments')"
     >

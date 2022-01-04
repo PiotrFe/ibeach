@@ -85,12 +85,14 @@
   </div>
 
   <div
+    @insertRemoveTrigger
     *ngIf="entryContainerWidth === 2 || entryContainerWidth > 2"
     [ngClass]="getFieldClasses('tags')"
   >
     <ng-container *ngTemplateOutlet="tagList"></ng-container>
   </div>
   <select
+    @insertRemoveTrigger
     *ngIf="entryContainerWidth === 3 || entryContainerWidth > 3"
     class="form-control section section-pdm mr-12 mw-4"
     formControlName="pdm"
@@ -98,6 +100,7 @@
     <option *ngFor="let pdm of pdmArr" [value]="pdm">{{ pdm }}</option>
   </select>
   <input
+    @insertRemoveTrigger
     *ngIf="entryContainerWidth === 4 || entryContainerWidth > 4"
     id="person-comments"
     class="form-control section section-comments mr-12"
@@ -123,6 +126,7 @@
 >
   <div class="collapsed-section no-select" [formGroup]="personForm">
     <select
+      @insertRemoveTrigger
       *ngIf="entryContainerWidth < 3"
       class="form-control section section-pdm mr-12 mw-4"
       formControlName="pdm"
@@ -130,13 +134,18 @@
       <option *ngFor="let pdm of pdmArr" [value]="pdm">{{ pdm }}</option>
     </select>
     <span class="break-ver fs-12 mr-3"> | </span>
-    <div *ngIf="entryContainerWidth < 2" [ngClass]="getFieldClasses('tags')">
+    <div
+      @insertRemoveTrigger
+      *ngIf="entryContainerWidth < 2"
+      [ngClass]="getFieldClasses('tags')"
+    >
       <ng-container *ngTemplateOutlet="tagList"></ng-container>
     </div>
     <span *ngIf="entryContainerWidth === 1" class="break-ver fs-12 mr-3">
       |
     </span>
     <input
+      @insertRemoveTrigger
       *ngIf="entryContainerWidth < 4"
       id="person-comments"
       class="form-control section section-comments mr-12"

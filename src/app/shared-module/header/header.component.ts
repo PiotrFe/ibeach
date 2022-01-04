@@ -1,7 +1,17 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { trigger, style, animate, transition } from '@angular/animations';
 
 @Component({
   template: '',
+  animations: [
+    trigger('insertRemoveTrigger', [
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate('180ms', style({ opacity: 1 })),
+      ]),
+      transition(':leave', [animate('180ms', style({ opacity: 0 }))]),
+    ]),
+  ],
 })
 export class HeaderComponent {
   @Input() sortable: boolean = false;

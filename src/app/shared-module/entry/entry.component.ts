@@ -9,11 +9,14 @@ import {
 } from '@angular/core';
 
 import { FormControl } from '@angular/forms';
+import { trigger, style, animate, transition } from '@angular/animations';
+
 import { Week } from 'src/app/people-list/week';
 import { TypeaheadService } from 'src/app/shared-module/typeahead.service';
 import { sortTags } from 'src/app/utils';
 import { Project } from 'src/app/project-list/project-list/project';
 import { Person } from 'src/app/people-list/person';
+
 export interface Tag {
   type: string;
   value: string;
@@ -21,6 +24,15 @@ export interface Tag {
 
 @Component({
   template: '',
+  animations: [
+    trigger('insertRemoveTrigger', [
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate('180ms', style({ opacity: 1 })),
+      ]),
+      transition(':leave', [animate('180ms', style({ opacity: 0 }))]),
+    ]),
+  ],
 })
 export class EntryComponent {
   @ViewChild('addTag') addTagElem!: ElementRef;

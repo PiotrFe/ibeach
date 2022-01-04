@@ -90,10 +90,18 @@ li {
   justify-content: space-between;
   align-items: center;
   border-bottom: 0.8px dashed rgba(0, 0, 0, 0.3);
-  transition: border 0.3s linear;
 
   &--uncollapsed {
     border-bottom: 0.8px dashed rgba(0, 0, 0, 0);
+  }
+}
+
+@keyframes scaleDown {
+  0% {
+    transform: scaleX(1);
+  }
+  100% {
+    transform: scaleX(0);
   }
 }
 

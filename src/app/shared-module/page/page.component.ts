@@ -8,6 +8,7 @@ import {
   OnChanges,
   Input,
 } from '@angular/core';
+import { trigger, style, animate, transition } from '@angular/animations';
 import { ResizeObserverService } from 'src/app/shared-module/resize-observer.service';
 import { PersonEntry, PersonEditable } from 'src/app/people-list/person';
 import { SortService } from 'src/app/utils/sort.service';
@@ -34,6 +35,15 @@ export const PAGE_TYPES = {
 
 @Component({
   template: '',
+  animations: [
+    trigger('insertRemoveTrigger', [
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate('180ms', style({ opacity: 1 })),
+      ]),
+      transition(':leave', [animate('180ms', style({ opacity: 0 }))]),
+    ]),
+  ],
 })
 export class PageComponent implements AfterViewInit, OnDestroy {
   @ViewChild('page') pageContainer!: ElementRef;
