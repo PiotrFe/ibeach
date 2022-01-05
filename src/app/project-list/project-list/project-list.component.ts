@@ -157,35 +157,40 @@ export class ProjectListComponent
   }
 
   async fetchData() {
-    setTimeout(() => {
-      this.fetching = true;
-      this.fetchError = '';
-      this.noData = false;
-    }, 0);
+    this.fetching = true;
+    this.fetchError = '';
+    this.noData = false;
 
-    try {
-      const projects: Project[] = await this.fetchService.fetchProjectList(
-        this.referenceDate
-      );
+    this.fetchService.fetchProjectList(this.referenceDate).subscribe({
+      next: (data: Project[]) => {
+        const projects = data.map((entry: any) => {
+          const { availDate, ...otherProps } = entry;
+          return {
+            ...otherProps,
+            availDate: new Date(Date.parse(availDate)),
+          };
+        });
+        this.dataSet = this.sortService
+          .sortData(projects, this.sortService.SORT_COLUMNS.NAME, false, true)
+          .map((entry) => ({
+            ...entry,
+            inEditMode: false,
+          }));
 
-      this.dataSet = this.sortService
-        .sortData(projects, this.sortService.SORT_COLUMNS.NAME, false, true)
-        .map((entry) => ({
-          ...entry,
-          inEditMode: false,
-        }));
-
-      this.updateFilteredView();
-    } catch (e: any) {
-      console.log({ e });
-      if (e.message === 'Error: No data') {
-        this.noData = true;
-      } else {
-        this.fetchError = e.message;
-      }
-    } finally {
-      this.fetching = false;
-    }
+        this.updateFilteredView();
+      },
+      error: (e) => {
+        if (e.message === 'No data') {
+          this.noData = true;
+        } else {
+          this.fetchError = e.message;
+        }
+        this.fetching = false;
+      },
+      complete: () => {
+        this.fetching = false;
+      },
+    });
   }
 
   onChangeSaved(): void {

@@ -79,7 +79,7 @@
       No data available
     </div>
     <ul *ngIf="inEditMode">
-      <li @insertRemoveTrigger *ngFor="let row of newRows">
+      <li *ngFor="let row of newRows">
         <project-entry-form
           [id]="row.id"
           [referenceDate]="referenceDate"
@@ -91,7 +91,7 @@
         ></project-entry-form>
       </li>
     </ul>
-    <li @insertRemoveTrigger *ngFor="let project of filteredDataset">
+    <li *ngFor="let project of filteredDataset">
       <ng-container [ngSwitch]="project.inEditMode">
         <project-entry
           [id]="project.id"
@@ -124,3 +124,4 @@
     </li>
   </div>
 </ul>
+<loading-overlay *ngIf="fetching || uploading"> </loading-overlay>

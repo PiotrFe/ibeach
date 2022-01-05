@@ -11,7 +11,7 @@ import {
 import { trigger, style, animate, transition } from '@angular/animations';
 import { ResizeObserverService } from 'src/app/shared-module/resize-observer.service';
 import { PersonEntry, PersonEditable } from 'src/app/people-list/person';
-import { SortService } from 'src/app/utils/sort.service';
+import { SortService } from 'src/app/utils/sortService';
 import { ProjectEditable } from 'src/app/project-list/project-list/project';
 import { Week } from 'src/app/people-list/week';
 import { getNewAvailDate, sortTags } from 'src/app/utils';
@@ -49,28 +49,32 @@ export class PageComponent implements AfterViewInit, OnDestroy {
   @ViewChild('page') pageContainer!: ElementRef;
   @Input() referenceDate: Date = new Date();
 
+  ngZone: NgZone;
+
   dataSet: (PersonEditable | ProjectEditable)[] = [];
   filteredDataset: (PersonEditable | ProjectEditable)[] = this.dataSet;
   newRows: (PersonEditable | ProjectEditable)[] = [];
 
   inEditMode: boolean = false;
   filters: Filter[] = [];
-  fetching: boolean = false;
-  fetchError: string = '';
 
   noData: boolean = false;
   showAvailableOnly: boolean = false;
 
   saveChangesInProgress: boolean = false;
-  uncollapsed: Set<string> = new Set();
+
   uploading: boolean = false;
   uploaded: boolean = false;
+  fetching: boolean = false;
+  fetchError: string = '';
 
-  ngZone: NgZone;
+  uncollapsed: Set<string> = new Set();
   sortService: SortService = new SortService();
   typeaheadService!: TypeaheadService;
   resizeObserverService: ResizeObserverService;
-  entryContainerWidth!: number;
+
+  entryContainerWidth: number = 1;
+  resizeSubscription!: any;
 
   constructor(
     ngZone: NgZone,
@@ -88,23 +92,23 @@ export class PageComponent implements AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     const thisID = this.pageContainer.nativeElement.id;
     this.resizeObserverService.registerElem(this.pageContainer.nativeElement);
-    this.resizeObserverService.currentWidth$.subscribe(
-      ([elemID, width]: [string, number]) => {
-        this.ngZone.run(() => {
-          if (thisID === elemID && this.entryContainerWidth !== width) {
-            setTimeout(() => {
-              this.entryContainerWidth = width;
-            }, 0);
-          }
-        });
-      }
-    );
+    this.resizeSubscription =
+      this.resizeObserverService.currentWidth$.subscribe(
+        ([elemID, width]: [string, number]) => {
+          this.ngZone.run(() => {
+            if (thisID === elemID && this.entryContainerWidth !== width) {
+              setTimeout(() => {
+                this.entryContainerWidth = width;
+              }, 0);
+            }
+          });
+        }
+      );
   }
 
   ngOnDestroy(): void {
-    this.resizeObserverService.deregisterElemAndUnsubscribe(
-      this.pageContainer.nativeElement
-    );
+    this.resizeObserverService.deregisterElem(this.pageContainer.nativeElement);
+    this.resizeSubscription.unsubscribe();
   }
 
   // ********************

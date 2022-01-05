@@ -10,19 +10,16 @@ export class ResizeObserverService {
   );
 
   private subject: ReplaySubject<[string, number]> = new ReplaySubject();
-  currentWidth$!: Observable<[string, number]>;
+  currentWidth$: Observable<[string, number]> = this.subject.asObservable();
 
   constructor() {}
 
   registerElem(elem: any) {
     this.resizeObserver.observe(elem);
-    this.currentWidth$ = this.subject.asObservable();
   }
 
-  deregisterElemAndUnsubscribe(elem: any) {
+  deregisterElem(elem: any) {
     this.resizeObserver.unobserve(elem);
-    // this.subject.complete();
-    // TODO - remove memory lead here
   }
 
   _processEntries(entries: ResizeObserverEntry[]) {

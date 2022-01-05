@@ -19,6 +19,7 @@ import {
   SubmissionStatus,
 } from 'src/app/shared-module/page/page.component';
 import { getNewWeek, getDaysLeft } from '../../shared-module/week-days/week';
+import { WeeklyData } from 'src/app/shared-module/fetch.service';
 
 @Component({
   selector: 'people-list',
@@ -38,6 +39,7 @@ export class PeopleListComponent
   statusLabel!: string;
   submitted!: boolean;
   boundGetNameTypeahead!: Function;
+  pdmArr!: String[];
 
   constructor(
     private fetchService: FetchService,
@@ -120,6 +122,9 @@ export class PeopleListComponent
     }
 
     const pdm = this.pdmFilter.value;
+
+    console.log('Updating label');
+    console.log(this.status);
 
     try {
       Object.entries(this.status).forEach(
@@ -226,60 +231,54 @@ export class PeopleListComponent
   // SUBMIT HANDLERS
   // *****************
 
-  async fetchData(forPDM: boolean = false) {
-    setTimeout(() => {
-      this.fetching = true;
-      this.fetchError = '';
-      this.noData = false;
-    }, 0);
+  fetchData(forPDM: boolean = false) {
+    this.fetching = true;
+    this.fetchError = '';
+    this.noData = false;
 
     const pdm = forPDM ? this.pdmFilter.value : null;
     const submittedOnly = this.displayedIn === 'ALLOCATE';
 
-    try {
-      const response = await this.fetchService.fetchWeeklyList(
-        this.referenceDate,
-        pdm,
-        submittedOnly
-      );
+    this.fetchService
+      .fetchWeeklyList(this.referenceDate, pdm, submittedOnly)
+      .subscribe({
+        next: (data: WeeklyData) => {
+          const { people, statusSummary, lookupTable } = data;
+          console.log({ data });
+          this.dataSet = this.sortService
+            .sortData(people, this.sortService.SORT_COLUMNS.NAME, false, true)
+            .map((person) => ({
+              ...person,
+              inEditMode: false,
+            }));
 
-      const {
-        people,
-        status,
-        lookupTable,
-      }: { people: Person[]; status: SubmissionStatus; lookupTable: Person[] } =
-        response;
+          // lookup table only sent on first fetch, where pdm not provided as parameter
+          // if pdm provided as a parameter, he/she cancelled changes and is fetching the old list from server
 
-      this.dataSet = this.sortService
-        .sortData(people, this.sortService.SORT_COLUMNS.NAME, false, true)
-        .map((person) => ({
-          ...person,
-          inEditMode: false,
-        }));
+          if (!forPDM) {
+            this.typeaheadService.storeLookupList(
+              this.typeaheadService.tableTypes.People,
+              lookupTable
+            );
+          }
 
-      // lookup table only sent on first fetch, where pdm not provided as parameter
-      // if pdm provided as a parameter, he/she cancelled changes and is fetching the old list from server
-
-      if (!forPDM) {
-        this.typeaheadService.storeLookupList(
-          this.typeaheadService.tableTypes.People,
-          lookupTable
-        );
-      }
-
-      this.status = status;
-      this.updateStatusLabel();
-      this.updateFilteredView();
-    } catch (e: any) {
-      console.log({ e });
-      if (e.message === 'Error: No data') {
-        this.noData = true;
-      } else {
-        this.fetchError = e.message;
-      }
-    } finally {
-      this.fetching = false;
-    }
+          this.status = statusSummary;
+          this.updateStatusLabel();
+          this.updateFilteredView();
+        },
+        error: (e) => {
+          console.log({ e });
+          if (e.message === 'No data') {
+            this.noData = true;
+          } else {
+            this.fetchError = e.message;
+          }
+          this.fetching = false;
+        },
+        complete: () => {
+          this.fetching = false;
+        },
+      });
   }
 
   async postChanges() {
@@ -320,8 +319,8 @@ export class PeopleListComponent
     if (submit) {
       this.uploading = true;
 
-      try {
-        await this.fetchService.submitList(
+      this.fetchService
+        .submitList(
           this.referenceDate,
           this.pdmFilter.value,
           (this.filteredDataset as any[]).map((person) => {
@@ -331,13 +330,19 @@ export class PeopleListComponent
               ...otherProps,
             };
           })
-        );
-        await this.fetchData(true);
-      } catch (e: any) {
-        this.fetchError = e;
-      } finally {
-        this.uploading = false;
-      }
+        )
+        .subscribe({
+          next: () => {
+            this.fetchData(true);
+          },
+          error: (e) => {
+            this.fetchError = e;
+            this.uploading = false;
+          },
+          complete: () => {
+            this.uploading = false;
+          },
+        });
     }
   }
 

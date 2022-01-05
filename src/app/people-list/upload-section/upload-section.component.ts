@@ -5,6 +5,7 @@ import { ResizeObserverService } from 'src/app/shared-module/resize-observer.ser
 import { parse } from '../../utils/csv-parser/index';
 import { Person } from '../person';
 import { PageComponent } from 'src/app/shared-module/page/page.component';
+import { WeeklyData } from 'src/app/shared-module/fetch.service';
 
 @Component({
   selector: 'upload-section',
@@ -39,47 +40,36 @@ export class UploadSectionComponent extends PageComponent implements OnInit {
       this.referenceDateStart.getTime() + 1000 * 60 * 60 * 24 * 5
     );
     this.previewData = [];
-    this.fetchData();
+    setTimeout(() => {
+      this.fetchData();
+    }, 0);
   }
 
-  async fetchData() {
-    setTimeout(() => {
-      this.fetching = true;
-      this.fetchError = '';
-      this.noData = false;
-      this.uploaded = false;
-    }, 0);
+  fetchData() {
+    this.fetching = true;
+    this.fetchError = '';
+    this.noData = false;
+    this.uploaded = false;
 
-    try {
-      const response = await this.fetchService.fetchWeeklyList(
-        this.referenceDateStart
-      );
-
-      const { people }: { people: Person[] } = response;
-
-      this.previewData = people.sort((a: Person, b: Person) => {
-        const nameA = a.name.toUpperCase();
-        const nameB = b.name.toUpperCase();
-
-        if (nameA < nameB) {
-          return -1;
+    this.fetchService.fetchWeeklyList(this.referenceDateStart).subscribe({
+      next: (data: WeeklyData) => {
+        const { people }: { people: Person[] } = data;
+        this.previewData = people.sort(this.sortService.sortByName);
+      },
+      error: (e) => {
+        console.log({ e });
+        if (e.message === 'No data') {
+          this.noData = true;
+        } else {
+          this.fetchError = e.message;
         }
-        if (nameA > nameB) {
-          return 1;
-        }
-        return 0;
-      });
-    } catch (e: any) {
-      if (e.message === 'Error: No data') {
-        this.noData = true;
-      } else {
-        this.fetchError = e.message;
-      }
-    } finally {
-      setTimeout(() => {
+
         this.fetching = false;
-      }, 0);
-    }
+      },
+      complete: () => {
+        this.fetching = false;
+      },
+    });
   }
 
   clearUploadStatus(): void {
@@ -140,20 +130,27 @@ export class UploadSectionComponent extends PageComponent implements OnInit {
     }
   }
 
-  async uploadData() {
+  uploadData() {
     this.uploading = true;
 
-    try {
-      await this.fetchService.storeMasterList(
-        this.referenceDateStart,
-        JSON.stringify({ week: this.previewData, full: this.fullData })
-      );
-      this.uploaded = true;
-    } catch (e: any) {
-      this.fetchError = e.message;
-    } finally {
-      this.uploading = false;
-    }
+    this.fetchService
+      .storeMasterList(this.referenceDateStart, {
+        week: this.previewData,
+        full: this.fullData,
+      })
+      .subscribe({
+        next: () => {
+          this.uploaded = true;
+        },
+        error: (e) => {
+          console.log({ e });
+          this.fetchError = e.message;
+          this.uploading = false;
+        },
+        complete: () => {
+          this.uploading = false;
+        },
+      });
   }
 
   ngOnInit(): void {}
