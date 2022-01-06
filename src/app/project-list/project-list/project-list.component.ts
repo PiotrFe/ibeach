@@ -186,30 +186,24 @@ export class ProjectListComponent
           this.fetchError = e.message;
         }
         this.fetching = false;
+        if (this.inEditMode) {
+          this.setInEditMode(false);
+        }
       },
       complete: () => {
         this.fetching = false;
+        if (this.inEditMode) {
+          this.setInEditMode(false);
+        }
       },
     });
   }
 
-  onChangeSaved(): void {
-    if (this.saveChangesInProgress && !this.checkIfAnyFormsOpen()) {
-      this.saveChangesInProgress = false;
-      this.setInEditMode(false);
-      setTimeout(() => {
-        this.postChanges();
-      });
-    }
-
-    this.updateFilteredView();
-  }
-
   async postChanges() {
-    this.uploading = true;
+    this.fetching = true;
 
-    try {
-      await this.fetchService.saveProjectList(
+    this.fetchService
+      .saveProjectList(
         this.referenceDate,
         (this.dataSet as any[]).map((entry) => {
           const { inEditMode, ...otherProps } = entry;
@@ -218,21 +212,43 @@ export class ProjectListComponent
             ...otherProps,
           };
         })
-      );
-      await this.fetchData();
-    } catch (e: any) {
-      this.fetchError = e;
-    } finally {
-      setTimeout(() => {
-        this.uploading = false;
-      }, 0);
+      )
+      .subscribe({
+        next: () => {
+          this.fetchData();
+        },
+        error: (e) => {
+          this.fetchError = e;
+          this.uploading = false;
+          this.setInEditMode(false);
+        },
+        complete: () => {},
+      });
+  }
+
+  onChangeSaved(): void {
+    if (this.saveChangesInProgress) {
+      this.saveChanges();
+      return;
     }
+  }
+
+  saveChanges(): void {
+    if (!this.checkIfAnyFormsOpen()) {
+      setTimeout(() => {
+        this.saveChangesInProgress = false;
+        this.updateFilteredView();
+        this.postChanges();
+        return;
+      });
+    }
+
+    this.saveChangesInProgress = true;
   }
 
   cancelChanges(): void {
     this.onCancelChanges();
     this.fetchData();
-    this.setInEditMode(false);
   }
 
   handleUpdateTags(objParam: {
@@ -243,16 +259,5 @@ export class ProjectListComponent
   }): void {
     this.updateTags(objParam);
     this.onChangeSaved();
-  }
-
-  saveChanges(): void {
-    if (!this.checkIfAnyFormsOpen()) {
-      this.setInEditMode(false);
-      this.updateFilteredView();
-      this.postChanges();
-      return;
-    }
-
-    this.saveChangesInProgress = true;
   }
 }

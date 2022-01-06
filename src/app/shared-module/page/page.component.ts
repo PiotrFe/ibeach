@@ -5,7 +5,6 @@ import {
   ViewChild,
   ElementRef,
   OnDestroy,
-  OnChanges,
   Input,
 } from '@angular/core';
 import { trigger, style, animate, transition } from '@angular/animations';

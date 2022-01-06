@@ -123,9 +123,6 @@ export class PeopleListComponent
 
     const pdm = this.pdmFilter.value;
 
-    console.log('Updating label');
-    console.log(this.status);
-
     try {
       Object.entries(this.status).forEach(
         ([status, pdmArr]: [string, string[]]) => {
@@ -244,12 +241,12 @@ export class PeopleListComponent
       .subscribe({
         next: (data: WeeklyData) => {
           const { people, statusSummary, lookupTable } = data;
-          console.log({ data });
           this.dataSet = this.sortService
             .sortData(people, this.sortService.SORT_COLUMNS.NAME, false, true)
             .map((person) => ({
               ...person,
               inEditMode: false,
+              availDate: new Date(Date.parse(person.availDate)),
             }));
 
           // lookup table only sent on first fetch, where pdm not provided as parameter
@@ -267,29 +264,34 @@ export class PeopleListComponent
           this.updateFilteredView();
         },
         error: (e) => {
-          console.log({ e });
           if (e.message === 'No data') {
             this.noData = true;
           } else {
             this.fetchError = e.message;
           }
           this.fetching = false;
+          if (this.inEditMode) {
+            this.setInEditMode(false);
+          }
         },
         complete: () => {
           this.fetching = false;
+          if (this.inEditMode) {
+            this.setInEditMode(false);
+          }
         },
       });
   }
 
-  async postChanges() {
-    this.uploading = true;
+  postChanges() {
+    this.fetching = true;
     const pdmParam =
       this.displayedIn !== 'ALLOCATE' ? this.pdmFilter.value : 'allocator';
     const fetchFullDataOnUpdate =
       this.displayedIn === 'ALLOCATE' ? true : false;
 
-    try {
-      await this.fetchService.saveList(
+    this.fetchService
+      .saveList(
         this.referenceDate,
         pdmParam,
         (this.filteredDataset as any[]).map((person) => {
@@ -299,15 +301,18 @@ export class PeopleListComponent
             ...otherProps,
           };
         })
-      );
-      await this.fetchData(!fetchFullDataOnUpdate);
-    } catch (e: any) {
-      this.fetchError = e;
-    } finally {
-      setTimeout(() => {
-        this.uploading = false;
-      }, 0);
-    }
+      )
+      .subscribe({
+        next: () => {
+          this.fetchData();
+        },
+        error: (e) => {
+          this.fetchError = e;
+          this.fetching = false;
+          this.setInEditMode(false);
+        },
+        complete: () => {},
+      });
   }
 
   onSubmit() {
@@ -352,21 +357,15 @@ export class PeopleListComponent
   }
 
   onChangeSaved(): void {
-    if (this.saveChangesInProgress && !this.checkIfAnyFormsOpen()) {
-      this.saveChangesInProgress = false;
-      this.setInEditMode(false);
-      setTimeout(() => {
-        this.postChanges();
-      });
+    if (this.saveChangesInProgress) {
+      this.saveChanges();
+      return;
     }
-
-    this.updateFilteredView();
   }
 
   cancelChanges(): void {
     this.onCancelChanges();
     this.fetchData(true);
-    this.setInEditMode(false);
   }
 
   handleUpdateTags(objParam: {
@@ -381,10 +380,12 @@ export class PeopleListComponent
 
   saveChanges(): void {
     if (!this.checkIfAnyFormsOpen()) {
-      this.setInEditMode(false);
-      this.updateFilteredView();
-      this.postChanges();
-      return;
+      setTimeout(() => {
+        this.saveChangesInProgress = false;
+        this.updateFilteredView();
+        this.postChanges();
+        return;
+      });
     }
 
     this.saveChangesInProgress = true;

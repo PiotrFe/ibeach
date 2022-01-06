@@ -32,7 +32,6 @@ export class FetchService {
   constructor(private http: HttpClient) {}
 
   private handleError(error: HttpErrorResponse) {
-    console.log({ error });
     if (error.status === 0) {
       console.log('An error occured: ', error.error);
     } else if (error.status === 404) {
@@ -78,20 +77,13 @@ export class FetchService {
       .pipe(catchError(this.handleError));
   }
 
-  async saveList(weekOf: Date, pdm: string, data: Person[]): Promise<void> {
+  saveList(weekOf: Date, pdm: string, data: Person[]): Observable<unknown> {
     const weekTs = weekOf.getTime();
     const pdmParam = encodeURIComponent(pdm);
 
-    try {
-      return await axios.post(
-        `${baseUrl}/people/${weekTs}/${pdmParam}`,
-        JSON.stringify(data),
-        config as AxiosRequestConfig
-      );
-    } catch (e: any) {
-      console.log(e);
-      return e.message;
-    }
+    return this.http
+      .post<Person[]>(`${baseUrl}/people/${weekTs}/${pdmParam}`, data)
+      .pipe(catchError(this.handleError));
   }
 
   submitList(weekOf: Date, pdm: string, data: Person[]): Observable<unknown> {
@@ -110,18 +102,11 @@ export class FetchService {
     return this.http.get<Project[]>(weekUrl).pipe(catchError(this.handleError));
   }
 
-  async saveProjectList(weekOf: Date, data: Project[]): Promise<void> {
+  saveProjectList(weekOf: Date, data: Project[]): Observable<unknown> {
     const weekTs = weekOf.getTime();
 
-    try {
-      return await axios.post(
-        `${baseUrl}/projects/${weekTs}`,
-        JSON.stringify(data),
-        config as AxiosRequestConfig
-      );
-    } catch (e: any) {
-      console.log(e);
-      return e.message;
-    }
+    return this.http
+      .post<Project[]>(`${baseUrl}/projects/${weekTs}`, data)
+      .pipe(catchError(this.handleError));
   }
 }

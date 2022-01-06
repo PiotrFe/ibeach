@@ -59,6 +59,7 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
   pdmArr: string[] = getPDMArr();
   fmno!: string;
   ignoreNextDateChange: boolean = false;
+  initialDate!: Date;
 
   // ***************
   // CONSTRUCTOR
@@ -99,7 +100,7 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
       this.tags = [];
     }
 
-    if (this.entryData?.week) {
+    if (this.entryData.week) {
       this.localCalendarObj = this.entryData.week;
       this.setDaysLeft(this.entryData.week);
     } else {
@@ -205,6 +206,11 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
   }
 
   onDateChange(date: Date) {
+    if (this.entryData && !this.initialDate) {
+      this.initialDate = this.entryData.availDate as Date;
+      return;
+    }
+
     if (this.ignoreNextDateChange) {
       this.ignoreNextDateChange = false;
     } else {

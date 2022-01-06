@@ -6,8 +6,10 @@ import {
   ViewChild,
   EventEmitter,
   Output,
+  OnDestroy,
 } from '@angular/core';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
+import { Subscription } from 'rxjs';
 
 const MODAL_TYPES = {
   CONFIRM: 'CONFIRM',
@@ -19,7 +21,7 @@ const MODAL_TYPES = {
   templateUrl: './modal-window.component.html',
   styleUrls: ['./modal-window.component.scss'],
 })
-export class ModalWindowComponent implements OnInit {
+export class ModalWindowComponent implements OnInit, OnDestroy {
   @ViewChild('template') template!: TemplateRef<any>;
   @ViewChild('template_simple') templateSimple!: TemplateRef<any>;
 
@@ -32,14 +34,34 @@ export class ModalWindowComponent implements OnInit {
   @Output() closeEvent = new EventEmitter<boolean>();
 
   modalRef!: BsModalRef;
+  subscriptions: Subscription[] = [];
+
   constructor(private modalService: BsModalService) {}
 
-  close(confirm: boolean) {
-    this.modalRef.hide();
+  ngOnInit(): void {
+    this.subscriptions.push(
+      this.modalService.onHide.subscribe((reason: string | any) => {
+        if (reason === 'backdrop-click' || reason === 'esc') {
+          this.close(false, false);
+        }
+      })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach((subscription: Subscription) => {
+      subscription.unsubscribe();
+    });
+  }
+
+  close(confirm: boolean, hide: boolean = true) {
+    if (hide) {
+      this.modalRef.hide();
+    }
+
     this.closeEvent.emit(confirm);
   }
 
-  ngOnInit(): void {}
   ngAfterViewInit() {
     if (this.title) {
       this.modalRef = this.modalService.show(this.template);

@@ -33,15 +33,6 @@
       (change)="onFileSelected($event)"
     />
   </div>
-  <div class="toolbar-group toolbar-group--center flex flex-ver-ctr">
-    <calendar
-      [scrollable]="true"
-      [weekly]="true"
-      [baseDay]="1"
-      [dateVal]="referenceDateStart"
-      (dateChangeEvent)="setReferenceDate($event)"
-    ></calendar>
-  </div>
   <div class="toolbar-group toolbar-group--right flex flex-ver-ctr">&nbsp;</div>
 </nav>
 

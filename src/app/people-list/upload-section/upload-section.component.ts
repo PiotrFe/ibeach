@@ -1,4 +1,10 @@
-import { Component, OnInit, NgZone } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  NgZone,
+  OnChanges,
+  SimpleChanges,
+} from '@angular/core';
 import { FetchService } from '../../shared-module/fetch.service';
 import { CsvParserService } from '../../shared-module/csv-parser.service';
 import { ResizeObserverService } from 'src/app/shared-module/resize-observer.service';
@@ -12,12 +18,12 @@ import { WeeklyData } from 'src/app/shared-module/fetch.service';
   templateUrl: './upload-section.component.html',
   styleUrls: ['./upload-section.component.scss'],
 })
-export class UploadSectionComponent extends PageComponent implements OnInit {
+export class UploadSectionComponent
+  extends PageComponent
+  implements OnInit, OnChanges
+{
   bsInlineValue: Date = new Date();
-  referenceDateStart: Date = this.bsInlineValue;
-  referenceDateEnd: Date = new Date(
-    this.referenceDateStart.getTime() + 1000 * 60 * 60 * 24 * 5
-  );
+  referenceDateEnd: Date = new Date();
   fileSelected: boolean = false;
   data!: string;
   previewData: Person[] = [];
@@ -33,16 +39,24 @@ export class UploadSectionComponent extends PageComponent implements OnInit {
     super(ngZone, resizeObserverService);
   }
 
-  setReferenceDate(date: Date) {
-    this.referenceDateStart = date;
-    this.referenceDateStart.setHours(0, 0, 0, 0);
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['referenceDate']) {
+      const { currentValue } = changes['referenceDate'];
+      const mil = currentValue.getMilliseconds();
+      const secs = currentValue.getSeconds();
+      if (mil === 0 && secs === 0) {
+        this.handleDateChange(currentValue as Date);
+      }
+    }
+  }
+
+  handleDateChange(date: Date) {
+    this.onDateChange(date);
     this.referenceDateEnd = new Date(
-      this.referenceDateStart.getTime() + 1000 * 60 * 60 * 24 * 5
+      this.referenceDate.getTime() + 1000 * 60 * 60 * 24 * 5
     );
     this.previewData = [];
-    setTimeout(() => {
-      this.fetchData();
-    }, 0);
+    this.fetchData();
   }
 
   fetchData() {
@@ -51,7 +65,7 @@ export class UploadSectionComponent extends PageComponent implements OnInit {
     this.noData = false;
     this.uploaded = false;
 
-    this.fetchService.fetchWeeklyList(this.referenceDateStart).subscribe({
+    this.fetchService.fetchWeeklyList(this.referenceDate).subscribe({
       next: (data: WeeklyData) => {
         const { people }: { people: Person[] } = data;
         this.previewData = people.sort(this.sortService.sortByName);
@@ -99,7 +113,7 @@ export class UploadSectionComponent extends PageComponent implements OnInit {
         this.fileSelected = true;
         this.previewData = this.csvParserService.parse(
           data,
-          this.referenceDateStart,
+          this.referenceDate,
           this.referenceDateEnd
         );
         this.noData = false;
@@ -134,7 +148,7 @@ export class UploadSectionComponent extends PageComponent implements OnInit {
     this.uploading = true;
 
     this.fetchService
-      .storeMasterList(this.referenceDateStart, {
+      .storeMasterList(this.referenceDate, {
         week: this.previewData,
         full: this.fullData,
       })
