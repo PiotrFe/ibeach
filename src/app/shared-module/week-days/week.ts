@@ -6,6 +6,14 @@ export interface Week {
   fri: boolean;
 }
 
+export interface WeekAllocated {
+  mon: boolean | string;
+  tue: boolean | string;
+  wed: boolean | string;
+  thu: boolean | string;
+  fri: boolean | string;
+}
+
 const newWeek: Week = {
   mon: true,
   tue: true,

@@ -2,7 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { TypeaheadService } from 'src/app/shared-module/typeahead.service';
 import { EntryComponent } from 'src/app/shared-module/entry/entry.component';
 import { Project, ProjectEditable } from '../project-list/project';
-import { Week } from 'src/app/people-list/week';
+import { Week } from 'src/app/shared-module/week-days/week';
 
 @Component({
   selector: 'project-entry',

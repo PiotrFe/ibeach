@@ -10,10 +10,11 @@ import { FormControl } from '@angular/forms';
 import { FetchService } from '../../shared-module/fetch.service';
 import { TypeaheadService } from '../../shared-module/typeahead.service';
 import { ResizeObserverService } from 'src/app/shared-module/resize-observer.service';
+import { LookupService } from 'src/app/shared-module/lookup.service';
 import { v4 as uuidv4 } from 'uuid';
 import { Person, PersonEditable } from '../person';
 import { Tag } from 'src/app/shared-module/entry/entry.component';
-import { Week } from 'src/app/people-list/week';
+import { Week } from 'src/app/shared-module/week-days/week';
 import {
   PageComponent,
   SubmissionStatus,
@@ -43,6 +44,7 @@ export class PeopleListComponent
 
   constructor(
     private fetchService: FetchService,
+    private lookupService: LookupService,
     typeaheadService: TypeaheadService,
     resizeObserverService: ResizeObserverService,
     ngZone: NgZone
@@ -279,6 +281,10 @@ export class PeopleListComponent
           if (this.inEditMode) {
             this.setInEditMode(false);
           }
+          this.lookupService.registerDatasetChange({
+            dataType: 'people',
+            data: this.dataSet as PersonEditable[],
+          });
         },
       });
   }
@@ -360,6 +366,8 @@ export class PeopleListComponent
     if (this.saveChangesInProgress) {
       this.saveChanges();
       return;
+    } else {
+      this.updateFilteredView();
     }
   }
 

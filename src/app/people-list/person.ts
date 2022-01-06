@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { Week } from './week';
+import { Week } from 'src/app/shared-module/week-days/week';
 import { EntryComponent } from 'src/app/shared-module/entry/entry.component';
 import { PAGE_SECTIONS } from '../app.component';
 import { TypeaheadService } from '../shared-module/typeahead.service';
@@ -27,7 +27,6 @@ export interface PersonEditable extends Person {
   template: '',
 })
 export class PersonEntry extends EntryComponent {
-  @Input() currPageSection!: keyof typeof PAGE_SECTIONS;
   @Input() displayedIn!: 'SUBMIT' | 'ALLOCATE';
   // @Input() entryContainerWidth!: number;
 

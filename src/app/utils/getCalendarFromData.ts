@@ -1,4 +1,4 @@
-import { Week } from '../people-list/week';
+import { Week } from 'src/app/shared-module/week-days/week';
 import { getNewWeek } from '../shared-module/week-days/week';
 import { getCalendarFromDate } from './index';
 

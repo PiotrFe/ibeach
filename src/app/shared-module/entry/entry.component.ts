@@ -11,7 +11,7 @@ import {
 import { FormControl } from '@angular/forms';
 import { trigger, style, animate, transition } from '@angular/animations';
 
-import { Week } from 'src/app/people-list/week';
+import { Week } from 'src/app/shared-module/week-days/week';
 import { TypeaheadService } from 'src/app/shared-module/typeahead.service';
 import { sortTags } from 'src/app/utils';
 import { Project } from 'src/app/project-list/project-list/project';

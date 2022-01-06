@@ -69,6 +69,8 @@
       (calendarChange)="onCalendarChange($event)"
       [weekObj]="person.week"
       [inEditMode]="inEditMode"
+      [droppable]="displayedIn === 'ALLOCATE'"
+      [displayedIn]="'people'"
     ></week-days>
   </div>
 

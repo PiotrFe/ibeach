@@ -1,12 +1,26 @@
 <div class="weekday-list">
-  <label
-    *ngFor="let weekDay of weekDaysArr"
-    [ngClass]="getBtnClass(weekDay)"
-    ngDefaultControl
-    (click)="handleBtnClick(weekDay)"
-    btnCheckbox
-    tabindex="0"
-    role="button"
-    >{{ weekDay | titlecase }}</label
-  >
+  <ng-container *ngFor="let weekDay of weekDaysArr">
+    <ng-container [ngSwitch]="showDropdownAtDay !== weekDay">
+      <label
+        *ngSwitchCase="true"
+        [ngClass]="getBtnClass(weekDay)"
+        ngDefaultControl
+        (click)="handleBtnClick(weekDay)"
+        btnCheckbox
+        tabindex="0"
+        role="button"
+        >{{ weekDay | titlecase }}</label
+      >
+      <label
+        *ngSwitchCase="false"
+        [ngClass]="getDropdownClass(weekDay)"
+        ngDefaultControl
+        (click)="handleBtnClick(weekDay)"
+        btnCheckbox
+        tabindex="0"
+        role="button"
+        >{{ weekDay | titlecase }}</label
+      >
+    </ng-container>
+  </ng-container>
 </div>

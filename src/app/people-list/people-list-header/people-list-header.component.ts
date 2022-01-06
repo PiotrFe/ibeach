@@ -12,7 +12,6 @@ export class PeopleListHeaderComponent
   implements OnInit
 {
   @Input() displayedIn!: 'SUBMIT' | 'ALLOCATE';
-  @Input() currPageSection!: keyof typeof PAGE_SECTIONS;
 
   constructor() {
     super();
