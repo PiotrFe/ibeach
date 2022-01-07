@@ -6,3 +6,17 @@
   color: gray;
   opacity: 0.8;
 }
+
+.calendar-input,
+.calendar.entry {
+  width: 50px;
+  display: inline-block;
+}
+
+.calendar.entry {
+  background-color: var(--bs-success);
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 0.8rem;
+}

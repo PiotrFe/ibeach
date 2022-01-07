@@ -55,4 +55,8 @@ export class PersonEntry extends EntryComponent {
 
     return `${baseClass}${sortedClass}${otherClass}`;
   }
+
+  onAllocation(event: any): void {
+    console.log(event);
+  }
 }

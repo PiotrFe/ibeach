@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { LookupService } from './lookup.service';
+import { AllocateService } from './allocate.service';
 
 describe('LookupService', () => {
-  let service: LookupService;
+  let service: AllocateService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(LookupService);
+    service = TestBed.inject(AllocateService);
   });
 
   it('should be created', () => {

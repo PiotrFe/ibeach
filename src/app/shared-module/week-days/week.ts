@@ -1,12 +1,4 @@
 export interface Week {
-  mon: boolean;
-  tue: boolean;
-  wed: boolean;
-  thu: boolean;
-  fri: boolean;
-}
-
-export interface WeekAllocated {
   mon: boolean | string;
   tue: boolean | string;
   wed: boolean | string;

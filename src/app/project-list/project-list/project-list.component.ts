@@ -9,7 +9,7 @@ import { FormControl } from '@angular/forms';
 import { FetchService } from '../../shared-module/fetch.service';
 import { TypeaheadService } from '../../shared-module/typeahead.service';
 import { ResizeObserverService } from 'src/app/shared-module/resize-observer.service';
-import { LookupService } from 'src/app/shared-module/lookup.service';
+import { AllocateService } from 'src/app/shared-module/allocate.service';
 import { Week } from 'src/app/shared-module/week-days/week';
 import { Tag } from 'src/app/shared-module/entry/entry.component';
 import { v4 as uuidv4 } from 'uuid';
@@ -33,7 +33,7 @@ export class ProjectListComponent
 
   constructor(
     private fetchService: FetchService,
-    private lookupService: LookupService,
+    private allocateService: AllocateService,
     typeaheadService: TypeaheadService,
     resizeObserverService: ResizeObserverService,
     ngZone: NgZone
@@ -196,7 +196,7 @@ export class ProjectListComponent
         if (this.inEditMode) {
           this.setInEditMode(false);
         }
-        this.lookupService.registerDatasetChange({
+        this.allocateService.registerDataset({
           dataType: 'projects',
           data: this.dataSet as ProjectEditable[],
         });

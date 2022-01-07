@@ -11,6 +11,7 @@ import { PageComponent } from './page/page.component';
 import { LoadingOverlayComponent } from './loading-overlay/loading-overlay.component';
 import { HeaderComponent } from './header/header.component';
 import { EntryComponent } from './entry/entry.component';
+import { TypeaheadModule } from 'ngx-bootstrap/typeahead';
 
 @NgModule({
   declarations: [
@@ -24,11 +25,12 @@ import { EntryComponent } from './entry/entry.component';
     EntryComponent,
   ],
   imports: [
-    BsDatepickerModule.forRoot(),
     CommonModule,
-    ModalModule.forRoot(),
     FormsModule,
     ReactiveFormsModule,
+    ModalModule.forRoot(),
+    BsDatepickerModule.forRoot(),
+    TypeaheadModule.forRoot(),
   ],
   exports: [
     WeekDaysComponent,

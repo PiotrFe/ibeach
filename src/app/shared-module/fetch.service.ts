@@ -9,6 +9,7 @@ import { kill } from 'process';
 import { throwError, catchError, retry, Observable, map } from 'rxjs';
 import { Person, PersonEditable } from 'src/app/people-list/person';
 import { Project } from 'src/app/project-list/project-list/project';
+import { AllocationEntry } from 'src/app/shared-module/allocate.service';
 
 const config = {
   headers: {
@@ -107,6 +108,14 @@ export class FetchService {
 
     return this.http
       .post<Project[]>(`${baseUrl}/projects/${weekTs}`, data)
+      .pipe(catchError(this.handleError));
+  }
+
+  saveAllocationEntry(weekOf: Date, data: AllocationEntry): Observable<any> {
+    const weekTs = weekOf.getTime();
+
+    return this.http
+      .patch<any>(`${baseUrl}/allocate/${weekTs}`, data)
       .pipe(catchError(this.handleError));
   }
 }

@@ -10,11 +10,16 @@ import { FormControl } from '@angular/forms';
 import { FetchService } from '../../shared-module/fetch.service';
 import { TypeaheadService } from '../../shared-module/typeahead.service';
 import { ResizeObserverService } from 'src/app/shared-module/resize-observer.service';
-import { LookupService } from 'src/app/shared-module/lookup.service';
+import {
+  AllocateService,
+  Dataset,
+} from 'src/app/shared-module/allocate.service';
 import { v4 as uuidv4 } from 'uuid';
+import { Subscription } from 'rxjs';
 import { Person, PersonEditable } from '../person';
 import { Tag } from 'src/app/shared-module/entry/entry.component';
 import { Week } from 'src/app/shared-module/week-days/week';
+
 import {
   PageComponent,
   SubmissionStatus,
@@ -42,9 +47,11 @@ export class PeopleListComponent
   boundGetNameTypeahead!: Function;
   pdmArr!: String[];
 
+  allocationDataSubscription!: Subscription;
+
   constructor(
     private fetchService: FetchService,
-    private lookupService: LookupService,
+    private allocateService: AllocateService,
     typeaheadService: TypeaheadService,
     resizeObserverService: ResizeObserverService,
     ngZone: NgZone
@@ -52,9 +59,30 @@ export class PeopleListComponent
     super(ngZone, resizeObserverService, typeaheadService);
   }
 
+  // *****************
+  // LIFECYCLE HOOKS
+  // *****************
+
   ngOnInit(): void {
     this.boundGetNameTypeahead = this.getNameTypeAhead.bind(this);
     this.updateFilteredView();
+
+    if (this.displayedIn === 'ALLOCATE') {
+      this.allocationDataSubscription =
+        this.allocateService.onDataset.subscribe({
+          next: (newData: Dataset) => {
+            const { dataType, data } = newData;
+
+            if (dataType === 'people') {
+              this.dataSet = data;
+              this.updateFilteredView();
+            }
+          },
+          error: (err) => {
+            this.fetchError = err;
+          },
+        });
+    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -67,6 +95,17 @@ export class PeopleListComponent
       }
     }
   }
+
+  ngOnDestroy(): void {
+    this.onPageDestroy();
+    if (this.allocationDataSubscription) {
+      this.allocationDataSubscription.unsubscribe();
+    }
+  }
+
+  // *****************
+  // FILTER HANDLERS
+  // *****************
 
   getPDMList(): string[] {
     if (!this.status) {
@@ -281,7 +320,7 @@ export class PeopleListComponent
           if (this.inEditMode) {
             this.setInEditMode(false);
           }
-          this.lookupService.registerDatasetChange({
+          this.allocateService.registerDataset({
             dataType: 'people',
             data: this.dataSet as PersonEditable[],
           });

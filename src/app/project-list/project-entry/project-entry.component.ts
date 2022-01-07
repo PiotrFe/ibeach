@@ -3,6 +3,10 @@ import { TypeaheadService } from 'src/app/shared-module/typeahead.service';
 import { EntryComponent } from 'src/app/shared-module/entry/entry.component';
 import { Project, ProjectEditable } from '../project-list/project';
 import { Week } from 'src/app/shared-module/week-days/week';
+import {
+  AllocateService,
+  AllocationEntry,
+} from 'src/app/shared-module/allocate.service';
 
 @Component({
   selector: 'project-entry',
@@ -12,7 +16,10 @@ import { Week } from 'src/app/shared-module/week-days/week';
 export class ProjectEntryComponent extends EntryComponent implements OnInit {
   project!: ProjectEditable;
 
-  constructor(typeaheadService: TypeaheadService) {
+  constructor(
+    private allocateService: AllocateService,
+    typeaheadService: TypeaheadService
+  ) {
     super(typeaheadService);
   }
 
@@ -41,5 +48,25 @@ export class ProjectEntryComponent extends EntryComponent implements OnInit {
 
   onCalendarChange(calendarObj: Week) {
     this.calendarChangeEvent.emit({ calendarObj, id: this.id });
+  }
+
+  onAllocation(event: any): void {
+    const { id, value, day } = event;
+    const allocationEntry: AllocationEntry = {
+      person: {
+        id,
+        value,
+      },
+      project: {
+        id: this.project.id,
+        value: this.project.client,
+      },
+      day,
+    };
+
+    this.allocateService.registerAllocation(
+      this.referenceDate,
+      allocationEntry
+    );
   }
 }

@@ -1,26 +1,30 @@
+<ng-template>
+  <input class="form-control" />
+  <datalist id="dataListOptions">
+    <option *ngFor="let item of dropdownList" value="item.value"></option>
+  </datalist>
+</ng-template>
+
 <div class="weekday-list">
-  <ng-container *ngFor="let weekDay of weekDaysArr">
-    <ng-container [ngSwitch]="showDropdownAtDay !== weekDay">
+  <ng-container *ngFor="let entry of weekDaysArr">
+    <ng-container [ngSwitch]="showDropdownAtDay !== entry.value">
       <label
         *ngSwitchCase="true"
-        [ngClass]="getBtnClass(weekDay)"
+        [ngClass]="getBtnClass(entry.value)"
         ngDefaultControl
-        (click)="handleBtnClick(weekDay)"
+        (click)="handleBtnClick(entry.value)"
         btnCheckbox
         tabindex="0"
         role="button"
-        >{{ weekDay | titlecase }}</label
+        >{{ entry.value | titlecase }}</label
       >
-      <label
+      <input
         *ngSwitchCase="false"
-        [ngClass]="getDropdownClass(weekDay)"
-        ngDefaultControl
-        (click)="handleBtnClick(weekDay)"
-        btnCheckbox
-        tabindex="0"
-        role="button"
-        >{{ weekDay | titlecase }}</label
-      >
+        class="form-control calendar-input"
+        [formControl]="allocatedTo"
+        [typeahead]="getDropdownTypeahead()"
+        (typeaheadOnSelect)="onDropdownSubmit()"
+      />
     </ng-container>
   </ng-container>
 </div>

@@ -44,7 +44,7 @@ export const PAGE_TYPES = {
     ]),
   ],
 })
-export class PageComponent implements AfterViewInit, OnDestroy {
+export class PageComponent implements AfterViewInit {
   @ViewChild('page') pageContainer!: ElementRef;
   @Input() referenceDate: Date = new Date();
 
@@ -105,7 +105,7 @@ export class PageComponent implements AfterViewInit, OnDestroy {
       );
   }
 
-  ngOnDestroy(): void {
+  onPageDestroy(): void {
     this.resizeObserverService.deregisterElem(this.pageContainer.nativeElement);
     this.resizeSubscription.unsubscribe();
   }

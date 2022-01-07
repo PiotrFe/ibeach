@@ -5,12 +5,20 @@ import {
   Input,
   Output,
   SimpleChanges,
+  ViewChild,
+  ElementRef,
 } from '@angular/core';
+import { v4 as uuidv4 } from 'uuid';
 
 import { FormControl } from '@angular/forms';
-import { Week, WeekAllocated, getNewWeek } from './week';
-import { DropdownEntry } from 'src/app/shared-module/lookup.service';
-import { LookupService } from '../lookup.service';
+import { Week, getNewWeek } from './week';
+import { DropdownEntry } from 'src/app/shared-module/allocate.service';
+import { AllocateService } from '../allocate.service';
+
+interface CalendarEntry {
+  type: 'filled' | 'empty';
+  value: string;
+}
 
 @Component({
   selector: 'week-days',
@@ -18,20 +26,30 @@ import { LookupService } from '../lookup.service';
   styleUrls: ['./week-days.component.scss'],
 })
 export class WeekDaysComponent implements OnInit {
-  @Input() weekObj!: Week | WeekAllocated;
+  @Input() weekObj!: Week;
   @Input() inEditMode: boolean = false;
   @Input() droppable!: boolean;
   @Input() displayedIn!: 'people' | 'projects';
   @Output() calendarChange = new EventEmitter<Week>();
+  @Output() allocation = new EventEmitter<{
+    id: string;
+    value: string;
+    day: string;
+  }>();
+  @ViewChild('dropdown') dropdown!: ElementRef;
 
   weekModel: Week = getNewWeek();
-  weekDaysArr = Object.keys(this.weekModel);
+  weekDaysArr: CalendarEntry[] = Object.keys(this.weekModel).map((val) => ({
+    type: 'empty',
+    value: val,
+  }));
 
   allocatedTo = new FormControl('');
   showDropdownAtDay!: keyof Week;
   dropdownList!: DropdownEntry[];
+  id: string = uuidv4();
 
-  constructor(private lookupService: LookupService) {}
+  constructor(private allocateService: AllocateService) {}
 
   ngOnInit(): void {}
   ngOnChanges(changes: SimpleChanges): void {
@@ -39,20 +57,46 @@ export class WeekDaysComponent implements OnInit {
       this.weekModel = {
         ...changes['weekObj'].currentValue,
       };
+      this.weekDaysArr = Object.entries(this.weekModel).map(([key, value]) => {
+        if (typeof value === 'boolean') {
+          return { type: 'empty', value: key };
+        } else {
+          return { type: 'filled', value };
+        }
+      });
+      console.log(this.weekModel);
+      // this.weekDaysArr = this.weekModel.map(())
+    }
+  }
+
+  getDropdownTypeahead(): string[] {
+    return this.dropdownList.map((item) => item.value);
+  }
+
+  onDropdownSubmit(): void {
+    const name = this.allocatedTo.value;
+    const dropDowndownEntry = this.dropdownList.find(
+      (entry) => entry.value === name
+    );
+
+    if (dropDowndownEntry) {
+      this.allocation.emit({
+        id: dropDowndownEntry.id,
+        value: dropDowndownEntry.value,
+        day: this.showDropdownAtDay,
+      });
     }
   }
 
   handleBtnClick(weekDay: any): void {
     if (this.droppable && !this.inEditMode) {
-      this.showDropdownAtDay = weekDay as keyof Week;
-      this.dropdownList = this.lookupService.getDataForDay(
+      this.allocatedTo.setValue('');
+      this.dropdownList = this.allocateService.getDataForDay(
         this.displayedIn === 'people' ? 'projects' : 'people',
         weekDay
       );
+      this.showDropdownAtDay = weekDay as keyof Week;
 
-      console.log({
-        dropdownList: this.dropdownList,
-      });
       return;
     }
     if (!this.inEditMode) {
