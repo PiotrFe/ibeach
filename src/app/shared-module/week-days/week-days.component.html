@@ -5,17 +5,17 @@
   </datalist>
 </ng-template>
 
-<div class="weekday-list">
-  <ng-container *ngFor="let entry of weekDaysArr">
+<div class="weekday-list flex flex-hor-ctr flex-ver-ctr">
+  <ng-container *ngFor="let entry of weekDaysArr; let i = index">
     <ng-container [ngSwitch]="showDropdownAtDay !== entry.value">
       <label
         *ngSwitchCase="true"
-        [ngClass]="getBtnClass(entry.value)"
+        [ngClass]="getClass(i)"
         ngDefaultControl
-        (click)="handleBtnClick(entry.value)"
         btnCheckbox
         tabindex="0"
         role="button"
+        (click)="handleBtnClick(i)"
         >{{ entry.value | titlecase }}</label
       >
       <input

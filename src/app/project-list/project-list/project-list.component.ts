@@ -9,10 +9,14 @@ import { FormControl } from '@angular/forms';
 import { FetchService } from '../../shared-module/fetch.service';
 import { TypeaheadService } from '../../shared-module/typeahead.service';
 import { ResizeObserverService } from 'src/app/shared-module/resize-observer.service';
-import { AllocateService } from 'src/app/shared-module/allocate.service';
+import {
+  AllocateService,
+  Dataset,
+} from 'src/app/shared-module/allocate.service';
 import { Week } from 'src/app/shared-module/week-days/week';
 import { Tag } from 'src/app/shared-module/entry/entry.component';
 import { v4 as uuidv4 } from 'uuid';
+import { Subscription } from 'rxjs';
 import {
   Project,
   ProjectEditable,
@@ -30,6 +34,7 @@ export class ProjectListComponent
   implements OnInit, OnChanges
 {
   projectFilter = new FormControl('All');
+  allocationDataSubscription!: Subscription;
 
   constructor(
     private fetchService: FetchService,
@@ -41,7 +46,21 @@ export class ProjectListComponent
     super(ngZone, resizeObserverService, typeaheadService);
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.allocationDataSubscription = this.allocateService.onDataset.subscribe({
+      next: (newData: Dataset) => {
+        const { dataType, data } = newData;
+
+        if (dataType === 'projects') {
+          this.dataSet = data;
+          this.updateFilteredView();
+        }
+      },
+      error: (err) => {
+        this.fetchError = err;
+      },
+    });
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['referenceDate']) {

@@ -101,7 +101,9 @@ export class AllocateService {
           ...entry,
           inEditMode: false,
         }));
-        console.log({ peopleData, projectData });
+
+        this.subject.next({ dataType: 'people', data: this.peopleDataSet });
+        this.subject.next({ dataType: 'projects', data: this.projectDataSet });
       },
 
       error: (e) => {

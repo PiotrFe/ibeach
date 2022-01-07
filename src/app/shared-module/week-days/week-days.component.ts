@@ -15,8 +15,10 @@ import { Week, getNewWeek } from './week';
 import { DropdownEntry } from 'src/app/shared-module/allocate.service';
 import { AllocateService } from '../allocate.service';
 
+const weekStrArr = ['mon', 'tue', 'wed', 'thu', 'fri'];
+
 interface CalendarEntry {
-  type: 'filled' | 'empty';
+  type: 'filled' | 'avail' | 'away';
   value: string;
 }
 
@@ -40,12 +42,12 @@ export class WeekDaysComponent implements OnInit {
 
   weekModel: Week = getNewWeek();
   weekDaysArr: CalendarEntry[] = Object.keys(this.weekModel).map((val) => ({
-    type: 'empty',
+    type: 'avail',
     value: val,
   }));
 
   allocatedTo = new FormControl('');
-  showDropdownAtDay!: keyof Week;
+  showDropdownAtDay!: keyof Week | null;
   dropdownList!: DropdownEntry[];
   id: string = uuidv4();
 
@@ -59,13 +61,11 @@ export class WeekDaysComponent implements OnInit {
       };
       this.weekDaysArr = Object.entries(this.weekModel).map(([key, value]) => {
         if (typeof value === 'boolean') {
-          return { type: 'empty', value: key };
+          return { type: value ? 'avail' : 'away', value: key };
         } else {
           return { type: 'filled', value };
         }
       });
-      console.log(this.weekModel);
-      // this.weekDaysArr = this.weekModel.map(())
     }
   }
 
@@ -83,19 +83,28 @@ export class WeekDaysComponent implements OnInit {
       this.allocation.emit({
         id: dropDowndownEntry.id,
         value: dropDowndownEntry.value,
-        day: this.showDropdownAtDay,
+        day: this.showDropdownAtDay as string,
       });
+
+      this.showDropdownAtDay = null;
     }
   }
 
-  handleBtnClick(weekDay: any): void {
+  handleBtnClick(idx: number): void {
+    const weekDay = weekStrArr[idx] as keyof Week;
+    const weekAllocationItem = this.weekDaysArr[idx];
+
+    if (!this.inEditMode && weekAllocationItem.type === 'away') {
+      return;
+    }
+
     if (this.droppable && !this.inEditMode) {
       this.allocatedTo.setValue('');
       this.dropdownList = this.allocateService.getDataForDay(
         this.displayedIn === 'people' ? 'projects' : 'people',
         weekDay
       );
-      this.showDropdownAtDay = weekDay as keyof Week;
+      this.showDropdownAtDay = weekDay;
 
       return;
     }
@@ -108,13 +117,20 @@ export class WeekDaysComponent implements OnInit {
     this.calendarChange.emit(this.weekModel);
   }
 
-  getBtnClass(weekDay: string): string {
+  getClass(idx: number): string {
+    const item = this.weekDaysArr[idx];
     const disabledCls =
       !this.inEditMode && !this.droppable ? ' btn-inactive' : '';
 
-    return this.weekObj[weekDay.toLowerCase() as keyof Week]
-      ? `btn btn-primary${disabledCls}`
-      : `btn btn-unavail${disabledCls}`;
+    if (item.type === 'away') {
+      return `btn btn-unavail${disabledCls}`;
+    }
+
+    if (item.type === 'avail') {
+      return `btn btn-primary${disabledCls}`;
+    }
+
+    return `btn-allocated flex flex-hor-ctr flex-ver-ctr`;
   }
 
   getDropdownClass(weekDay: string): string {

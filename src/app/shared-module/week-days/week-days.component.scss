@@ -20,3 +20,13 @@
   flex-wrap: wrap;
   font-size: 0.8rem;
 }
+
+.btn-allocated {
+  width: 50px;
+  height: 38px;
+  background-color: var(--bs-success);
+  border-radius: 0.25rem;
+  color: #fff;
+  font-size: 0.8rem;
+  text-align: center;
+}
