@@ -297,7 +297,40 @@ ul {
 }
 
 // ****************
-// ELEMENT VARIANTS STYLING
+// DRAG & DROP
+// ****************
+
+.draggable {
+  cursor: grab;
+}
+
+.droppable {
+}
+
+.dragging-over {
+  z-index: 1600;
+}
+
+.phase-out {
+  animation: phase-out 0.3s ease-in-out;
+}
+
+@keyframes phase-out {
+  0% {
+    transform: scale(1.2);
+  }
+
+  30% {
+    transform: scale(1.5);
+  }
+
+  100% {
+    transform: scale(0);
+  }
+}
+
+// ****************
+// ELEMENT STYLING - VARIANTS
 // ****************
 
 .no-select {

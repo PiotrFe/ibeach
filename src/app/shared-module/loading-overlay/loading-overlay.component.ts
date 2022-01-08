@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 
 @Component({
   selector: 'loading-overlay',
@@ -6,6 +6,8 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./loading-overlay.component.scss'],
 })
 export class LoadingOverlayComponent implements OnInit {
+  @Input() loading: boolean = true;
+
   constructor() {}
 
   ngOnInit(): void {}

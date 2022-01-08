@@ -1,20 +1,61 @@
-import { Component, OnInit, ViewChild, ElementRef, Input } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ViewChild,
+  ElementRef,
+  Input,
+  OnDestroy,
+} from '@angular/core';
+import {
+  DragAndDropService,
+  DragAndDropEvent,
+} from 'src/app/shared-module/drag-and-drop.service';
+import { Subscription } from 'rxjs';
+import { trigger, style, animate, transition } from '@angular/animations';
 
 @Component({
   selector: 'allocate-section',
   templateUrl: './allocate-section.component.html',
   styleUrls: ['./allocate-section.component.scss'],
+  animations: [
+    trigger('insertRemoveTrigger', [
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate('180ms', style({ opacity: 1 })),
+      ]),
+      transition(':leave', [animate('180ms', style({ opacity: 0 }))]),
+    ]),
+  ],
 })
-export class AllocateSectionComponent implements OnInit {
+export class AllocateSectionComponent implements OnInit, OnDestroy {
   @ViewChild('peopleSide') peopleSide!: ElementRef;
   @ViewChild('dragHandle') dragHandle!: ElementRef;
   @ViewChild('projectSide') projectSide!: ElementRef;
 
   @Input() referenceDate: Date = new Date();
 
-  constructor() {}
+  dragging: boolean = false;
+  dragAndDropSubscription!: Subscription;
 
-  ngOnInit(): void {}
+  constructor(private dragAndDrop: DragAndDropService) {}
+
+  ngOnInit(): void {
+    this.dragAndDropSubscription = this.dragAndDrop.onDragAndDrop$.subscribe({
+      next: (event: DragAndDropEvent) => {
+        console.log({ event });
+        if (event.type === 'dragstart') {
+          this.dragging = true;
+        }
+        if (event.type === 'drop') {
+          this.dragging = false;
+        }
+      },
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.dragAndDropSubscription.unsubscribe();
+  }
 
   onDragHandleClick(e: any) {
     const { x: originalX } = e;

@@ -9,13 +9,14 @@
   <ng-container *ngFor="let entry of weekDaysArr; let i = index">
     <ng-container [ngSwitch]="showDropdownAtDay !== entry.value">
       <label
+        id="{{ id + '-' + i }}"
         *ngSwitchCase="true"
         [ngClass]="getClass(i)"
         ngDefaultControl
         btnCheckbox
         tabindex="0"
-        role="button"
         (click)="handleBtnClick(i)"
+        (pointerdown)="handlePointerDown($event)"
         >{{ entry.value | titlecase }}</label
       >
       <input

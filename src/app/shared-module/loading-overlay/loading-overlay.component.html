@@ -1,5 +1,7 @@
 <div class="loading-overlay flex flex-ver-ctr flex-hor-ctr">
-  <div class="spinner-grow text-dark mr-15" role="status"></div>
-  <div class="spinner-grow text-dark mr-15" role="status"></div>
-  <div class="spinner-grow text-dark" role="status"></div>
+  <ng-container *ngIf="loading">
+    <div class="spinner-grow text-dark mr-15" role="status"></div>
+    <div class="spinner-grow text-dark mr-15" role="status"></div>
+    <div class="spinner-grow text-dark" role="status"></div>
+  </ng-container>
 </div>

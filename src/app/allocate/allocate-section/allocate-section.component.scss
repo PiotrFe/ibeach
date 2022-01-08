@@ -22,3 +22,26 @@
     cursor: grab;
   }
 }
+
+#trash-main {
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(1);
+  z-index: 1600;
+  background-color: var(--bs-gray-500);
+  width: 120px;
+  height: 120px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 100px;
+  transition: all 0.2s;
+
+  > i {
+    font-size: 80px;
+  }
+}
+#trash-main.dragging-over {
+  transform: translate(-50%, -50%) scale(1.2);
+}

@@ -12,8 +12,12 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { FormControl } from '@angular/forms';
 import { Week, getNewWeek } from './week';
-import { DropdownEntry } from 'src/app/shared-module/allocate.service';
-import { AllocateService } from '../allocate.service';
+import {
+  AllocateService,
+  DropdownEntry,
+} from 'src/app/shared-module/allocate.service';
+
+import { DragAndDropService } from '../drag-and-drop.service';
 
 const weekStrArr = ['mon', 'tue', 'wed', 'thu', 'fri'];
 
@@ -28,6 +32,7 @@ interface CalendarEntry {
   styleUrls: ['./week-days.component.scss'],
 })
 export class WeekDaysComponent implements OnInit {
+  @Input() id!: string;
   @Input() weekObj!: Week;
   @Input() inEditMode: boolean = false;
   @Input() droppable!: boolean;
@@ -49,9 +54,11 @@ export class WeekDaysComponent implements OnInit {
   allocatedTo = new FormControl('');
   showDropdownAtDay!: keyof Week | null;
   dropdownList!: DropdownEntry[];
-  id: string = uuidv4();
 
-  constructor(private allocateService: AllocateService) {}
+  constructor(
+    private allocateService: AllocateService,
+    private dragAndDrop: DragAndDropService
+  ) {}
 
   ngOnInit(): void {}
   ngOnChanges(changes: SimpleChanges): void {
@@ -121,21 +128,27 @@ export class WeekDaysComponent implements OnInit {
     const item = this.weekDaysArr[idx];
     const disabledCls =
       !this.inEditMode && !this.droppable ? ' btn-inactive' : '';
+    const activeDragAndDropFor =
+      this.displayedIn === 'people' ? 'projects' : 'people';
 
     if (item.type === 'away') {
       return `btn btn-unavail${disabledCls}`;
     }
 
     if (item.type === 'avail') {
-      return `btn btn-primary${disabledCls}`;
+      return `btn btn-primary${disabledCls} droppable droppable-${activeDragAndDropFor}`;
     }
 
-    return `btn-allocated flex flex-hor-ctr flex-ver-ctr`;
+    return `btn-allocated draggable draggable-${activeDragAndDropFor} flex flex-hor-ctr flex-ver-ctr`;
   }
 
   getDropdownClass(weekDay: string): string {
     return this.weekObj[weekDay.toLowerCase() as keyof Week]
       ? `btn btn-success`
       : `btn btn-unavail`;
+  }
+
+  handlePointerDown(event: any) {
+    this.dragAndDrop.onPointerDown(event);
   }
 }

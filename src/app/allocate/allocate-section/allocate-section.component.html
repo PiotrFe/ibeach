@@ -11,6 +11,10 @@
     class="drag-handle"
     (pointerdown)="onDragHandleClick($event)"
   ></div>
+  <div @insertRemoveTrigger *ngIf="dragging" id="trash-main" class="droppable">
+    <i class="bi bi-trash fa-5x"></i>
+  </div>
+
   <div #projectSide class="project-side">
     <project-list
       class="page-container"
@@ -18,3 +22,4 @@
     ></project-list>
   </div>
 </div>
+<loading-overlay *ngIf="dragging" [loading]="false"></loading-overlay>
