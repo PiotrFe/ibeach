@@ -16,7 +16,7 @@
         btnCheckbox
         tabindex="0"
         (click)="handleBtnClick(i)"
-        (pointerdown)="handlePointerDown($event)"
+        (pointerdown)="handlePointerDown($event, i)"
         >{{ entry.value | titlecase }}</label
       >
       <input

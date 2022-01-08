@@ -218,6 +218,7 @@ export class ProjectListComponent
         this.allocateService.registerDataset({
           dataType: 'projects',
           data: this.dataSet as ProjectEditable[],
+          weekOf: this.referenceDate,
         });
       },
     });

@@ -14,6 +14,7 @@ import { FormControl } from '@angular/forms';
 import { Week, getNewWeek } from './week';
 import {
   AllocateService,
+  AllocationDragDropEvent,
   DropdownEntry,
 } from 'src/app/shared-module/allocate.service';
 
@@ -148,7 +149,13 @@ export class WeekDaysComponent implements OnInit {
       : `btn btn-unavail`;
   }
 
-  handlePointerDown(event: any) {
+  handlePointerDown(event: any, idx: number) {
+    const day = weekStrArr[idx] as keyof Week;
     this.dragAndDrop.onPointerDown(event);
+    this.allocateService.registerDragEvent({
+      id: this.id,
+      day,
+      elemType: this.displayedIn,
+    });
   }
 }

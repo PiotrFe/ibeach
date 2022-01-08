@@ -42,7 +42,6 @@ export class AllocateSectionComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.dragAndDropSubscription = this.dragAndDrop.onDragAndDrop$.subscribe({
       next: (event: DragAndDropEvent) => {
-        console.log({ event });
         if (event.type === 'dragstart') {
           this.dragging = true;
         }

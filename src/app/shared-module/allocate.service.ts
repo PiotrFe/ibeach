@@ -25,9 +25,16 @@ export interface AllocationEntry {
   day: string;
 }
 
+export interface AllocationDragDropEvent {
+  id: string;
+  day: keyof Week;
+  elemType: 'people' | 'projects';
+}
+
 export interface Dataset {
   dataType: 'people' | 'projects';
   data: PersonEditable[] | ProjectEditable[];
+  weekOf: Date;
 }
 
 @Injectable({
@@ -38,11 +45,12 @@ export class AllocateService {
   projectDataSet!: ProjectEditable[];
   subject: Subject<Dataset> = new Subject<Dataset>();
   onDataset = this.subject.asObservable();
+  weekOf!: Date;
 
   constructor(private fetchService: FetchService) {}
 
   registerDataset(newDataset: Dataset): void {
-    const { dataType, data } = newDataset;
+    const { dataType, data, weekOf } = newDataset;
 
     if (dataType === 'people') {
       this.peopleDataSet = data as PersonEditable[];
@@ -51,6 +59,8 @@ export class AllocateService {
     if (dataType === 'projects') {
       this.projectDataSet = data as ProjectEditable[];
     }
+
+    this.weekOf = weekOf;
   }
 
   getDataForDay(
@@ -91,6 +101,9 @@ export class AllocateService {
   }
 
   registerAllocation(weekOf: Date, entry: AllocationEntry): void {
+    if (weekOf !== this.weekOf) {
+      throw new Error('Date mismatch');
+    }
     this.fetchService.saveAllocationEntry(weekOf, entry).subscribe({
       next: ({ peopleData, projectData }) => {
         this.peopleDataSet = peopleData.map((entry: Person) => ({
@@ -102,13 +115,26 @@ export class AllocateService {
           inEditMode: false,
         }));
 
-        this.subject.next({ dataType: 'people', data: this.peopleDataSet });
-        this.subject.next({ dataType: 'projects', data: this.projectDataSet });
+        this.subject.next({
+          dataType: 'people',
+          data: this.peopleDataSet,
+          weekOf: this.weekOf,
+        });
+        this.subject.next({
+          dataType: 'projects',
+          data: this.projectDataSet,
+          weekOf: this.weekOf,
+        });
       },
 
       error: (e) => {
         console.log(e);
       },
     });
+  }
+
+  registerDragEvent(data: AllocationDragDropEvent): void {
+    const { id, day, elemType } = data;
+    console.log({ id, day, elemType });
   }
 }

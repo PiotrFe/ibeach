@@ -9,6 +9,10 @@ import {
 import { FormControl } from '@angular/forms';
 import { FetchService } from '../../shared-module/fetch.service';
 import { TypeaheadService } from '../../shared-module/typeahead.service';
+import {
+  DragAndDropService,
+  DragAndDropEvent,
+} from 'src/app/shared-module/drag-and-drop.service';
 import { ResizeObserverService } from 'src/app/shared-module/resize-observer.service';
 import {
   AllocateService,
@@ -48,10 +52,12 @@ export class PeopleListComponent
   pdmArr!: String[];
 
   allocationDataSubscription!: Subscription;
+  dragAndDropSubscription!: Subscription;
 
   constructor(
     private fetchService: FetchService,
     private allocateService: AllocateService,
+    private dragAndDrop: DragAndDropService,
     typeaheadService: TypeaheadService,
     resizeObserverService: ResizeObserverService,
     ngZone: NgZone
@@ -68,20 +74,7 @@ export class PeopleListComponent
     this.updateFilteredView();
 
     if (this.displayedIn === 'ALLOCATE') {
-      this.allocationDataSubscription =
-        this.allocateService.onDataset.subscribe({
-          next: (newData: Dataset) => {
-            const { dataType, data } = newData;
-
-            if (dataType === 'people') {
-              this.dataSet = data;
-              this.updateFilteredView();
-            }
-          },
-          error: (err) => {
-            this.fetchError = err;
-          },
-        });
+      this.subscribeToAllocationServices();
     }
   }
 
@@ -100,7 +93,41 @@ export class PeopleListComponent
     this.onPageDestroy();
     if (this.allocationDataSubscription) {
       this.allocationDataSubscription.unsubscribe();
+      this.dragAndDropSubscription.unsubscribe();
     }
+  }
+
+  subscribeToAllocationServices(): void {
+    this.allocationDataSubscription = this.allocateService.onDataset.subscribe({
+      next: (newData: Dataset) => {
+        const { dataType, data } = newData;
+
+        if (dataType === 'people') {
+          this.dataSet = data;
+          this.updateFilteredView();
+        }
+      },
+      error: (err) => {
+        this.fetchError = err;
+      },
+    });
+
+    this.dragAndDropSubscription = this.dragAndDrop.onDragAndDrop$.subscribe({
+      next: (event: DragAndDropEvent) => {
+        console.log({ event });
+        const { type, draggable, droppable } = event;
+
+        if (!draggable || !droppable) {
+          return;
+        }
+
+        console.log({
+          type,
+          draggable,
+          droppable,
+        });
+      },
+    });
   }
 
   // *****************
@@ -323,6 +350,7 @@ export class PeopleListComponent
           this.allocateService.registerDataset({
             dataType: 'people',
             data: this.dataSet as PersonEditable[],
+            weekOf: this.referenceDate,
           });
         },
       });

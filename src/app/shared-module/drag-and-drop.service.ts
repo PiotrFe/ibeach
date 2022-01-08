@@ -3,8 +3,8 @@ import { Subject, Observable } from 'rxjs';
 
 export interface DragAndDropEvent {
   type: 'dragstart' | 'drop';
-  draggable?: HTMLElement;
-  droppable?: HTMLElement;
+  draggable?: Element | null;
+  droppable?: Element | null;
 }
 
 @Injectable({
@@ -40,7 +40,7 @@ export class DragAndDropService {
 
     document.body.append(draggable);
     const draggableElem = document.getElementById(draggableId);
-    let lastDroppable!: Element | null;
+    let lastDroppable: Element | null = null;
 
     if (!draggableElem) {
       return;
@@ -49,7 +49,6 @@ export class DragAndDropService {
     draggable.ondragstart = () => false;
     draggableElem.style.position = 'absolute';
     draggableElem.style.zIndex = '1600';
-    // draggableElem.style.transform = 'scale(1.2)';
     draggableElem.style.width = '50px';
     draggableElem.style.height = '50px';
     draggableElem.style.left = pageX - shiftX + 'px';
@@ -79,6 +78,7 @@ export class DragAndDropService {
 
       if (droppable && droppable !== lastDroppable) {
         if (
+          droppable.id === 'trash-main' ||
           (droppable.classList.contains('droppable-people') &&
             draggableElem?.classList.contains('draggable-people')) ||
           (droppable.classList.contains('droppable-projects') &&
@@ -102,16 +102,16 @@ export class DragAndDropService {
         draggableElem.remove();
       });
 
-      if (lastDroppable && lastDroppable.id === 'trash-main') {
-        console.log('TRASH');
-      }
-
       target.style.zIndex = originalZIndex;
 
       document.removeEventListener('pointermove', onPointerMove);
       document.removeEventListener('pointerup', onPointerUp);
 
-      subject.next({ type: 'drop' });
+      subject.next({
+        type: 'drop',
+        draggable: target,
+        droppable: lastDroppable,
+      });
     }
 
     document.addEventListener('pointermove', onPointerMove);
