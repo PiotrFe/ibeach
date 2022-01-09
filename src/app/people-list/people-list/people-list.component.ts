@@ -114,7 +114,6 @@ export class PeopleListComponent
 
     this.dragAndDropSubscription = this.dragAndDrop.onDragAndDrop$.subscribe({
       next: (event: DragAndDropEvent) => {
-        console.log({ event });
         const { type, draggable, droppable } = event;
 
         if (!draggable || !droppable) {

@@ -1,5 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Subject, Observable } from 'rxjs';
+import {
+  AllocateService,
+  AllocationDragDropEvent,
+  DropdownEntry,
+} from 'src/app/shared-module/allocate.service';
+import { Week } from './week-days/week';
 
 export interface DragAndDropEvent {
   type: 'dragstart' | 'drop';
@@ -14,9 +20,14 @@ export class DragAndDropService {
   _subject: Subject<DragAndDropEvent> = new Subject<DragAndDropEvent>();
   onDragAndDrop$: Observable<DragAndDropEvent> = this._subject.asObservable();
 
-  constructor() {}
+  constructor(private allocateService: AllocateService) {}
 
-  onPointerDown(event: any) {
+  onPointerDown(
+    event: any,
+    elemId: string,
+    day: keyof Week,
+    elemType: 'people' | 'projects'
+  ) {
     const { target, pageX, pageY } = event;
 
     const style = window.getComputedStyle(target);
@@ -32,19 +43,20 @@ export class DragAndDropService {
     }
     const draggable: any = node.cloneNode(true);
     const draggableId = `${target.id}-clone`;
-    draggable.id = `${target.id}-clone`;
-
-    const shiftX = event.clientX - target.getBoundingClientRect().left;
-    const shiftY = event.clientY - target.getBoundingClientRect().top;
-    const subject = this._subject;
-
+    draggable.id = draggableId;
     document.body.append(draggable);
     const draggableElem = document.getElementById(draggableId);
-    let lastDroppable: Element | null = null;
 
     if (!draggableElem) {
       return;
     }
+
+    const subject = this._subject;
+    const allocationService = this.allocateService;
+    const shiftX = event.clientX - target.getBoundingClientRect().left;
+    const shiftY = event.clientY - target.getBoundingClientRect().top;
+
+    let lastDroppable: Element | null = null;
 
     draggable.ondragstart = () => false;
     draggableElem.style.position = 'absolute';
@@ -109,13 +121,25 @@ export class DragAndDropService {
 
       subject.next({
         type: 'drop',
-        draggable: target,
-        droppable: lastDroppable,
       });
+
+      if (!lastDroppable) {
+        allocationService.registerDropEvent({ id: null });
+      }
+
+      if (lastDroppable?.id === 'trash-main') {
+        allocationService.registerDropEvent({ id: 'trash-main' });
+      }
     }
 
     document.addEventListener('pointermove', onPointerMove);
     document.addEventListener('pointerup', onPointerUp);
+
+    this.allocateService.registerDragEvent({
+      id: elemId,
+      day,
+      elemType,
+    });
   }
 }
 

@@ -1,8 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { Week } from 'src/app/shared-module/week-days/week';
 import { EntryComponent } from 'src/app/shared-module/entry/entry.component';
-import { PAGE_SECTIONS } from '../app.component';
-import { TypeaheadService } from '../shared-module/typeahead.service';
+import { TypeaheadService } from 'src/app/shared-module/typeahead.service';
 import { Tag } from 'src/app/shared-module/entry/entry.component';
 
 export const SKILLS = ['EM', 'ASC', 'FELL', 'BA', 'INT'];
@@ -54,9 +53,5 @@ export class PersonEntry extends EntryComponent {
     const otherClass = fieldName === 'pdm' ? ' flex-ctr-hor' : '';
 
     return `${baseClass}${sortedClass}${otherClass}`;
-  }
-
-  onAllocation(event: any): void {
-    console.log(event);
   }
 }

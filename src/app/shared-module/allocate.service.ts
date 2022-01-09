@@ -8,6 +8,12 @@ import {
 import { Week } from 'src/app/shared-module/week-days/week';
 import { FetchService } from 'src/app/shared-module/fetch.service';
 
+export interface Dataset {
+  dataType: 'people' | 'projects';
+  data: PersonEditable[] | ProjectEditable[];
+  weekOf: Date;
+}
+
 export interface DropdownEntry {
   id: string;
   value: string;
@@ -16,25 +22,25 @@ export interface DropdownEntry {
 export interface AllocationEntry {
   person: {
     id: string;
-    value: string;
+    value: string | null;
   };
   project: {
     id: string;
-    value: string;
+    value: string | null;
   };
-  day: string;
+  day: keyof Week;
 }
 
 export interface AllocationDragDropEvent {
-  id: string;
-  day: keyof Week;
-  elemType: 'people' | 'projects';
+  id: string | null;
+  elemType?: 'people' | 'projects';
+  day?: keyof Week;
+  area?: string;
 }
 
-export interface Dataset {
-  dataType: 'people' | 'projects';
-  data: PersonEditable[] | ProjectEditable[];
-  weekOf: Date;
+interface RegisteredAllocationDragDropEvent extends AllocationDragDropEvent {
+  entryMain: PersonEditable | ProjectEditable;
+  entrySub?: PersonEditable | ProjectEditable;
 }
 
 @Injectable({
@@ -43,6 +49,8 @@ export interface Dataset {
 export class AllocateService {
   peopleDataSet!: PersonEditable[];
   projectDataSet!: ProjectEditable[];
+  registeredDragEvent!: RegisteredAllocationDragDropEvent | null;
+  registeredDropEvent!: RegisteredAllocationDragDropEvent | null;
   subject: Subject<Dataset> = new Subject<Dataset>();
   onDataset = this.subject.asObservable();
   weekOf!: Date;
@@ -101,6 +109,10 @@ export class AllocateService {
   }
 
   registerAllocation(weekOf: Date, entry: AllocationEntry): void {
+    console.log({
+      weekOf,
+      registeredWeek: this.weekOf,
+    });
     if (weekOf !== this.weekOf) {
       throw new Error('Date mismatch');
     }
@@ -135,6 +147,71 @@ export class AllocateService {
 
   registerDragEvent(data: AllocationDragDropEvent): void {
     const { id, day, elemType } = data;
-    console.log({ id, day, elemType });
+    const dataSet =
+      elemType === 'people' ? this.peopleDataSet : this.projectDataSet;
+    const entryMain = (dataSet as Array<PersonEditable | ProjectEditable>).find(
+      (elem: PersonEditable | Project) => elem.id === id
+    );
+    let entrySub;
+
+    if (!entryMain) {
+      return;
+    }
+
+    const allocationForDay = entryMain?.week[day as keyof Week];
+
+    if (
+      typeof allocationForDay !== 'boolean' &&
+      typeof allocationForDay !== 'undefined'
+    ) {
+      const subDataSet =
+        elemType === 'people' ? this.projectDataSet : this.peopleDataSet;
+
+      entrySub = (subDataSet as Array<PersonEditable | ProjectEditable>).find(
+        (elem: PersonEditable | ProjectEditable) =>
+          elem.id === allocationForDay.id
+      );
+    }
+
+    this.registeredDragEvent = {
+      id,
+      day,
+      elemType,
+      entryMain,
+      ...(entrySub && {
+        entrySub,
+      }),
+    };
+  }
+
+  registerDropEvent(data: AllocationDragDropEvent): void {
+    const { id: droppableId } = data;
+
+    if (droppableId === null) {
+      this.registeredDragEvent = null;
+      return;
+    }
+
+    if (droppableId === 'trash-main') {
+      const { day, elemType, entryMain, entrySub } = this
+        .registeredDragEvent as RegisteredAllocationDragDropEvent;
+
+      const personEntry = elemType === 'people' ? entryMain : entrySub;
+      const projectEntry = elemType === 'projects' ? entryMain : entrySub;
+
+      if (personEntry && projectEntry) {
+        this.registerAllocation(this.weekOf, {
+          person: {
+            id: personEntry.id,
+            value: null,
+          },
+          project: {
+            id: projectEntry.id,
+            value: null,
+          },
+          day: day as keyof Week,
+        });
+      }
+    }
   }
 }

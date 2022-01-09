@@ -7,7 +7,7 @@
 
 <div class="weekday-list flex flex-hor-ctr flex-ver-ctr">
   <ng-container *ngFor="let entry of weekDaysArr; let i = index">
-    <ng-container [ngSwitch]="showDropdownAtDay !== entry.value">
+    <ng-container [ngSwitch]="showDropdownAtDay !== entry.day">
       <label
         id="{{ id + '-' + i }}"
         *ngSwitchCase="true"
@@ -17,9 +17,14 @@
         tabindex="0"
         (click)="handleBtnClick(i)"
         (pointerdown)="handlePointerDown($event, i)"
-        >{{ entry.value | titlecase }}</label
+        >{{
+          entry.type === "avail" || entry.type === "away"
+            ? entry.value.text
+            : entry.value.text
+        }}</label
       >
       <input
+        #dropdown
         *ngSwitchCase="false"
         class="form-control calendar-input"
         [formControl]="allocatedTo"

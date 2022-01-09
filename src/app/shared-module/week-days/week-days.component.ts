@@ -8,13 +8,11 @@ import {
   ViewChild,
   ElementRef,
 } from '@angular/core';
-import { v4 as uuidv4 } from 'uuid';
 
 import { FormControl } from '@angular/forms';
 import { Week, getNewWeek } from './week';
 import {
   AllocateService,
-  AllocationDragDropEvent,
   DropdownEntry,
 } from 'src/app/shared-module/allocate.service';
 
@@ -24,7 +22,11 @@ const weekStrArr = ['mon', 'tue', 'wed', 'thu', 'fri'];
 
 interface CalendarEntry {
   type: 'filled' | 'avail' | 'away';
-  value: string;
+  day: keyof Week;
+  value: {
+    id: string | null;
+    text: string;
+  };
 }
 
 @Component({
@@ -49,7 +51,11 @@ export class WeekDaysComponent implements OnInit {
   weekModel: Week = getNewWeek();
   weekDaysArr: CalendarEntry[] = Object.keys(this.weekModel).map((val) => ({
     type: 'avail',
-    value: val,
+    day: val as keyof Week,
+    value: {
+      id: null,
+      text: val,
+    },
   }));
 
   allocatedTo = new FormControl('');
@@ -69,9 +75,16 @@ export class WeekDaysComponent implements OnInit {
       };
       this.weekDaysArr = Object.entries(this.weekModel).map(([key, value]) => {
         if (typeof value === 'boolean') {
-          return { type: value ? 'avail' : 'away', value: key };
+          return {
+            type: value ? 'avail' : 'away',
+            day: key as keyof Week,
+            value: {
+              id: null,
+              text: key,
+            },
+          };
         } else {
-          return { type: 'filled', value };
+          return { type: 'filled', day: key as keyof Week, value };
         }
       });
     }
@@ -114,6 +127,10 @@ export class WeekDaysComponent implements OnInit {
       );
       this.showDropdownAtDay = weekDay;
 
+      setTimeout(() => {
+        this.dropdown.nativeElement.focus();
+      }, 0);
+
       return;
     }
     if (!this.inEditMode) {
@@ -151,11 +168,6 @@ export class WeekDaysComponent implements OnInit {
 
   handlePointerDown(event: any, idx: number) {
     const day = weekStrArr[idx] as keyof Week;
-    this.dragAndDrop.onPointerDown(event);
-    this.allocateService.registerDragEvent({
-      id: this.id,
-      day,
-      elemType: this.displayedIn,
-    });
+    this.dragAndDrop.onPointerDown(event, this.id, day, this.displayedIn);
   }
 }
