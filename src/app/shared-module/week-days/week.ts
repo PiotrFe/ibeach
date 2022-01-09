@@ -35,5 +35,10 @@ export const getClearWeek = (): Week => {
 };
 
 export const getDaysLeft = (weekObj: Week): number => {
-  return Object.values(weekObj).reduce((acc, val) => (val ? acc + 1 : acc), 0);
+  return Object.values(weekObj).reduce((acc, val) => {
+    if (typeof val === 'boolean' && val === true) {
+      return acc + 1;
+    }
+    return acc;
+  }, 0);
 };

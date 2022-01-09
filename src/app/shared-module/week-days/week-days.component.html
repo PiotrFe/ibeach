@@ -30,6 +30,7 @@
         [formControl]="allocatedTo"
         [typeahead]="getDropdownTypeahead()"
         (typeaheadOnSelect)="onDropdownSubmit()"
+        (blur)="onInputBlur($event)"
       />
     </ng-container>
   </ng-container>

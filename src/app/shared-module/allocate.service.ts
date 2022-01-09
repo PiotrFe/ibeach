@@ -88,7 +88,9 @@ export class AllocateService {
     }
 
     return this.peopleDataSet
-      .filter((person) => person.week[day])
+      .filter(
+        (person) => typeof person.week[day] === 'boolean' && person.week[day]
+      )
       .map((person) => ({
         id: person.id,
         value: person.name,
@@ -101,7 +103,9 @@ export class AllocateService {
     }
 
     return this.projectDataSet
-      .filter((project) => project.week[day])
+      .filter(
+        (project) => typeof project.week[day] === 'boolean' && project.week[day]
+      )
       .map((project) => ({
         id: project.id,
         value: project.client,
@@ -109,10 +113,6 @@ export class AllocateService {
   }
 
   registerAllocation(weekOf: Date, entry: AllocationEntry): void {
-    console.log({
-      weekOf,
-      registeredWeek: this.weekOf,
-    });
     if (weekOf !== this.weekOf) {
       throw new Error('Date mismatch');
     }

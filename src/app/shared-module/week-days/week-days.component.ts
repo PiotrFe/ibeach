@@ -111,6 +111,15 @@ export class WeekDaysComponent implements OnInit {
     }
   }
 
+  onInputBlur(e: any): void {
+    const { relatedTarget } = e;
+
+    if (relatedTarget && relatedTarget.classList.contains('dropdown-item')) {
+      return;
+    }
+    this.showDropdownAtDay = null;
+  }
+
   handleBtnClick(idx: number): void {
     const weekDay = weekStrArr[idx] as keyof Week;
     const weekAllocationItem = this.weekDaysArr[idx];
