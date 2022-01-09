@@ -103,7 +103,7 @@ export class PeopleListComponent
         const { dataType, data } = newData;
 
         if (dataType === 'people') {
-          this.dataSet = data;
+          this.dataSet = this.sortService.applyCurrentSort(data);
           this.updateFilteredView();
         }
       },
@@ -119,12 +119,6 @@ export class PeopleListComponent
         if (!draggable || !droppable) {
           return;
         }
-
-        console.log({
-          type,
-          draggable,
-          droppable,
-        });
       },
     });
   }

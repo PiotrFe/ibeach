@@ -12,6 +12,8 @@ import { LoadingOverlayComponent } from './loading-overlay/loading-overlay.compo
 import { HeaderComponent } from './header/header.component';
 import { EntryComponent } from './entry/entry.component';
 import { TypeaheadModule } from 'ngx-bootstrap/typeahead';
+import { FirstInitialPipe } from './first-initial.pipe';
+import { ProjectNamePipe } from './project-name.pipe';
 
 @NgModule({
   declarations: [
@@ -23,6 +25,8 @@ import { TypeaheadModule } from 'ngx-bootstrap/typeahead';
     LoadingOverlayComponent,
     HeaderComponent,
     EntryComponent,
+    FirstInitialPipe,
+    ProjectNamePipe,
   ],
   imports: [
     CommonModule,
@@ -36,6 +40,7 @@ import { TypeaheadModule } from 'ngx-bootstrap/typeahead';
     WeekDaysComponent,
     ModalWindowComponent,
     InitialsPipe,
+    ProjectNamePipe,
     CalendarComponent,
     PageComponent,
     LoadingOverlayComponent,

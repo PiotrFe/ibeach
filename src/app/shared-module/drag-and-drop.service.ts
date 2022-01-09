@@ -73,6 +73,7 @@ export class DragAndDropService {
     draggableElem.style.borderRadius = '150px';
     draggableElem.innerText = getInitials(draggableElem.innerText);
     draggableElem.style.fontSize = '1.2rem';
+    draggableElem.classList.add('phase-in');
 
     if (day === 'match') {
       draggableElem.style.backgroundColor = '#6610f2';

@@ -112,6 +112,15 @@ li {
   }
 }
 
+@keyframes scaleUp {
+  0% {
+    transform: scaleX(0);
+  }
+  100% {
+    transform: scaleX(1);
+  }
+}
+
 .tl-row {
   height: 3.1rem;
 }
@@ -141,6 +150,7 @@ li {
   &-skill {
     width: 7%;
     min-width: max(3.5rem, 7%);
+    justify-content: center;
   }
 
   &-availDate {
@@ -311,8 +321,26 @@ ul {
   z-index: 1600;
 }
 
+.phase-in {
+  animation: phase-in 0.15s ease-in-out;
+}
+
 .phase-out {
   animation: phase-out 0.15s ease-in-out;
+}
+
+@keyframes phase-in {
+  0% {
+    transform: scale(0);
+  }
+
+  // 70% {
+  //   transform: scale(1.5);
+  // }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 @keyframes phase-out {

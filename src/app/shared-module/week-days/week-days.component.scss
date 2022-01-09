@@ -13,21 +13,17 @@
   display: inline-block;
 }
 
-.calendar.entry {
-  background-color: var(--bs-success);
-  padding: 0;
-  display: flex;
-  flex-wrap: wrap;
-  font-size: 0.8rem;
+.cal-entry {
+  width: 53px;
+  height: 38px;
 }
 
 .btn-allocated {
-  width: 53px;
-  height: 38px;
   font-weight: 400;
   background-color: var(--bs-success);
   border-radius: 0.25rem;
   color: #fff;
   font-size: 0.8rem;
   text-align: center;
+  word-break: break-all;
 }

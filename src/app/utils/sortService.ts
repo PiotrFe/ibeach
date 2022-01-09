@@ -208,16 +208,29 @@ export class SortService {
     return 0;
   };
 
+  applyCurrentSort = (dataSet: any[]): any[] => {
+    if (this.sort.field) {
+      return this.sortData(dataSet, this.sort.field, true, false, false);
+    }
+    return this.sortData(dataSet, 'name', true, false, false);
+  };
+
   sortData = (
     dataSet: any[],
     colName: string,
     showHighlight: boolean = true,
-    freshStart: boolean = false
+    freshStart: boolean = false,
+    updateCriteria: boolean = true
   ): any[] => {
     if (freshStart) {
       this.clearSort();
     }
-    this.updateSortCriteria(colName);
+    if (updateCriteria) {
+      this.updateSortCriteria(colName);
+    }
+
+    console.log({ showHighlight, freshStart, updateCriteria, sort: this.sort });
+
     const sortBySkill = this.sortBySkill;
     const sortByName = this.sortByName;
     const sortByDays = this.sortByDays;

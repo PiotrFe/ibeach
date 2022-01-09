@@ -100,7 +100,7 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
       this.tags = [];
     }
 
-    if (this.entryData.week) {
+    if (this.entryData?.week) {
       this.localCalendarObj = this.entryData.week;
       this.setDaysLeft(this.entryData.week);
     } else {

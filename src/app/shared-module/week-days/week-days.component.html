@@ -20,7 +20,9 @@
         >{{
           entry.type === "avail" || entry.type === "away"
             ? entry.value.text
-            : entry.value.text
+            : displayedIn === "projects"
+            ? (entry.value.text | firstInitial)
+            : (entry.value.text | projectName)
         }}</label
       >
       <input

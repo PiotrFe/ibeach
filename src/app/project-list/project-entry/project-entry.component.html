@@ -47,7 +47,7 @@
     id="{{ id }}"
     [ngClass]="getFieldClasses('name')"
     (pointerdown)="handlePointerDown($event)"
-    >{{ project.client }}</span
+    >{{ project.client | projectName }}</span
   >
   <span
     *ngIf="entryContainerWidth < 4"
@@ -60,7 +60,7 @@
     [attr.aria-expanded]="isCollapsed"
     [attr.aria-controls]="'collapse-' + id"
   >
-    {{ project.client }}
+    {{ project.client | projectName }}
   </span>
   <span [ngClass]="getFieldClasses('skill')">{{ project.type }}</span>
   <span [ngClass]="getFieldClasses('days')">{{ project.daysLeft }}</span>
