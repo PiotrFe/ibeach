@@ -1,5 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { TypeaheadService } from 'src/app/shared-module/typeahead.service';
+import { DragAndDropService } from 'src/app/shared-module/drag-and-drop.service';
 import { EntryComponent } from 'src/app/shared-module/entry/entry.component';
 import { Project, ProjectEditable } from '../project-list/project';
 import { Week } from 'src/app/shared-module/week-days/week';
@@ -18,6 +19,7 @@ export class ProjectEntryComponent extends EntryComponent implements OnInit {
 
   constructor(
     private allocateService: AllocateService,
+    private dragAndDrop: DragAndDropService,
     typeaheadService: TypeaheadService
   ) {
     super(typeaheadService);
@@ -34,8 +36,13 @@ export class ProjectEntryComponent extends EntryComponent implements OnInit {
   getFieldClasses(fieldName: string): string {
     const baseClass = `section section-${fieldName} mr-12 flex flex-ver-ctr pl-3`;
     const sortedClass = fieldName === this.sortField ? ' sorted' : '';
+    let otherClass = '';
 
-    return `${baseClass}${sortedClass}`;
+    if (fieldName === 'name') {
+      otherClass += ` draggable draggable-projects`;
+    }
+
+    return `${baseClass}${sortedClass}${otherClass}`;
   }
 
   handleEdit(): void {
@@ -68,5 +75,8 @@ export class ProjectEntryComponent extends EntryComponent implements OnInit {
       this.referenceDate,
       allocationEntry
     );
+  }
+  handlePointerDown(event: any) {
+    this.dragAndDrop.onPointerDown(event, this.id, 'match', 'projects');
   }
 }

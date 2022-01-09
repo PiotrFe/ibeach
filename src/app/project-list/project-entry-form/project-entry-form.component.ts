@@ -9,6 +9,7 @@ import {
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { EntryComponent } from 'src/app/shared-module/entry/entry.component';
 import { TypeaheadService } from 'src/app/shared-module/typeahead.service';
+
 import { Project, ProjectEditable } from '../project-list/project';
 import { Tag } from 'src/app/shared-module/entry/entry.component';
 import {

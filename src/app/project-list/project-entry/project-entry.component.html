@@ -42,15 +42,21 @@
   class="entry-item tl-row no-select"
   [class.entry-item--uncollapsed]="entryContainerWidth < 4 && !isCollapsed"
 >
-  <span *ngIf="entryContainerWidth === 4" [ngClass]="getFieldClasses('name')">{{
-    project.client
-  }}</span>
   <span
-    type="button"
+    *ngIf="entryContainerWidth === 4"
+    id="{{ id }}"
+    [ngClass]="getFieldClasses('name')"
+    (pointerdown)="handlePointerDown($event)"
+    >{{ project.client }}</span
+  >
+  <span
     *ngIf="entryContainerWidth < 4"
+    id="{{ id }}"
+    type="button"
     [ngClass]="getFieldClasses('name')"
     role="button"
     (click)="handleCollapse()"
+    (pointerdown)="handlePointerDown($event)"
     [attr.aria-expanded]="isCollapsed"
     [attr.aria-controls]="'collapse-' + id"
   >
