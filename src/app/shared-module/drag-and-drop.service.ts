@@ -25,7 +25,7 @@ export class DragAndDropService {
   onPointerDown(
     event: any,
     elemId: string,
-    day: keyof Week,
+    day: keyof Week | 'match',
     elemType: 'people' | 'projects'
   ) {
     const { target, pageX, pageY } = event;
@@ -41,6 +41,7 @@ export class DragAndDropService {
     if (!node) {
       return;
     }
+
     const draggable: any = node.cloneNode(true);
     const draggableId = `${target.id}-clone`;
     draggable.id = draggableId;
@@ -50,6 +51,8 @@ export class DragAndDropService {
     if (!draggableElem) {
       return;
     }
+
+    console.log({ draggableElem });
 
     const subject = this._subject;
     const allocationService = this.allocateService;
@@ -62,12 +65,21 @@ export class DragAndDropService {
     draggableElem.style.position = 'absolute';
     draggableElem.style.zIndex = '1600';
     draggableElem.style.width = '50px';
+    draggableElem.style.minWidth = '50px';
     draggableElem.style.height = '50px';
+    draggableElem.style.minHeight = '50px';
     draggableElem.style.left = pageX - shiftX + 'px';
     draggableElem.style.top = pageY - shiftY + 'px';
     draggableElem.style.borderRadius = '150px';
-    draggableElem.textContent = getInitials(draggableElem.textContent);
+    draggableElem.innerText = getInitials(draggableElem.innerText);
     draggableElem.style.fontSize = '1.2rem';
+
+    if (day === 'match') {
+      draggableElem.style.backgroundColor = '#6610f2';
+      draggableElem.style.fontWeight = 'bold';
+      draggableElem.style.justifyContent = 'center';
+      draggableElem.style.color = '#fff';
+    }
 
     target.style.zIndex = '1600';
 

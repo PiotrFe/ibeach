@@ -5,6 +5,7 @@ import {
   AllocateService,
   AllocationEntry,
 } from 'src/app/shared-module/allocate.service';
+import { DragAndDropService } from 'src/app/shared-module/drag-and-drop.service';
 import { Week } from 'src/app/shared-module/week-days/week';
 
 @Component({
@@ -15,7 +16,8 @@ import { Week } from 'src/app/shared-module/week-days/week';
 export class PersonEntryComponent extends PersonEntry {
   constructor(
     typeaheadService: TypeaheadService,
-    private allocateService: AllocateService
+    private allocateService: AllocateService,
+    private dragAndDrop: DragAndDropService
   ) {
     super(typeaheadService);
   }
@@ -52,5 +54,9 @@ export class PersonEntryComponent extends PersonEntry {
       this.referenceDate,
       allocationEntry
     );
+  }
+
+  handlePointerDown(event: any) {
+    this.dragAndDrop.onPointerDown(event, this.id, 'match', 'people');
   }
 }

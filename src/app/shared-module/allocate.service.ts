@@ -20,21 +20,21 @@ export interface DropdownEntry {
 }
 
 export interface AllocationEntry {
-  person: {
+  person?: {
     id: string;
     value: string | null;
   };
-  project: {
+  project?: {
     id: string;
     value: string | null;
   };
-  day: keyof Week;
+  day: keyof Week | 'match';
 }
 
 export interface AllocationDragDropEvent {
   id: string | null;
   elemType?: 'people' | 'projects';
-  day?: keyof Week;
+  day?: keyof Week | 'match';
   area?: string;
 }
 
@@ -50,7 +50,6 @@ export class AllocateService {
   peopleDataSet!: PersonEditable[];
   projectDataSet!: ProjectEditable[];
   registeredDragEvent!: RegisteredAllocationDragDropEvent | null;
-  registeredDropEvent!: RegisteredAllocationDragDropEvent | null;
   subject: Subject<Dataset> = new Subject<Dataset>();
   onDataset = this.subject.asObservable();
   weekOf!: Date;
@@ -199,6 +198,8 @@ export class AllocateService {
       const personEntry = elemType === 'people' ? entryMain : entrySub;
       const projectEntry = elemType === 'projects' ? entryMain : entrySub;
 
+      console.log(this.registeredDragEvent);
+
       if (personEntry && projectEntry) {
         this.registerAllocation(this.weekOf, {
           person: {
@@ -209,7 +210,20 @@ export class AllocateService {
             id: projectEntry.id,
             value: null,
           },
-          day: day as keyof Week,
+          day: day as keyof Week | 'match',
+        });
+      } else if (personEntry || projectEntry) {
+        this.registerAllocation(this.weekOf, {
+          ...(personEntry && {
+            person: { id: personEntry.id, value: null },
+          }),
+          ...(projectEntry && {
+            project: {
+              id: projectEntry.id,
+              value: null,
+            },
+          }),
+          day: 'match',
         });
       }
     }
