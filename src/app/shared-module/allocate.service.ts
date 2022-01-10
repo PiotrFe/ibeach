@@ -5,7 +5,7 @@ import {
   Project,
   ProjectEditable,
 } from 'src/app/project-list/project-list/project';
-import { Week } from 'src/app/shared-module/week-days/week';
+import { Week, getDaysLeft } from 'src/app/shared-module/week-days/week';
 import { FetchService } from 'src/app/shared-module/fetch.service';
 
 export interface Dataset {
@@ -192,40 +192,91 @@ export class AllocateService {
     }
 
     if (droppableId === 'trash-main') {
-      const { day, elemType, entryMain, entrySub } = this
-        .registeredDragEvent as RegisteredAllocationDragDropEvent;
+      this._handleTrash();
+    } else {
+      this._handleAllocate(data);
+    }
+  }
 
-      const personEntry = elemType === 'people' ? entryMain : entrySub;
-      const projectEntry = elemType === 'projects' ? entryMain : entrySub;
+  private _handleAllocate(data: AllocationDragDropEvent): void {
+    const { elemType, entryMain } = this
+      .registeredDragEvent as RegisteredAllocationDragDropEvent;
 
-      console.log(this.registeredDragEvent);
+    const { day: dayCapitalized, id } = data;
+    const day = dayCapitalized?.toLowerCase();
 
-      if (personEntry && projectEntry) {
-        this.registerAllocation(this.weekOf, {
-          person: {
-            id: personEntry.id,
-            value: null,
-          },
+    const entrySub =
+      elemType === 'people'
+        ? this.projectDataSet.find(
+            (elem: PersonEditable | ProjectEditable) => elem.id === id
+          )
+        : this.peopleDataSet.find(
+            (elem: PersonEditable | ProjectEditable) => elem.id === id
+          );
+
+    const personEntry = (
+      elemType === 'people' ? entryMain : entrySub
+    ) as PersonEditable;
+    const projectEntry = (
+      elemType === 'projects' ? entryMain : entrySub
+    ) as ProjectEditable;
+
+    const allocationCriteriaMet =
+      personEntry &&
+      projectEntry &&
+      (day === 'match' ||
+        (personEntry.week[day as keyof Week] === true &&
+          projectEntry.week[day as keyof Week] === true));
+
+    console.log({ personEntry, projectEntry, day });
+
+    if (allocationCriteriaMet) {
+      this.registerAllocation(this.weekOf, {
+        person: {
+          id: personEntry.id,
+          value: personEntry.name,
+        },
+        project: {
+          id: projectEntry.id,
+          value: projectEntry.client,
+        },
+        day: day as keyof Week | 'match',
+      });
+    }
+  }
+
+  private _handleTrash(): void {
+    const { day, elemType, entryMain, entrySub } = this
+      .registeredDragEvent as RegisteredAllocationDragDropEvent;
+
+    const personEntry = elemType === 'people' ? entryMain : entrySub;
+    const projectEntry = elemType === 'projects' ? entryMain : entrySub;
+
+    if (personEntry && projectEntry) {
+      this.registerAllocation(this.weekOf, {
+        person: {
+          id: personEntry.id,
+          value: null,
+        },
+        project: {
+          id: projectEntry.id,
+          value: null,
+        },
+        day: day as keyof Week | 'match',
+      });
+    } else if (personEntry || projectEntry) {
+      this.registerAllocation(this.weekOf, {
+        ...(personEntry && {
+          person: { id: personEntry.id, value: null },
+        }),
+        ...(projectEntry && {
           project: {
             id: projectEntry.id,
             value: null,
           },
-          day: day as keyof Week | 'match',
-        });
-      } else if (personEntry || projectEntry) {
-        this.registerAllocation(this.weekOf, {
-          ...(personEntry && {
-            person: { id: personEntry.id, value: null },
-          }),
-          ...(projectEntry && {
-            project: {
-              id: projectEntry.id,
-              value: null,
-            },
-          }),
-          day: 'match',
-        });
-      }
+        }),
+        day: 'match',
+      });
     }
   }
 }

@@ -22,7 +22,7 @@ export class DragAndDropService {
 
   constructor(private allocateService: AllocateService) {}
 
-  onPointerDown(
+  onDragStart(
     event: any,
     elemId: string,
     day: keyof Week | 'match',
@@ -36,6 +36,7 @@ export class DragAndDropService {
     if (!target.classList.contains('draggable')) {
       return;
     }
+
     const node: HTMLElement | null = document.getElementById(target.id);
 
     if (!node) {
@@ -51,8 +52,6 @@ export class DragAndDropService {
     if (!draggableElem) {
       return;
     }
-
-    console.log({ draggableElem });
 
     const subject = this._subject;
     const allocationService = this.allocateService;
@@ -74,6 +73,7 @@ export class DragAndDropService {
     draggableElem.innerText = getInitials(draggableElem.innerText);
     draggableElem.style.fontSize = '1.2rem';
     draggableElem.classList.add('phase-in');
+    draggableElem.classList.remove('droppable');
 
     if (day === 'match') {
       draggableElem.style.backgroundColor = '#6610f2';
@@ -92,6 +92,20 @@ export class DragAndDropService {
       draggableElem!.style.top = pageY - shiftY + 'px';
       const elements: Array<Element> = document.elementsFromPoint(pageX, pageY);
 
+      const inactiveEntry = elements.find((element) => {
+        return (
+          element.classList.contains('btn-allocated') ||
+          element.classList.contains('btn-unavail')
+        );
+      });
+
+      if (inactiveEntry && inactiveEntry !== draggableElem) {
+        if (lastDroppable) {
+          lastDroppable.classList.remove('dragging-over');
+          lastDroppable = null;
+        }
+        return;
+      }
       const droppable = elements.filter((element) =>
         element.classList.contains('droppable')
       )[0];
@@ -113,6 +127,7 @@ export class DragAndDropService {
             lastDroppable.classList.remove('dragging-over');
           }
           droppable.classList.add('dragging-over');
+
           lastDroppable = droppable;
         }
       }
@@ -138,11 +153,28 @@ export class DragAndDropService {
 
       if (!lastDroppable) {
         allocationService.registerDropEvent({ id: null });
+        return;
       }
 
       if (lastDroppable?.id === 'trash-main') {
         allocationService.registerDropEvent({ id: 'trash-main' });
+        return;
       }
+
+      const { entryId, weekDay } = lastDroppable?.classList.contains(
+        'cal-entry'
+      )
+        ? {
+            entryId: lastDroppable?.id.split('__')[0],
+            weekDay: lastDroppable.textContent,
+          }
+        : { entryId: lastDroppable?.id, weekDay: 'match' };
+
+      allocationService.registerDropEvent({
+        id: entryId as string,
+        elemType,
+        day: weekDay as keyof Week | 'match',
+      });
     }
 
     document.addEventListener('pointermove', onPointerMove);
@@ -165,5 +197,5 @@ const getInitials = (text: string | null): string => {
     return text[0];
   }
 
-  return `${text[0].toUpperCase()} ${text[text.length - 1].toUpperCase()}`;
+  return `${arr[0][0].toUpperCase()} ${arr[arr.length - 1][0].toUpperCase()}`;
 };

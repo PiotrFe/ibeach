@@ -254,6 +254,7 @@ export class PageComponent implements AfterViewInit {
 
   editRow(id: string): void {
     const idx = this.dataSet.findIndex((entry) => entry.id === id);
+
     this.dataSet[idx] = {
       ...this.dataSet[idx],
       inEditMode: true,

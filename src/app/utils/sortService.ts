@@ -229,8 +229,6 @@ export class SortService {
       this.updateSortCriteria(colName);
     }
 
-    console.log({ showHighlight, freshStart, updateCriteria, sort: this.sort });
-
     const sortBySkill = this.sortBySkill;
     const sortByName = this.sortByName;
     const sortByDays = this.sortByDays;

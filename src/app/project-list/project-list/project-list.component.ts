@@ -4,6 +4,7 @@ import {
   NgZone,
   OnChanges,
   SimpleChanges,
+  OnDestroy,
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { FetchService } from '../../shared-module/fetch.service';
@@ -31,7 +32,7 @@ import { getNewWeek, getDaysLeft } from '../../shared-module/week-days/week';
 })
 export class ProjectListComponent
   extends PageComponent
-  implements OnInit, OnChanges
+  implements OnInit, OnChanges, OnDestroy
 {
   projectFilter = new FormControl('All');
   allocationDataSubscription!: Subscription;
@@ -52,7 +53,7 @@ export class ProjectListComponent
         const { dataType, data } = newData;
 
         if (dataType === 'projects') {
-          this.dataSet = data;
+          this.dataSet = this.sortService.applyCurrentSort(data);
           this.updateFilteredView();
         }
       },
@@ -72,6 +73,8 @@ export class ProjectListComponent
       }
     }
   }
+
+  ngOnDestroy(): void {}
 
   clearFilters(): void {
     this.filters = [];
@@ -255,6 +258,8 @@ export class ProjectListComponent
     if (this.saveChangesInProgress) {
       this.saveChanges();
       return;
+    } else {
+      this.updateFilteredView();
     }
   }
 

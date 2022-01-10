@@ -175,8 +175,9 @@ export class WeekDaysComponent implements OnInit {
       : `btn btn-unavail`;
   }
 
-  handlePointerDown(event: any, idx: number) {
+  handleDragStart(event: any, idx: number) {
     const day = weekStrArr[idx] as keyof Week;
-    this.dragAndDrop.onPointerDown(event, this.id, day, this.displayedIn);
+    this.dragAndDrop.onDragStart(event, this.id, day, this.displayedIn);
+    return false;
   }
 }

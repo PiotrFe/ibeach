@@ -56,7 +56,24 @@ export class PersonEntryComponent extends PersonEntry {
     );
   }
 
-  handlePointerDown(event: any) {
-    this.dragAndDrop.onPointerDown(event, this.id, 'match', 'people');
+  handleDragStart(event: any) {
+    this.dragAndDrop.onDragStart(event, this.id, 'match', 'people');
+    return false;
+  }
+
+  getFieldClasses(fieldName: string): string {
+    const baseClass = `section section-${fieldName} mr-12 flex flex-ver-ctr pl-3`;
+    const sortedClass = fieldName === this.sortField ? ' sorted' : '';
+    let otherClass = fieldName === 'pdm' ? ' flex-ctr-hor' : '';
+
+    if (fieldName === 'name') {
+      otherClass += ` draggable draggable-people`;
+    }
+
+    // if (this.entryData.daysLeft > 0) {
+    //   otherClass += ' droppable droppable-projects';
+    // }
+
+    return `${baseClass}${sortedClass}${otherClass}`;
   }
 }

@@ -9,17 +9,18 @@
   <ng-container *ngFor="let entry of weekDaysArr; let i = index">
     <ng-container [ngSwitch]="showDropdownAtDay !== entry.day">
       <label
-        id="{{ id + '-' + i }}"
+        id="{{ id + '__' + i }}"
         *ngSwitchCase="true"
         [ngClass]="getClass(i)"
         ngDefaultControl
         btnCheckbox
         tabindex="0"
+        draggable="true"
         (click)="handleBtnClick(i)"
-        (pointerdown)="handlePointerDown($event, i)"
+        (dragstart)="handleDragStart($event, i)"
         >{{
           entry.type === "avail" || entry.type === "away"
-            ? entry.value.text
+            ? (entry.value.text | titlecase)
             : displayedIn === "projects"
             ? (entry.value.text | firstInitial)
             : (entry.value.text | projectName)

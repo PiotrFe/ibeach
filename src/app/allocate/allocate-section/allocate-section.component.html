@@ -1,3 +1,4 @@
+<loading-overlay *ngIf="dragging" [loading]="false"></loading-overlay>
 <div class="allocate-section">
   <div #peopleSide class="people-side">
     <people-list
@@ -22,4 +23,3 @@
     ></project-list>
   </div>
 </div>
-<loading-overlay *ngIf="dragging" [loading]="false"></loading-overlay>

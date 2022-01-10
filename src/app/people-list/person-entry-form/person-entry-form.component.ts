@@ -235,4 +235,12 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
   setDaysLeft(calendarObj: Week) {
     this.daysLeft = getDaysLeft(calendarObj);
   }
+
+  getFieldClasses(fieldName: string): string {
+    const baseClass = `section section-${fieldName} mr-12 flex flex-ver-ctr pl-3`;
+    const sortedClass = fieldName === this.sortField ? ' sorted' : '';
+    let otherClass = fieldName === 'pdm' ? ' flex-ctr-hor' : '';
+
+    return `${baseClass}${sortedClass}${otherClass}`;
+  }
 }

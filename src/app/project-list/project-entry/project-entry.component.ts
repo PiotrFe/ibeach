@@ -33,18 +33,6 @@ export class ProjectEntryComponent extends EntryComponent implements OnInit {
     };
   }
 
-  getFieldClasses(fieldName: string): string {
-    const baseClass = `section section-${fieldName} mr-12 flex flex-ver-ctr pl-3`;
-    const sortedClass = fieldName === this.sortField ? ' sorted' : '';
-    let otherClass = '';
-
-    if (fieldName === 'name') {
-      otherClass += ` draggable draggable-projects`;
-    }
-
-    return `${baseClass}${sortedClass}${otherClass}`;
-  }
-
   handleEdit(): void {
     this.editEvent.emit(this.id);
   }
@@ -76,7 +64,24 @@ export class ProjectEntryComponent extends EntryComponent implements OnInit {
       allocationEntry
     );
   }
-  handlePointerDown(event: any) {
-    this.dragAndDrop.onPointerDown(event, this.id, 'match', 'projects');
+  handleDragStart(event: any) {
+    this.dragAndDrop.onDragStart(event, this.id, 'match', 'projects');
+    return false;
+  }
+
+  getFieldClasses(fieldName: string): string {
+    const baseClass = `section section-${fieldName} mr-12 flex flex-ver-ctr pl-3`;
+    const sortedClass = fieldName === this.sortField ? ' sorted' : '';
+    let otherClass = '';
+
+    if (fieldName === 'name') {
+      otherClass += ` draggable draggable-projects`;
+    }
+
+    // if (this.entryData.daysLeft > 0) {
+    //   otherClass += ' droppable droppable-people';
+    // }
+
+    return `${baseClass}${sortedClass}${otherClass}`;
   }
 }

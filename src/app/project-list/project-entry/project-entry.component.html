@@ -39,24 +39,29 @@
 
 <div
   #entryContainer
+  id="{{ id }}"
   class="entry-item tl-row no-select"
   [class.entry-item--uncollapsed]="entryContainerWidth < 4 && !isCollapsed"
+  [class.droppable]="entryData.daysLeft > 0"
+  [class.droppable-people]="entryData.daysLeft > 0"
 >
   <span
     *ngIf="entryContainerWidth === 4"
-    id="{{ id }}"
+    id="{{ id + '__name' }}"
     [ngClass]="getFieldClasses('name')"
-    (pointerdown)="handlePointerDown($event)"
+    draggable="true"
+    (dragstart)="handleDragStart($event)"
     >{{ project.client | projectName }}</span
   >
   <span
     *ngIf="entryContainerWidth < 4"
-    id="{{ id }}"
+    id="{{ id + '__name' }}"
     type="button"
     [ngClass]="getFieldClasses('name')"
     role="button"
+    draggable="true"
+    (dragstart)="handleDragStart($event)"
     (click)="handleCollapse()"
-    (pointerdown)="handlePointerDown($event)"
     [attr.aria-expanded]="isCollapsed"
     [attr.aria-controls]="'collapse-' + id"
   >

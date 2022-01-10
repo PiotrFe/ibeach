@@ -46,16 +46,4 @@ export class PersonEntry extends EntryComponent {
   getPDMTypeAhead(key: string): any[] {
     return [];
   }
-
-  getFieldClasses(fieldName: string): string {
-    const baseClass = `section section-${fieldName} mr-12 flex flex-ver-ctr pl-3`;
-    const sortedClass = fieldName === this.sortField ? ' sorted' : '';
-    let otherClass = fieldName === 'pdm' ? ' flex-ctr-hor' : '';
-
-    if (fieldName === 'name') {
-      otherClass += ` draggable draggable-people`;
-    }
-
-    return `${baseClass}${sortedClass}${otherClass}`;
-  }
 }

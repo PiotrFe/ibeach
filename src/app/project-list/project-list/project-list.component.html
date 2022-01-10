@@ -94,6 +94,7 @@
     <li *ngFor="let project of filteredDataset">
       <ng-container [ngSwitch]="project.inEditMode">
         <project-entry
+          *ngSwitchCase="false"
           [id]="project.id"
           [entryData]="project"
           [inEditMode]="inEditMode"
