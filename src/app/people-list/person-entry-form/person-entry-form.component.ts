@@ -1,10 +1,13 @@
 import {
   Component,
   OnInit,
+  AfterViewInit,
   Input,
   Output,
   EventEmitter,
   SimpleChanges,
+  ViewChild,
+  ElementRef,
 } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { TypeaheadMatch } from 'ngx-bootstrap/typeahead';
@@ -30,7 +33,10 @@ import {
   templateUrl: './person-entry-form.component.html',
   styleUrls: ['./person-entry-form.component.scss'],
 })
-export class PersonEntryFormComponent extends PersonEntry implements OnInit {
+export class PersonEntryFormComponent
+  extends PersonEntry
+  implements OnInit, AfterViewInit
+{
   @Input() dispatchToParentAndClose: boolean = false;
   @Input() pdm!: string;
   @Input() getNameTypeAhead!: Function;
@@ -55,6 +61,8 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
     week: Week;
     tags: Tag[];
   }>();
+
+  @ViewChild('entryContainer') entryContainer!: ElementRef;
 
   pdmArr: string[] = getPDMArr();
   fmno!: string;
@@ -98,6 +106,10 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
       this.fmno = this.entryData.id;
     } else {
       this.tags = [];
+      this.personForm.patchValue({
+        skill: 'skill',
+        pdm: 'pdm',
+      });
     }
 
     if (this.entryData?.week) {
@@ -107,6 +119,16 @@ export class PersonEntryFormComponent extends PersonEntry implements OnInit {
       this.daysLeft = 5;
       this.localCalendarObj = getNewWeek();
       this.personForm.patchValue({ availDate: this.referenceDate });
+    }
+  }
+
+  ngAfterViewInit(): void {
+    if (!this.entryData) {
+      this.entryContainer.nativeElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+        inline: 'nearest',
+      });
     }
   }
 

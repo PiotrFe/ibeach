@@ -121,6 +121,8 @@ export class ProjectListComponent
     const { id, client, type, comments, availDate, week, tags, leadership } =
       objParam;
 
+    console.log({ objParam });
+
     this.dataSet = this.dataSet.map((project) => {
       if (project.id !== id) {
         return project;

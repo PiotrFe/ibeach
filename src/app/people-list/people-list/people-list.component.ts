@@ -289,16 +289,19 @@ export class PeopleListComponent
   // SUBMIT HANDLERS
   // *****************
 
-  fetchData(forPDM: boolean = false) {
+  fetchData(skipFetchingLookupTable: boolean = false) {
     this.fetching = true;
     this.fetchError = '';
     this.noData = false;
 
-    const pdm = forPDM ? this.pdmFilter.value : null;
     const submittedOnly = this.displayedIn === 'ALLOCATE';
 
     this.fetchService
-      .fetchWeeklyList(this.referenceDate, pdm, submittedOnly)
+      .fetchWeeklyList(
+        this.referenceDate,
+        skipFetchingLookupTable,
+        submittedOnly
+      )
       .subscribe({
         next: (data: WeeklyData) => {
           const { people, statusSummary, lookupTable } = data;
@@ -313,7 +316,7 @@ export class PeopleListComponent
           // lookup table only sent on first fetch, where pdm not provided as parameter
           // if pdm provided as a parameter, he/she cancelled changes and is fetching the old list from server
 
-          if (!forPDM) {
+          if (!skipFetchingLookupTable) {
             this.typeaheadService.storeLookupList(
               this.typeaheadService.tableTypes.People,
               lookupTable
@@ -353,8 +356,6 @@ export class PeopleListComponent
     this.fetching = true;
     const pdmParam =
       this.displayedIn !== 'ALLOCATE' ? this.pdmFilter.value : 'allocator';
-    const fetchFullDataOnUpdate =
-      this.displayedIn === 'ALLOCATE' ? true : false;
 
     this.fetchService
       .saveList(

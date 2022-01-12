@@ -39,18 +39,13 @@
   <span
     @insertRemoveTrigger
     *ngIf="entryContainerWidth === 3 || entryContainerWidth > 3"
-    class="section section-pdm pl-3 mr-12 clickable"
-    (click)="handleClick('pdm')"
-    >Leadership<i
-      *ngIf="getSort('pdm', 1)"
-      class="bi bi-sort-down-alt fs-085 ptop-3 ml-2"
-    ></i>
-    <i *ngIf="getSort('pdm', -1)" class="bi bi-sort-up fs-085 ptop-3 ml-2"></i
-  ></span>
+    class="section section-leadership pl-3 mr-12"
+    >CST</span
+  >
   <span
     @insertRemoveTrigger
     *ngIf="entryContainerWidth === 4 || entryContainerWidth > 4"
-    class="section section-comments txt-center pl-3"
+    class="section section-comments section-comments--project txt-center pl-3"
     >Comments</span
   >
   <div class="edit-entry-icons"></div>

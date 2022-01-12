@@ -60,18 +60,18 @@ export class FetchService {
 
   fetchWeeklyList(
     weekOf: Date,
-    pdm?: string,
+    skipFetchingLookupTable?: boolean,
     submittedOnly?: boolean
   ): Observable<WeeklyData> {
     const weekTs = weekOf.getTime();
-    const weekUrl = `${baseUrl}/people/${weekTs}`;
-    const finalUrl = pdm
-      ? new URL(`${weekUrl}/${encodeURIComponent(pdm)}`)
-      : new URL(weekUrl);
+    const finalUrl = new URL(`${baseUrl}/people/${weekTs}`);
 
-    if (submittedOnly) {
-      finalUrl.searchParams.append('submitted', 'true');
-    }
+    finalUrl.searchParams.append('submitted', String(Boolean(submittedOnly)));
+
+    finalUrl.searchParams.append(
+      'skiplookup',
+      String(Boolean(skipFetchingLookupTable))
+    );
 
     return this.http
       .get<WeeklyData>(finalUrl.href)

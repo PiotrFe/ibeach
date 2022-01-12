@@ -45,7 +45,7 @@
   novalidate
 >
   <input
-    class="form-control section section-name mr-12 mw-6"
+    class="form-control section section-name data-entry-input mr-12 mw-6"
     [class.is-invalid]="isFieldValid('name')"
     type="text"
     placeholder="Name"
@@ -54,12 +54,15 @@
     (typeaheadOnSelect)="onNameSelect($event)"
     required
   />
+
   <select
-    class="form-control section section-skill mr-12 mw-3"
+    class="form-control section section-skill data-entry-input mr-12 mw-3"
     [class.is-invalid]="isFieldValid('skill')"
     formControlName="skill"
   >
+    <option value="skill" selected hidden>Skill</option>
     <option value="EM">EM</option>
+    <option value="SRAS">SRAS</option>
     <option value="ASC">ASC</option>
     <option value="FELL">FELL</option>
     <option value="BA">BA</option>
@@ -97,13 +100,13 @@
     class="form-control section section-pdm mr-12 mw-4"
     formControlName="pdm"
   >
+    <option value="pdm" selected hidden>PDM</option>
     <option *ngFor="let pdm of pdmArr" [value]="pdm">{{ pdm }}</option>
   </select>
   <input
     @insertRemoveTrigger
     *ngIf="entryContainerWidth === 4 || entryContainerWidth > 4"
-    id="person-comments"
-    class="form-control section section-comments mr-12"
+    class="form-control section section-comments data-entry-input mr-12"
     type="text"
     placeholder="Comments"
     formControlName="comments"
@@ -128,9 +131,10 @@
     <select
       @insertRemoveTrigger
       *ngIf="entryContainerWidth < 3"
-      class="form-control section section-pdm mr-12 mw-4"
+      class="form-control section section-pdm data-entry-input mr-12 mw-4"
       formControlName="pdm"
     >
+      <option value="pdm" selected hidden>PDM</option>
       <option *ngFor="let pdm of pdmArr" [value]="pdm">{{ pdm }}</option>
     </select>
     <span class="break-ver fs-12 mr-3"> | </span>
@@ -147,8 +151,7 @@
     <input
       @insertRemoveTrigger
       *ngIf="entryContainerWidth < 4"
-      id="person-comments"
-      class="form-control section section-comments mr-12"
+      class="form-control section section-comments data-entry-input mr-12"
       type="text"
       placeholder="Comments"
       formControlName="comments"

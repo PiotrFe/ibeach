@@ -40,6 +40,7 @@ import { ProjectNamePipe } from './project-name.pipe';
     WeekDaysComponent,
     ModalWindowComponent,
     InitialsPipe,
+    FirstInitialPipe,
     ProjectNamePipe,
     CalendarComponent,
     PageComponent,

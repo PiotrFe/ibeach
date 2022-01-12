@@ -1,10 +1,13 @@
 import {
   Component,
   OnInit,
+  AfterViewInit,
   Input,
   Output,
   EventEmitter,
   SimpleChanges,
+  ViewChild,
+  ElementRef,
 } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { EntryComponent } from 'src/app/shared-module/entry/entry.component';
@@ -30,7 +33,7 @@ import {
 })
 export class ProjectEntryFormComponent
   extends EntryComponent
-  implements OnInit
+  implements OnInit, AfterViewInit
 {
   @Input() dispatchToParentAndClose: boolean = false;
 
@@ -55,6 +58,10 @@ export class ProjectEntryFormComponent
     leadership: string[];
   }>();
 
+  @ViewChild('entryContainer') entryContainer!: ElementRef;
+
+  showAddLeader: boolean = false;
+
   constructor(typeaheadService: TypeaheadService) {
     super(typeaheadService);
   }
@@ -63,12 +70,30 @@ export class ProjectEntryFormComponent
     this.isCollapsed = false;
 
     if (this.entryData) {
-      const { client, type, comments, availDate } = this.entryData as Project;
+      const { client, type, comments, availDate, leadership } = this
+        .entryData as Project;
       this.projectForm.setValue({
         client,
         type,
         comments: comments || '',
         availDate: availDate || '',
+        leadership: !leadership.length
+          ? ''
+          : leadership.reduce(
+              (
+                acc: string,
+                elem: string,
+                idx: number,
+                arr: string[]
+              ): string => {
+                if (idx < arr.length - 1) {
+                  return `${acc} ${elem}, `;
+                }
+
+                return `${acc} ${elem}`;
+              },
+              ''
+            ),
       });
       this.tags = this.entryData.tags;
       this.id = this.entryData.id;
@@ -89,6 +114,16 @@ export class ProjectEntryFormComponent
     }
   }
 
+  ngAfterViewInit(): void {
+    if (!this.entryData) {
+      this.entryContainer.nativeElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+        inline: 'nearest',
+      });
+    }
+  }
+
   projectForm = new FormGroup({
     client: new FormControl('', [Validators.required]),
     type: new FormControl('', [Validators.required]),
@@ -96,7 +131,10 @@ export class ProjectEntryFormComponent
       Validators.required,
     ]),
     comments: new FormControl(''),
+    leadership: new FormControl(''),
   });
+
+  cstInput = new FormControl('');
 
   ignoreNextDateChange: boolean = false;
 
@@ -132,7 +170,8 @@ export class ProjectEntryFormComponent
       return;
     }
 
-    const { client, type, comments, availDate } = this.projectForm.value;
+    const { client, type, comments, availDate, leadership } =
+      this.projectForm.value;
 
     if (this.entryData) {
       this.formEditEvent.emit({
@@ -143,7 +182,7 @@ export class ProjectEntryFormComponent
         availDate,
         week: this.localCalendarObj,
         tags: this.tags,
-        leadership: [],
+        leadership: leadership.split(', ').map((elem: string) => elem.trim()),
       });
     } else {
       this.formSubmitEvent.emit({
@@ -154,7 +193,7 @@ export class ProjectEntryFormComponent
         availDate,
         week: this.localCalendarObj,
         tags: this.tags,
-        leadership: [],
+        leadership: leadership.split(', ').map((elem: string) => elem.trim()),
       });
     }
   }
@@ -187,6 +226,16 @@ export class ProjectEntryFormComponent
       const control = this.projectForm.get(field);
       control?.markAsTouched({ onlySelf: true });
     });
+  }
+
+  onLeaderDelete(person: string) {
+    console.log('Click');
+  }
+
+  onLeaderSubmit(): void {}
+
+  setShowAddLeader(show: boolean) {
+    this.showAddLeader = show;
   }
 
   ngOnChanges(changes: SimpleChanges): void {

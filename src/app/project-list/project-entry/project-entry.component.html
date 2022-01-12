@@ -94,7 +94,9 @@
     *ngIf="entryContainerWidth === 3 || entryContainerWidth > 3"
     [ngClass]="getFieldClasses('leadership')"
   >
-    <span class="bg-secondary-light"> {{ project.leadership }}</span>
+    <ng-container span *ngFor="let leader of $any(entryData).leadership">
+      {{ leader | firstInitial }}
+    </ng-container>
   </div>
   <span
     @insertRemoveTrigger
@@ -117,6 +119,8 @@
       (click)="handleDelete()"
     ></i>
   </div>
+
+  <i class="bi bi-envelope send-icon" (click)="generateEmail()"></i>
 </div>
 <div
   *ngIf="entryContainerWidth < 4"
@@ -128,9 +132,11 @@
     <div
       @insertRemoveTrigger
       *ngIf="entryContainerWidth < 3"
-      [ngClass]="getFieldClasses('pdm')"
+      [ngClass]="getFieldClasses('leadership')"
     >
-      <span class="bg-secondary-light"> {{ project.leadership }}</span>
+      <ng-container span *ngFor="let leader of $any(entryData).leadership">
+        {{ leader | firstInitial }}
+      </ng-container>
     </div>
     <span class="break-ver fs-12 mr-3"> | </span>
     <div

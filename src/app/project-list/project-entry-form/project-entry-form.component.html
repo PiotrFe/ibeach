@@ -45,7 +45,7 @@
   novalidate
 >
   <input
-    class="form-control section section-name mr-12 mw-6"
+    class="form-control section section-name data-entry-input mr-12 mw-6"
     [class.is-invalid]="isFieldValid('client')"
     type="text"
     placeholder="Client"
@@ -53,7 +53,7 @@
     required
   />
   <select
-    class="form-control section section-skill mr-12 mw-3"
+    class="form-control section section-skill data-entry-input mr-12 mw-3"
     [class.is-invalid]="isFieldValid('type')"
     formControlName="type"
   >
@@ -81,11 +81,20 @@
   >
     <ng-container *ngTemplateOutlet="tagList"></ng-container>
   </div>
+
+  <input
+    @insertRemoveTrigger
+    *ngIf="entryContainerWidth === 3 || entryContainerWidth > 3"
+    class="form-control section section-leadership data-entry-input mr-12"
+    type="text"
+    placeholder="Leadership"
+    formControlName="leadership"
+  />
+
   <input
     @insertRemoveTrigger
     *ngIf="entryContainerWidth === 4 || entryContainerWidth > 4"
-    id="project-comments"
-    class="form-control section section-comments mr-12"
+    class="form-control section section-comments section-comments--project data-entry-input mr-12"
     type="text"
     placeholder="Comments"
     formControlName="comments"
@@ -108,16 +117,24 @@
 >
   <div class="collapsed-section no-select" [formGroup]="projectForm">
     <span class="break-ver fs-12 mr-3"> | </span>
+    <input
+      @insertRemoveTrigger
+      *ngIf="entryContainerWidth < 3"
+      class="form-control section section-leadership data-entry-input mr-12"
+      type="text"
+      placeholder="Leadership"
+      formControlName="leadership"
+    />
     <div *ngIf="entryContainerWidth < 2" [ngClass]="getFieldClasses('tags')">
       <ng-container *ngTemplateOutlet="tagList"></ng-container>
     </div>
     <span *ngIf="entryContainerWidth === 1" class="break-ver fs-12 mr-3">
       |
     </span>
+
     <input
       *ngIf="entryContainerWidth < 4"
-      id="project-comments"
-      class="form-control section section-comments mr-12"
+      class="form-control section section-comments section-comments--project data-entry-input mr-12"
       type="text"
       placeholder="Comments"
       formControlName="comments"

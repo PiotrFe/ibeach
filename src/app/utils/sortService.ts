@@ -212,7 +212,7 @@ export class SortService {
     if (this.sort.field) {
       return this.sortData(dataSet, this.sort.field, true, false, false);
     }
-    return this.sortData(dataSet, 'name', true, false, false);
+    return dataSet;
   };
 
   sortData = (
@@ -252,11 +252,11 @@ export class SortService {
           return returnVal;
         }
         // (2) sort by days (asc)
-        returnVal = sortByDays(a, b, true);
+        // returnVal = sortByDays(a, b, true);
 
-        if (returnVal !== 0) {
-          return returnVal;
-        }
+        // if (returnVal !== 0) {
+        //   return returnVal;
+        // }
 
         // (3) sort by name (asc)
         return sortByName(a, b, true);

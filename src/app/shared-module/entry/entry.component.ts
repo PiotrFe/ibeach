@@ -36,7 +36,6 @@ export interface Tag {
 })
 export class EntryComponent {
   @ViewChild('addTag') addTagElem!: ElementRef;
-  @ViewChild('entryContainer') entryContainer!: ElementRef;
 
   @Input() id!: string;
   @Input() sortField!: string;
