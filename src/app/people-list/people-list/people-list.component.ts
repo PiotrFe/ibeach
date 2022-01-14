@@ -143,6 +143,7 @@ export class PeopleListComponent
 
     if (pdm === 'All') {
       this.filters = [];
+      this.updateStatusLabel();
     } else {
       this.updateFilter('pdm', pdm);
       this.updateStatusLabel();
@@ -178,7 +179,12 @@ export class PeopleListComponent
   }
 
   updateStatusLabel() {
-    if (!this.status && this.pdmFilter.value === 'All') {
+    if (this.status && this.pdmFilter.value === 'All') {
+      if (!this.status.pending) {
+        this.statusLabel = 'ready';
+      } else {
+        this.statusLabel = 'pending';
+      }
       return;
     }
 
@@ -306,7 +312,13 @@ export class PeopleListComponent
         next: (data: WeeklyData) => {
           const { people, statusSummary, lookupTable } = data;
           this.dataSet = this.sortService
-            .sortData(people, this.sortService.SORT_COLUMNS.NAME, false, true)
+            .sortData(
+              people,
+              this.sortService.SORT_COLUMNS.NAME,
+              false,
+              true,
+              false
+            )
             .map((person) => ({
               ...person,
               inEditMode: false,

@@ -212,7 +212,7 @@ export class SortService {
     if (this.sort.field) {
       return this.sortData(dataSet, this.sort.field, true, false, false);
     }
-    return dataSet;
+    return this.sortData(dataSet, 'name', false, true, false);
   };
 
   sortData = (
@@ -225,9 +225,8 @@ export class SortService {
     if (freshStart) {
       this.clearSort();
     }
-    if (updateCriteria) {
-      this.updateSortCriteria(colName);
-    }
+
+    this.updateSortCriteria(colName);
 
     const sortBySkill = this.sortBySkill;
     const sortByName = this.sortByName;
@@ -313,6 +312,10 @@ export class SortService {
     }
 
     if (!showHighlight) {
+      this.clearSort();
+    }
+
+    if (!updateCriteria) {
       this.clearSort();
     }
 

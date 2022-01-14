@@ -6,8 +6,8 @@ import {
 import { Injectable } from '@angular/core';
 import axios, { AxiosRequestConfig } from 'axios';
 import { kill } from 'process';
-import { throwError, catchError, retry, Observable, map } from 'rxjs';
-import { Person, PersonEditable } from 'src/app/people-list/person';
+import { throwError, catchError, Observable } from 'rxjs';
+import { Person } from 'src/app/people-list/person';
 import { Project } from 'src/app/project-list/project-list/project';
 import { AllocationEntry } from 'src/app/shared-module/allocate.service';
 

@@ -177,7 +177,7 @@ export class PageComponent implements AfterViewInit {
       otherClasses.push(' clickable');
     } else {
       otherClasses.push(' btn-inactive');
-      otherClasses.push('btn-greyed-out');
+      otherClasses.push('btn-grayed-out');
     }
 
     const otherClsStr = otherClasses.join(' ');

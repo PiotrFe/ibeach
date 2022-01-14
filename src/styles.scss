@@ -408,8 +408,9 @@ ul {
   pointer-events: none;
 }
 
-.btn-greyed-out {
-  opacity: 0.6;
+.btn-grayed-out {
+  pointer-events: none;
+  opacity: 0.5;
 }
 .i-active {
   &:hover {

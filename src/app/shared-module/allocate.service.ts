@@ -29,6 +29,10 @@ export interface AllocationEntry {
     value: string | null;
   };
   day: keyof Week | 'match';
+  reallocateTo?: {
+    id: string;
+    elemType: 'people' | 'projects';
+  };
 }
 
 export interface AllocationDragDropEvent {
@@ -39,8 +43,8 @@ export interface AllocationDragDropEvent {
 }
 
 interface RegisteredAllocationDragDropEvent extends AllocationDragDropEvent {
-  entryMain: PersonEditable | ProjectEditable;
-  entrySub?: PersonEditable | ProjectEditable;
+  draggable: PersonEditable | ProjectEditable;
+  droppable?: PersonEditable | ProjectEditable;
 }
 
 @Injectable({
@@ -148,16 +152,16 @@ export class AllocateService {
     const { id, day, elemType } = data;
     const dataSet =
       elemType === 'people' ? this.peopleDataSet : this.projectDataSet;
-    const entryMain = (dataSet as Array<PersonEditable | ProjectEditable>).find(
+    const draggable = (dataSet as Array<PersonEditable | ProjectEditable>).find(
       (elem: PersonEditable | Project) => elem.id === id
     );
-    let entrySub;
+    let droppable;
 
-    if (!entryMain) {
+    if (!draggable) {
       return;
     }
 
-    const allocationForDay = entryMain?.week[day as keyof Week];
+    const allocationForDay = draggable?.week[day as keyof Week];
 
     if (
       typeof allocationForDay !== 'boolean' &&
@@ -166,7 +170,7 @@ export class AllocateService {
       const subDataSet =
         elemType === 'people' ? this.projectDataSet : this.peopleDataSet;
 
-      entrySub = (subDataSet as Array<PersonEditable | ProjectEditable>).find(
+      droppable = (subDataSet as Array<PersonEditable | ProjectEditable>).find(
         (elem: PersonEditable | ProjectEditable) =>
           elem.id === allocationForDay.id
       );
@@ -176,9 +180,9 @@ export class AllocateService {
       id,
       day,
       elemType,
-      entryMain,
-      ...(entrySub && {
-        entrySub,
+      draggable,
+      ...(droppable && {
+        droppable,
       }),
     };
   }
@@ -199,58 +203,112 @@ export class AllocateService {
   }
 
   private _handleAllocate(data: AllocationDragDropEvent): void {
-    const { elemType, entryMain } = this
+    const { elemType, draggable } = this
       .registeredDragEvent as RegisteredAllocationDragDropEvent;
 
     const { day: dayCapitalized, id } = data;
     const day = dayCapitalized?.toLowerCase();
 
-    const entrySub =
-      elemType === 'people'
-        ? this.projectDataSet.find(
+    const droppable =
+      data.elemType === 'projects'
+        ? this.peopleDataSet.find(
             (elem: PersonEditable | ProjectEditable) => elem.id === id
           )
-        : this.peopleDataSet.find(
+        : this.projectDataSet.find(
             (elem: PersonEditable | ProjectEditable) => elem.id === id
           );
 
-    const personEntry = (
-      elemType === 'people' ? entryMain : entrySub
-    ) as PersonEditable;
-    const projectEntry = (
-      elemType === 'projects' ? entryMain : entrySub
-    ) as ProjectEditable;
+    const personEntry = [draggable, droppable].find(
+      (elem) => (elem as any)?.name
+    );
+    const projectEntry = [draggable, droppable].find(
+      (elem) => (elem as any)?.client
+    );
 
-    const allocationCriteriaMet =
+    const allocationCriteriaMet = Boolean(
       personEntry &&
-      projectEntry &&
-      (day === 'match' ||
-        (personEntry.week[day as keyof Week] === true &&
-          projectEntry.week[day as keyof Week] === true));
+        projectEntry &&
+        (day === 'match' ||
+          (personEntry.week[day as keyof Week] === true &&
+            projectEntry.week[day as keyof Week] === true))
+    );
 
-    console.log({ personEntry, projectEntry, day });
-
+    // Regular allocation
     if (allocationCriteriaMet) {
       this.registerAllocation(this.weekOf, {
         person: {
-          id: personEntry.id,
-          value: personEntry.name,
+          id: personEntry!.id,
+          value: (personEntry as PersonEditable)!.name,
         },
         project: {
-          id: projectEntry.id,
-          value: projectEntry.client,
+          id: projectEntry!.id,
+          value: (projectEntry as ProjectEditable)!.client,
         },
         day: day as keyof Week | 'match',
+      });
+    }
+
+    // Reallocation
+    if (!allocationCriteriaMet && (draggable || droppable) && day) {
+      const calendarEntry = draggable.week[day as keyof Week];
+
+      if (typeof calendarEntry === 'boolean') {
+        return;
+      }
+
+      const sameTypeDroppable =
+        data.elemType === 'projects'
+          ? this.projectDataSet.find(
+              (elem: PersonEditable | ProjectEditable) => elem.id === id
+            )
+          : this.peopleDataSet.find(
+              (elem: PersonEditable | ProjectEditable) => elem.id === id
+            );
+
+      if (!sameTypeDroppable) {
+        return;
+      }
+
+      const person =
+        data.elemType === 'projects'
+          ? {
+              id: calendarEntry.id,
+              value: calendarEntry.text,
+            }
+          : {
+              id: draggable.id,
+              value: (draggable as PersonEditable).name,
+            };
+
+      const project =
+        data.elemType === 'people'
+          ? {
+              id: calendarEntry.id,
+              value: calendarEntry.text,
+            }
+          : {
+              id: draggable.id,
+              value: (draggable as ProjectEditable).client,
+            };
+
+      this.registerAllocation(this.weekOf, {
+        person,
+        project,
+        day: day as keyof Week,
+        reallocateTo: {
+          id: sameTypeDroppable.id,
+          elemType: data.elemType as 'people' | 'projects',
+        },
       });
     }
   }
 
   private _handleTrash(): void {
-    const { day, elemType, entryMain, entrySub } = this
+    const { day, elemType, draggable, droppable } = this
       .registeredDragEvent as RegisteredAllocationDragDropEvent;
 
-    const personEntry = elemType === 'people' ? entryMain : entrySub;
-    const projectEntry = elemType === 'projects' ? entryMain : entrySub;
+    const personEntry = elemType === 'people' ? draggable : droppable;
+    const projectEntry = elemType === 'projects' ? draggable : droppable;
 
     if (personEntry && projectEntry) {
       this.registerAllocation(this.weekOf, {

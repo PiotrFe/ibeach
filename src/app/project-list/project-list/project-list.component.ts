@@ -194,7 +194,13 @@ export class ProjectListComponent
           };
         });
         this.dataSet = this.sortService
-          .sortData(projects, this.sortService.SORT_COLUMNS.NAME, false, true)
+          .sortData(
+            projects,
+            this.sortService.SORT_COLUMNS.NAME,
+            false,
+            true,
+            false
+          )
           .map((entry) => ({
             ...entry,
             inEditMode: false,

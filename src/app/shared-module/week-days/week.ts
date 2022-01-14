@@ -1,9 +1,9 @@
 export interface Week {
-  mon: boolean | { id: string; value: string };
-  tue: boolean | { id: string; value: string };
-  wed: boolean | { id: string; value: string };
-  thu: boolean | { id: string; value: string };
-  fri: boolean | { id: string; value: string };
+  mon: boolean | { id: string; text: string };
+  tue: boolean | { id: string; text: string };
+  wed: boolean | { id: string; text: string };
+  thu: boolean | { id: string; text: string };
+  fri: boolean | { id: string; text: string };
 }
 
 const newWeek: Week = {

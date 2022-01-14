@@ -87,8 +87,13 @@ export class PersonEntryFormComponent
     }
 
     if (!this.entryData && this.pdm) {
+      console.log(this.pdm);
       this.personForm.patchValue({
         pdm: this.pdm,
+      });
+    } else if (!this.entryData && !this.pdm) {
+      this.personForm.patchValue({
+        pdm: 'pdm',
       });
     }
 
@@ -108,7 +113,6 @@ export class PersonEntryFormComponent
       this.tags = [];
       this.personForm.patchValue({
         skill: 'skill',
-        pdm: 'pdm',
       });
     }
 

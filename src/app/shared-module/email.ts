@@ -268,5 +268,9 @@ const getDaysString = (week: Week): string => {
     }
   }
 
+  if (str[str.length - 2] === ',') {
+    str = str.slice(0, str.length - 2);
+  }
+
   return str;
 };
