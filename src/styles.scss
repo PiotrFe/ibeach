@@ -102,6 +102,11 @@ li {
   &--uncollapsed {
     border-bottom: 0.8px dashed rgba(0, 0, 0, 0);
   }
+
+  &--form {
+    background-color: var(--bs-gray-300);
+    padding: 0 5px;
+  }
 }
 
 .data-entry-input {

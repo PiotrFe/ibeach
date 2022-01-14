@@ -182,7 +182,7 @@ export class ProjectEntryFormComponent
         availDate,
         week: this.localCalendarObj,
         tags: this.tags,
-        leadership: leadership.split(', ').map((elem: string) => elem.trim()),
+        leadership: getLeadershipStringArr(leadership),
       });
     } else {
       this.formSubmitEvent.emit({
@@ -193,7 +193,7 @@ export class ProjectEntryFormComponent
         availDate,
         week: this.localCalendarObj,
         tags: this.tags,
-        leadership: leadership.split(', ').map((elem: string) => elem.trim()),
+        leadership: getLeadershipStringArr(leadership),
       });
     }
   }
@@ -247,3 +247,18 @@ export class ProjectEntryFormComponent
     }
   }
 }
+
+const capitalizeFirst = (str: string): string => {
+  const arr = str.split(' ');
+  return arr
+    .map((word) => `${word[0].toUpperCase()}${word.slice(1)}`)
+    .join(' ');
+};
+
+const getLeadershipStringArr = (str: string): string[] => {
+  const arr = str
+    .split(', ')
+    .map((elem: string) => capitalizeFirst(elem.trim()));
+
+  return Array.from(new Set(arr));
+};

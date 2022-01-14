@@ -10,6 +10,6 @@ export class FirstInitialPipe implements PipeTransform {
     }
     const nameParts = value.split(' ');
 
-    return `${nameParts[0][0]} ${nameParts[nameParts.length - 1]}`;
+    return `${nameParts[0][0].toUpperCase()} ${nameParts.slice(1).join(' ')}`;
   }
 }

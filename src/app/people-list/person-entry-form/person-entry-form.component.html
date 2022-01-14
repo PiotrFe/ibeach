@@ -40,7 +40,7 @@
   #entryContainer
   [formGroup]="personForm"
   (ngSubmit)="onSubmit()"
-  class="entry-item tl-row"
+  class="entry-item entry-item--form tl-row"
   [class.entry-item--uncollapsed]="entryContainerWidth < 4 && !isCollapsed"
   novalidate
 >
@@ -127,7 +127,10 @@
   [collapse]="isCollapsed"
   [isAnimated]="true"
 >
-  <div class="collapsed-section no-select" [formGroup]="personForm">
+  <div
+    class="collapsed-section entry-item--form no-select"
+    [formGroup]="personForm"
+  >
     <select
       @insertRemoveTrigger
       *ngIf="entryContainerWidth < 3"
