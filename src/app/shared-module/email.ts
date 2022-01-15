@@ -253,7 +253,6 @@ const getDaysString = (week: Week): string => {
   });
 
   for (let i = 0; i < arr.length; i++) {
-    console.log(arr[i]);
     if (arr[i]) {
       if (str === '' || !arr[i - 1] || (arr[i - 1] && !arr[i + 1])) {
         str += capitalizeFirst(arr[i] as string);

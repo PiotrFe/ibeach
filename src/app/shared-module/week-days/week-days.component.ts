@@ -128,6 +128,10 @@ export class WeekDaysComponent implements OnInit {
       return;
     }
 
+    if (weekAllocationItem.type === 'filled') {
+      return;
+    }
+
     if (this.droppable && !this.inEditMode) {
       this.allocatedTo.setValue('');
       this.dropdownList = this.allocateService.getDataForDay(
