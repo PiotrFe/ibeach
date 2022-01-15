@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, ReplaySubject, Subscription } from 'rxjs';
+import { Observable, Subject, Subscription } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -9,7 +9,7 @@ export class ResizeObserverService {
     this._processEntries(entries)
   );
 
-  private subject: ReplaySubject<[string, number]> = new ReplaySubject();
+  private subject: Subject<[string, number]> = new Subject();
   currentWidth$: Observable<[string, number]> = this.subject.asObservable();
 
   constructor() {}

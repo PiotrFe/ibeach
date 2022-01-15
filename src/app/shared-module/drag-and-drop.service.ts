@@ -122,6 +122,17 @@ export class DragAndDropService {
       }
 
       if (droppable && droppable !== lastDroppable) {
+        // if dragging an individual calendar entry and hover over main data entry, no highlighting
+        if (
+          allocationService.registeredDragEvent?.day &&
+          allocationService.registeredDragEvent?.day !== 'match' &&
+          droppable.classList.contains('entry-item')
+        ) {
+          lastDroppable?.classList.remove('dragging-over');
+          lastDroppable = null;
+          return;
+        }
+
         if (
           droppable.id === 'trash-main' ||
           (droppable.classList.contains('droppable-people') &&

@@ -75,6 +75,7 @@ export class PeopleListComponent
 
     if (this.displayedIn === 'ALLOCATE') {
       this.subscribeToAllocationServices();
+      this.entryContainerWidth = 1;
     }
   }
 

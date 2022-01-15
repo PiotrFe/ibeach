@@ -34,15 +34,6 @@ export const PAGE_TYPES = {
 
 @Component({
   template: '',
-  animations: [
-    trigger('insertRemoveTrigger', [
-      transition(':enter', [
-        style({ opacity: 0 }),
-        animate('180ms', style({ opacity: 1 })),
-      ]),
-      transition(':leave', [animate('180ms', style({ opacity: 0 }))]),
-    ]),
-  ],
 })
 export class PageComponent implements AfterViewInit {
   @ViewChild('page') pageContainer!: ElementRef;
@@ -72,7 +63,7 @@ export class PageComponent implements AfterViewInit {
   typeaheadService!: TypeaheadService;
   resizeObserverService: ResizeObserverService;
 
-  entryContainerWidth: number = 1;
+  entryContainerWidth: number = 4;
   resizeSubscription!: any;
 
   constructor(
