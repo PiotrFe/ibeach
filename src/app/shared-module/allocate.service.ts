@@ -245,6 +245,7 @@ export class AllocateService {
       if (dayTo !== 'match') {
         const allocationLegal = this._checkIfAllocationLegal(
           draggable,
+          dayFrom as string,
           dayTo as string
         );
 
@@ -310,6 +311,7 @@ export class AllocateService {
 
       const allocationLegal = this._checkIfAllocationLegal(
         null,
+        dayFrom as string,
         dayTo as string,
         person,
         project,
@@ -335,6 +337,7 @@ export class AllocateService {
 
   private _checkIfAllocationLegal(
     draggable: any,
+    dayFrom: string,
     dayTo: string,
     person?: any,
     project?: any,
@@ -350,6 +353,10 @@ export class AllocateService {
       return isLegal;
     }
 
+    if (dayFrom === dayTo) {
+      return true;
+    }
+
     if (!person || !project || !data) {
       return true;
     }
@@ -361,10 +368,13 @@ export class AllocateService {
       checkAvailabilityInDataSet as (PersonEditable | ProjectEditable)[]
     ).find((elem: any) => elem.id === checkAvailabilityForID);
 
-    if (
+    const isLegal =
       checkAvailabilityForEntry &&
-      !checkAvailabilityForEntry.week[dayTo as keyof Week]
-    ) {
+      typeof checkAvailabilityForEntry.week[dayTo as keyof Week] ===
+        'boolean' &&
+      checkAvailabilityForEntry.week[dayTo as keyof Week];
+
+    if (checkAvailabilityForEntry && !isLegal) {
       this._highlightIllegalAllocation(
         checkAvailabilityForID,
         dayTo as keyof Week

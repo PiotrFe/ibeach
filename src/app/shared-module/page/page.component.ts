@@ -171,7 +171,7 @@ export class PageComponent implements AfterViewInit {
   }
 
   getClearFilterBtnClass(): string {
-    const baseClass = 'bi bi-x-circle-fill fs-12';
+    const baseClass = 'bi bi-x-circle-fill icon-menu fs-12';
     const otherClasses = [];
     if (this.filters.length) {
       otherClasses.push(' clickable');
