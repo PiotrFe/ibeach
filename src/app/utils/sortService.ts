@@ -224,9 +224,12 @@ export class SortService {
   ): any[] => {
     if (freshStart) {
       this.clearSort();
+      this.updateSortCriteria(colName);
     }
 
-    this.updateSortCriteria(colName);
+    if (!freshStart && updateCriteria) {
+      this.updateSortCriteria(colName);
+    }
 
     const sortBySkill = this.sortBySkill;
     const sortByName = this.sortByName;
@@ -272,7 +275,7 @@ export class SortService {
         }
 
         // (2) sort by name (skill)
-        returnVal = sortBySkill(a, b, true);
+        returnVal = sortBySkill(a, b);
 
         if (returnVal !== 0) {
           return returnVal;
@@ -290,7 +293,7 @@ export class SortService {
           return returnVal;
         }
         // (2) sort by name (skill)
-        returnVal = sortBySkill(a, b, true);
+        returnVal = sortBySkill(a, b);
 
         if (returnVal !== 0) {
           return returnVal;
@@ -307,15 +310,11 @@ export class SortService {
         if (returnVal !== 0) {
           return returnVal;
         }
-        return sortBySkill(a, b, true);
+        return sortBySkill(a, b);
       });
     }
 
     if (!showHighlight) {
-      this.clearSort();
-    }
-
-    if (!updateCriteria) {
       this.clearSort();
     }
 

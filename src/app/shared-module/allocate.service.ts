@@ -7,6 +7,7 @@ import {
 } from 'src/app/project-list/project-list/project';
 import { Week, getDaysLeft } from 'src/app/shared-module/week-days/week';
 import { FetchService } from 'src/app/shared-module/fetch.service';
+import { DayHighlighterService } from 'src/app/shared-module/day-highlighter.service';
 
 export interface Dataset {
   dataType: 'people' | 'projects';
@@ -32,6 +33,7 @@ export interface AllocationEntry {
   reallocateTo?: {
     id: string;
     elemType: 'people' | 'projects';
+    day: keyof Week;
   };
 }
 
@@ -58,7 +60,10 @@ export class AllocateService {
   onDataset = this.subject.asObservable();
   weekOf!: Date;
 
-  constructor(private fetchService: FetchService) {}
+  constructor(
+    private fetchService: FetchService,
+    private dayHighlighter: DayHighlighterService
+  ) {}
 
   registerDataset(newDataset: Dataset): void {
     const { dataType, data, weekOf } = newDataset;
@@ -203,11 +208,11 @@ export class AllocateService {
   }
 
   private _handleAllocate(data: AllocationDragDropEvent): void {
-    const { elemType, draggable } = this
+    const { day: dayFrom, draggable } = this
       .registeredDragEvent as RegisteredAllocationDragDropEvent;
 
     const { day: dayCapitalized, id } = data;
-    const day = dayCapitalized?.toLowerCase();
+    const dayTo = dayCapitalized?.toLowerCase();
 
     const droppable =
       data.elemType === 'projects'
@@ -225,16 +230,28 @@ export class AllocateService {
       (elem) => (elem as any)?.client
     );
 
-    const allocationCriteriaMet = Boolean(
-      personEntry &&
-        projectEntry &&
-        (day === 'match' ||
-          (personEntry.week[day as keyof Week] === true &&
-            projectEntry.week[day as keyof Week] === true))
-    );
+    // const allocationCriteriaMet = Boolean(
+    //   personEntry &&
+    //     projectEntry &&
+    //     (dayTo === 'match' ||
+    //       (personEntry.week[dayTo as keyof Week] === true &&
+    //         projectEntry.week[dayTo as keyof Week] === true))
+    // );
+
+    const allocationCriteriaMet = Boolean(personEntry && projectEntry);
 
     // Regular allocation
     if (allocationCriteriaMet) {
+      if (dayTo !== 'match') {
+        const allocationLegal = this._checkIfAllocationLegal(
+          draggable,
+          dayTo as string
+        );
+
+        if (!allocationLegal) {
+          return;
+        }
+      }
       this.registerAllocation(this.weekOf, {
         person: {
           id: personEntry!.id,
@@ -244,13 +261,13 @@ export class AllocateService {
           id: projectEntry!.id,
           value: (projectEntry as ProjectEditable)!.client,
         },
-        day: day as keyof Week | 'match',
+        day: dayTo as keyof Week | 'match',
       });
     }
 
     // Reallocation
-    if (!allocationCriteriaMet && (draggable || droppable) && day) {
-      const calendarEntry = draggable.week[day as keyof Week];
+    if (!allocationCriteriaMet && (draggable || droppable) && dayFrom) {
+      const calendarEntry = draggable.week[dayFrom as keyof Week];
 
       if (typeof calendarEntry === 'boolean') {
         return;
@@ -291,16 +308,74 @@ export class AllocateService {
               value: (draggable as ProjectEditable).client,
             };
 
+      const allocationLegal = this._checkIfAllocationLegal(
+        null,
+        dayTo as string,
+        person,
+        project,
+        data
+      );
+
+      if (!allocationLegal) {
+        return;
+      }
+
       this.registerAllocation(this.weekOf, {
         person,
         project,
-        day: day as keyof Week,
+        day: dayFrom as keyof Week,
         reallocateTo: {
           id: sameTypeDroppable.id,
           elemType: data.elemType as 'people' | 'projects',
+          day: dayTo as keyof Week,
         },
       });
     }
+  }
+
+  private _checkIfAllocationLegal(
+    draggable: any,
+    dayTo: string,
+    person?: any,
+    project?: any,
+    data?: any
+  ): boolean {
+    // check if a person / project's destination day is free for reallocation
+    if (draggable && dayTo) {
+      const isLegal =
+        typeof draggable?.week[dayTo] === 'boolean' && draggable?.week[dayTo];
+      if (!isLegal) {
+        this._highlightIllegalAllocation(draggable.id, dayTo as keyof Week);
+      }
+      return isLegal;
+    }
+
+    if (!person || !project || !data) {
+      return true;
+    }
+    const checkAvailabilityForID =
+      data.elemType === 'projects' ? person.id : project.id;
+    const checkAvailabilityInDataSet =
+      data.elemType === 'projects' ? this.peopleDataSet : this.projectDataSet;
+    const checkAvailabilityForEntry = (
+      checkAvailabilityInDataSet as (PersonEditable | ProjectEditable)[]
+    ).find((elem: any) => elem.id === checkAvailabilityForID);
+
+    if (
+      checkAvailabilityForEntry &&
+      !checkAvailabilityForEntry.week[dayTo as keyof Week]
+    ) {
+      this._highlightIllegalAllocation(
+        checkAvailabilityForID,
+        dayTo as keyof Week
+      );
+      return false;
+    }
+    return true;
+  }
+
+  private _highlightIllegalAllocation(id: string, day: keyof Week): void {
+    this.dayHighlighter.highlight(id, day);
   }
 
   private _handleTrash(): void {

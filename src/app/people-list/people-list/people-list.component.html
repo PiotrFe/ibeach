@@ -8,7 +8,7 @@
         displayedIn !== 'ALLOCATE'
       "
       type="button"
-      class="btn btn-success mr-20"
+      class="btn btn-primary btn-menu mr-20"
       (click)="onSubmit()"
     >
       Submit
@@ -20,7 +20,7 @@
           (pdmFilter.value !== 'All' && !submitted))
       "
       type="button"
-      class="btn btn-primary mr-20"
+      class="btn btn-primary btn-menu mr-20"
       (click)="setInEditMode(true)"
     >
       Edit
@@ -29,7 +29,7 @@
     <button
       *ngIf="inEditMode"
       type="button"
-      class="btn btn-primary btn-main-action"
+      class="btn btn-primary btn-menu btn-main-action"
       (click)="addNewRow()"
     >
       Add
@@ -37,7 +37,7 @@
     <button
       *ngIf="inEditMode"
       type="button"
-      class="btn btn-primary btn-main-action"
+      class="btn btn-primary btn-main-action ml-20"
       (click)="saveChanges()"
     >
       Save

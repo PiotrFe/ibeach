@@ -32,9 +32,15 @@ export class DragAndDropService {
 
     const style = window.getComputedStyle(target);
     const originalZIndex = style.zIndex;
+    let reapplySort = false;
 
     if (!target.classList.contains('draggable')) {
       return;
+    }
+
+    if (target.classList.contains('sorted')) {
+      target.classList.toggle('sorted', false);
+      reapplySort = true;
     }
 
     const node: HTMLElement | null = document.getElementById(target.id);
@@ -134,6 +140,9 @@ export class DragAndDropService {
     }
 
     function onPointerUp(event: any) {
+      if (reapplySort) {
+        target.classList.toggle('sorted', true);
+      }
       if (lastDroppable) {
         lastDroppable.classList.remove('dragging-over');
       }

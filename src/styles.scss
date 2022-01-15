@@ -4,6 +4,8 @@
 
 $content-width: 90vw;
 $content-height: 80vh;
+$menu-color: rgb(0, 55, 55);
+$menu-color-button: #406969;
 
 // ****************
 // GLOBAL SETTINGS
@@ -44,8 +46,10 @@ li {
 }
 
 .sorted {
-  background-color: rgba(20, 162, 184, 0.2);
-  height: 100%;
+  background-color: rgba(20, 162, 184, 0.2) !important;
+  background-image: none !important;
+  border-radius: 0px !important;
+  height: 100% !important;
 }
 
 // ****************
@@ -162,6 +166,41 @@ li {
     width: 7%;
     min-width: max(3.5rem, 7%);
     justify-content: center;
+    height: 30px;
+    // color: #fff;
+    border-radius: 5px;
+
+    &--green {
+      background-image: linear-gradient(
+        to right,
+        rgba(25, 135, 84, 0.1),
+        rgba(25, 135, 84, 0.4)
+      );
+      // background-color: rgba(25, 135, 84, 0.8);
+    }
+
+    &--yellow {
+      background-image: linear-gradient(
+        to right,
+        rgba(255, 193, 7, 0.1),
+        rgba(255, 193, 7, 0.4)
+      );
+    }
+
+    &--orange {
+      background-image: linear-gradient(
+        to right,
+        rgba(253, 125, 20, 0.1),
+        rgba(253, 125, 20, 0.4)
+      );
+    }
+    &--red {
+      background-image: linear-gradient(
+        to right,
+        rgba(220, 53, 70, 0.1),
+        rgba(220, 53, 70, 0.4)
+      );
+    }
   }
 
   &-availDate {
@@ -251,7 +290,7 @@ ul {
 }
 
 .main-toolbar {
-  background-color: lightgray;
+  background-color: #003737;
   height: 3.3rem;
   width: 100%;
   display: flex;
@@ -415,6 +454,20 @@ ul {
 .i-active {
   &:hover {
     cursor: pointer;
+  }
+}
+
+.btn-primary--light {
+  background-color: rgba(13, 110, 253, 0.75) !important;
+  border-color: rgba(13, 110, 253, 0.75) !important;
+}
+
+.btn-menu {
+  background-color: $menu-color-button !important;
+  border-color: $menu-color-button !important;
+
+  &:focus {
+    box-shadow: 0 0 0 0.15rem #4b8080 !important;
   }
 }
 

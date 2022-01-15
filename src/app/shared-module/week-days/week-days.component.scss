@@ -18,11 +18,27 @@
   height: 38px;
 }
 
+.cal-entry--illegal {
+  animation: illegalAction 0.3s ease-in 0s 3;
+}
+
+@keyframes illegalAction {
+  0% {
+    background-color: none;
+  }
+  50% {
+    background-color: var(--bs-warning);
+  }
+  100% {
+    background-color: none;
+  }
+}
+
 .btn-allocated {
   background-color: var(--bs-success);
   border-radius: 0.25rem;
   color: #fff;
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   text-align: center;
   word-break: break-all;
   padding: 2px;

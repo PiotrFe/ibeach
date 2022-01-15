@@ -70,6 +70,12 @@ export class PersonEntryComponent extends PersonEntry {
       otherClass += ` draggable draggable-people`;
     }
 
+    if (fieldName === 'skill') {
+      otherClass += ` section-skill--${getSkillGroup(this.person.skill)}`;
+    }
+
+    otherClass += ` draggable draggable-people`;
+
     // if (this.entryData.daysLeft > 0) {
     //   otherClass += ' droppable droppable-projects';
     // }
@@ -77,3 +83,19 @@ export class PersonEntryComponent extends PersonEntry {
     return `${baseClass}${sortedClass}${otherClass}`;
   }
 }
+
+const getSkillGroup = (skill: string): string => {
+  if (['EM', 'PSSM', 'PE', 'EDS'].includes(skill)) {
+    return 'green';
+  }
+  if (['ASC', 'PSS', 'SRAS', 'SPDS'].includes(skill)) {
+    return 'yellow';
+  }
+  if (['BA', 'FELL', 'SFDS', 'PSSR'].includes(skill)) {
+    return 'orange';
+  }
+  if (['INT', 'SA'].includes(skill)) {
+    return 'red';
+  }
+  return '';
+};

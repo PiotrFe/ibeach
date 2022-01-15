@@ -3,7 +3,7 @@
     <button
       *ngIf="!inEditMode"
       type="button"
-      class="btn btn-primary mr-20"
+      class="btn btn-primary btn-menu mr-20"
       (click)="setInEditMode(true)"
     >
       Edit
@@ -12,7 +12,7 @@
     <button
       *ngIf="inEditMode"
       type="button"
-      class="btn btn-primary btn-main-action"
+      class="btn btn-primary btn-menu btn-main-action"
       (click)="addNewRow()"
     >
       Add
@@ -20,7 +20,7 @@
     <button
       *ngIf="inEditMode"
       type="button"
-      class="btn btn-primary btn-main-action"
+      class="btn btn-primary btn-main-action ml-15"
       (click)="saveChanges()"
     >
       Save
