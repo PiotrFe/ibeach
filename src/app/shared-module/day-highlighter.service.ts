@@ -7,17 +7,21 @@ import { Week } from 'src/app/shared-module/week-days/week';
 export class DayHighlighterService {
   constructor() {}
 
-  highlight(entryID: string, day: keyof Week): void {
+  highlight(entryID: string, day: keyof Week | 'match'): void {
     const entry = document.getElementById(`${entryID}`);
-    const dayBtn = entry?.querySelector(`.cal-entry--${day}`);
-    if (!dayBtn) {
+    const elemToHighlight =
+      day === 'match'
+        ? entry?.querySelector('.section-days')
+        : entry?.querySelector(`.cal-entry--${day}`);
+
+    if (!elemToHighlight) {
       return;
     }
-    dayBtn.scrollIntoView({ block: 'nearest' });
+    elemToHighlight.scrollIntoView({ block: 'nearest' });
     setTimeout(() => {
-      dayBtn.classList.add('cal-entry--illegal');
+      elemToHighlight.classList.add('cal-entry--illegal');
       setTimeout(() => {
-        dayBtn.classList.remove('cal-entry--illegal');
+        elemToHighlight.classList.remove('cal-entry--illegal');
       }, 1500);
     }, 200);
   }

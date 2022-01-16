@@ -131,7 +131,7 @@ export class ProjectEntryFormComponent
       Validators.required,
     ]),
     comments: new FormControl(''),
-    leadership: new FormControl(''),
+    leadership: new FormControl('', [Validators.required]),
   });
 
   cstInput = new FormControl('');

@@ -9,14 +9,14 @@ import {
 import { FormControl } from '@angular/forms';
 import { FetchService } from '../../shared-module/fetch.service';
 import { TypeaheadService } from '../../shared-module/typeahead.service';
-import {
-  DragAndDropService,
-  DragAndDropEvent,
-} from 'src/app/shared-module/drag-and-drop.service';
+import { DragAndDropService } from 'src/app/shared-module/drag-and-drop.service';
 import { ResizeObserverService } from 'src/app/shared-module/resize-observer.service';
 import {
   AllocateService,
   Dataset,
+  DeletionEvent,
+  SaveEvent,
+  isInstanceOfSaveEvent,
 } from 'src/app/shared-module/allocate.service';
 import { v4 as uuidv4 } from 'uuid';
 import { Subscription } from 'rxjs';
@@ -52,7 +52,11 @@ export class PeopleListComponent
   pdmArr!: String[];
 
   allocationDataSubscription!: Subscription;
-  dragAndDropSubscription!: Subscription;
+  deleteRecordSubscription!: Subscription;
+
+  // arr used for storing entries modified by the project side of the app (e.g. by deleting project records - days free up then)
+  // records are stored in this array until save / cancel event on the project side
+  modifiedEntries: PersonEditable[] = [];
 
   constructor(
     private fetchService: FetchService,
@@ -92,9 +96,13 @@ export class PeopleListComponent
 
   ngOnDestroy(): void {
     this.onPageDestroy();
+
     if (this.allocationDataSubscription) {
       this.allocationDataSubscription.unsubscribe();
-      this.dragAndDropSubscription.unsubscribe();
+    }
+
+    if (this.deleteRecordSubscription) {
+      this.deleteRecordSubscription.unsubscribe();
     }
   }
 
@@ -113,15 +121,83 @@ export class PeopleListComponent
       },
     });
 
-    this.dragAndDropSubscription = this.dragAndDrop.onDragAndDrop$.subscribe({
-      next: (event: DragAndDropEvent) => {
-        const { type, draggable, droppable } = event;
+    this.deleteRecordSubscription =
+      this.allocateService.onDeleteRecord.subscribe({
+        next: (data: DeletionEvent | SaveEvent) => {
+          // save or discard changes
+          if (isInstanceOfSaveEvent(data)) {
+            const { save, issuedBy } = data;
 
-        if (!draggable || !droppable) {
-          return;
-        }
-      },
-    });
+            if (issuedBy === 'people' || !this.modifiedEntries.length) {
+              return;
+            }
+            if (save) {
+              this.postChanges();
+            } else {
+              this.dataSet = this.dataSet.map((elem) => {
+                const modified = this.modifiedEntries.find(
+                  (modElem) => modElem.id === elem.id
+                );
+
+                if (modified) {
+                  return modified;
+                }
+
+                return elem;
+              });
+
+              this.updateFilteredView();
+            }
+            this.modifiedEntries = [];
+            return;
+          }
+          // clear people's calendars if a project entry has been deleted
+          const { deletedID, deletedRecordType, affectedSubIDs } = data;
+
+          if (deletedRecordType === 'people') {
+            return;
+          }
+
+          this.dataSet = (this.dataSet as PersonEditable[]).map(
+            (elem: PersonEditable): PersonEditable => {
+              if (!affectedSubIDs.includes(elem.id)) {
+                return elem;
+              }
+
+              const elemCopy = JSON.parse(JSON.stringify(elem));
+              this.modifiedEntries.push(elemCopy);
+
+              const updatedWeek = Object.entries(elem.week).reduce(
+                (acc, [key, val]): any => {
+                  if (val.id === deletedID) {
+                    return {
+                      ...acc,
+                      [key]: true,
+                    };
+                  }
+
+                  return {
+                    ...acc,
+                    [key]: val,
+                  };
+                },
+                {}
+              );
+
+              return {
+                ...elem,
+                week: updatedWeek as Week,
+                daysLeft: getDaysLeft(updatedWeek as Week),
+              };
+            }
+          );
+
+          this.updateFilteredView();
+        },
+        error: (err) => {
+          this.fetchError = err;
+        },
+      });
   }
 
   // *****************
@@ -223,6 +299,16 @@ export class PeopleListComponent
       tags: [],
       inEditMode: true,
     } as PersonEditable);
+  }
+
+  removeExistingRow(id: string): void {
+    const removedEntry = this.dataSet.find((elem) => elem.id === id);
+    if (!removedEntry) {
+      return;
+    }
+    this.allocateService.handleDeleteRecord(removedEntry, 'people');
+    this.dataSet = this.dataSet.filter((entry) => entry.id !== id);
+    this.updateFilteredView();
   }
 
   updatePersonDetails(objParam: {
@@ -374,7 +460,7 @@ export class PeopleListComponent
       .saveList(
         this.referenceDate,
         pdmParam,
-        (this.filteredDataset as any[]).map((person) => {
+        (this.dataSet as any[]).map((person) => {
           const { inEditMode, ...otherProps } = person;
 
           return {
@@ -446,6 +532,7 @@ export class PeopleListComponent
   }
 
   cancelChanges(): void {
+    this.allocateService.registerSaveEvent(false, 'people');
     this.onCancelChanges();
     this.fetchData(true);
   }
@@ -464,6 +551,7 @@ export class PeopleListComponent
     if (!this.checkIfAnyFormsOpen()) {
       setTimeout(() => {
         this.saveChangesInProgress = false;
+        this.allocateService.registerSaveEvent(true, 'people');
         this.updateFilteredView();
         this.postChanges();
         return;

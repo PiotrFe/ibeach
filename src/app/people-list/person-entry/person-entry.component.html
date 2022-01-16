@@ -67,7 +67,9 @@
   >
     {{ person.name }}
   </span>
-  <span [ngClass]="getFieldClasses('skill')">{{ person.skill }}</span>
+  <div [ngClass]="getFieldClasses('skill')">
+    <span>{{ person.skill }}</span>
+  </div>
   <span
     *ngIf="displayedIn !== 'ALLOCATE'"
     [ngClass]="getFieldClasses('availDate')"

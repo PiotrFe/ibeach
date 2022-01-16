@@ -169,37 +169,58 @@ li {
     height: 30px;
     // color: #fff;
     border-radius: 5px;
+    padding-right: 3px;
+
+    & > span {
+      height: 30px;
+      width: 90%;
+      min-width: max(3.3rem, 90%);
+      border-radius: 5px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #fff;
+    }
 
     &--green {
-      background-image: linear-gradient(
-        to right,
-        rgba(25, 135, 84, 0.1),
-        rgba(25, 135, 84, 0.4)
-      );
+      & > span {
+        background-image: linear-gradient(
+          to right,
+          rgba(25, 135, 84, 0.1),
+          rgba(25, 135, 84, 0.4)
+        );
+      }
+
       // background-color: rgba(25, 135, 84, 0.8);
     }
 
     &--yellow {
-      background-image: linear-gradient(
-        to right,
-        rgba(255, 193, 7, 0.1),
-        rgba(255, 193, 7, 0.4)
-      );
+      & > span {
+        background-image: linear-gradient(
+          to right,
+          rgba(255, 193, 7, 0.1),
+          rgba(255, 193, 7, 0.4)
+        );
+      }
     }
 
     &--orange {
-      background-image: linear-gradient(
-        to right,
-        rgba(253, 125, 20, 0.1),
-        rgba(253, 125, 20, 0.4)
-      );
+      & > span {
+        background-image: linear-gradient(
+          to right,
+          rgba(253, 125, 20, 0.1),
+          rgba(253, 125, 20, 0.4)
+        );
+      }
     }
     &--red {
-      background-image: linear-gradient(
-        to right,
-        rgba(220, 53, 70, 0.1),
-        rgba(220, 53, 70, 0.4)
-      );
+      & > span {
+        background-image: linear-gradient(
+          to right,
+          rgba(220, 53, 70, 0.1),
+          rgba(220, 53, 70, 0.4)
+        );
+      }
     }
   }
 
@@ -212,6 +233,8 @@ li {
   &-days {
     width: 5%;
     min-width: max(2rem, 5%);
+    height: 30px;
+    border-radius: 5px;
     justify-content: center;
     text-align: center;
   }
@@ -254,6 +277,22 @@ li {
 .calendar-group {
   width: 16.7rem;
   min-width: 16.7rem;
+}
+
+.cal-entry--illegal {
+  animation: illegalAction 0.3s ease-in 0s 3;
+}
+
+@keyframes illegalAction {
+  0% {
+    background-color: none;
+  }
+  50% {
+    background-color: var(--bs-warning);
+  }
+  100% {
+    background-color: none;
+  }
 }
 
 .edit-entry-icons {

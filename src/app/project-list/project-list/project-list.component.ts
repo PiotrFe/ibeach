@@ -13,6 +13,9 @@ import { ResizeObserverService } from 'src/app/shared-module/resize-observer.ser
 import {
   AllocateService,
   Dataset,
+  DeletionEvent,
+  SaveEvent,
+  isInstanceOfSaveEvent,
 } from 'src/app/shared-module/allocate.service';
 import { Week } from 'src/app/shared-module/week-days/week';
 import { Tag } from 'src/app/shared-module/entry/entry.component';
@@ -36,6 +39,11 @@ export class ProjectListComponent
 {
   projectFilter = new FormControl('All');
   allocationDataSubscription!: Subscription;
+  deleteRecordSubscription!: Subscription;
+
+  // arr used for storing entries modified by the people side of the app (e.g. by deleting people records - days free up then)
+  // records are stored in this array until save / cancel event on the people side
+  modifiedEntries: ProjectEditable[] = [];
 
   constructor(
     private fetchService: FetchService,
@@ -61,6 +69,84 @@ export class ProjectListComponent
         this.fetchError = err;
       },
     });
+
+    this.deleteRecordSubscription =
+      this.allocateService.onDeleteRecord.subscribe({
+        next: (data: DeletionEvent | SaveEvent) => {
+          // save or discard changes
+          if (isInstanceOfSaveEvent(data)) {
+            const { save, issuedBy } = data;
+
+            if (issuedBy === 'projects' || !this.modifiedEntries.length) {
+              return;
+            }
+            if (save) {
+              this.postChanges();
+            } else {
+              this.dataSet = this.dataSet.map((elem) => {
+                const modified = this.modifiedEntries.find(
+                  (modElem) => modElem.id === elem.id
+                );
+
+                if (modified) {
+                  return modified;
+                }
+
+                return elem;
+              });
+
+              this.updateFilteredView();
+            }
+            this.modifiedEntries = [];
+            return;
+          }
+          // clear projects' calendars if a person entry has been deleted
+          const { deletedID, deletedRecordType, affectedSubIDs } = data;
+
+          if (deletedRecordType === 'projects') {
+            return;
+          }
+
+          this.dataSet = (this.dataSet as ProjectEditable[]).map(
+            (elem: ProjectEditable): ProjectEditable => {
+              if (!affectedSubIDs.includes(elem.id)) {
+                return elem;
+              }
+
+              const elemCopy = JSON.parse(JSON.stringify(elem));
+              this.modifiedEntries.push(elemCopy);
+
+              const updatedWeek = Object.entries(elem.week).reduce(
+                (acc, [key, val]): any => {
+                  if (val.id === deletedID) {
+                    return {
+                      ...acc,
+                      [key]: true,
+                    };
+                  }
+
+                  return {
+                    ...acc,
+                    [key]: val,
+                  };
+                },
+                {}
+              );
+
+              return {
+                ...elem,
+                week: updatedWeek as Week,
+                daysLeft: getDaysLeft(updatedWeek as Week),
+              };
+            }
+          );
+
+          this.updateFilteredView();
+        },
+        error: (err) => {
+          this.fetchError = err;
+        },
+      });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -74,7 +160,11 @@ export class ProjectListComponent
     }
   }
 
-  ngOnDestroy(): void {}
+  ngOnDestroy(): void {
+    this.onPageDestroy();
+    this.allocationDataSubscription.unsubscribe();
+    this.deleteRecordSubscription.unsubscribe();
+  }
 
   clearFilters(): void {
     this.filters = [];
@@ -179,6 +269,16 @@ export class ProjectListComponent
     this.onChangeSaved();
   }
 
+  removeExistingRow(id: string): void {
+    const removedEntry = this.dataSet.find((elem) => elem.id === id);
+    if (!removedEntry) {
+      return;
+    }
+    this.allocateService.handleDeleteRecord(removedEntry, 'projects');
+    this.dataSet = this.dataSet.filter((entry) => entry.id !== id);
+    this.updateFilteredView();
+  }
+
   async fetchData() {
     this.fetching = true;
     this.fetchError = '';
@@ -273,6 +373,7 @@ export class ProjectListComponent
     if (!this.checkIfAnyFormsOpen()) {
       setTimeout(() => {
         this.saveChangesInProgress = false;
+        this.allocateService.registerSaveEvent(true, 'projects');
         this.updateFilteredView();
         this.postChanges();
         return;
@@ -283,6 +384,7 @@ export class ProjectListComponent
   }
 
   cancelChanges(): void {
+    this.allocateService.registerSaveEvent(false, 'projects');
     this.onCancelChanges();
     this.fetchData();
   }

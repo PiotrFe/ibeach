@@ -86,6 +86,7 @@
     @insertRemoveTrigger
     *ngIf="entryContainerWidth === 3 || entryContainerWidth > 3"
     class="form-control section section-leadership data-entry-input mr-12"
+    [class.is-invalid]="isFieldValid('leadership')"
     type="text"
     placeholder="Leadership"
     formControlName="leadership"
@@ -124,6 +125,7 @@
       @insertRemoveTrigger
       *ngIf="entryContainerWidth < 3"
       class="form-control section section-leadership data-entry-input mr-12"
+      [class.is-invalid]="isFieldValid('leadership')"
       type="text"
       placeholder="Leadership"
       formControlName="leadership"

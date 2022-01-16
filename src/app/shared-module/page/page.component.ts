@@ -238,11 +238,6 @@ export class PageComponent implements AfterViewInit {
     this.newRows = this.newRows.filter((item) => item.id !== id);
   }
 
-  removeExistingRow(id: string): void {
-    this.dataSet = this.dataSet.filter((entry) => entry.id !== id);
-    this.updateFilteredView();
-  }
-
   editRow(id: string): void {
     const idx = this.dataSet.findIndex((entry) => entry.id === id);
 

@@ -37,6 +37,21 @@ export interface AllocationEntry {
   };
 }
 
+export interface DeletionEvent {
+  deletedID: string;
+  deletedRecordType: 'people' | 'projects';
+  affectedSubIDs: string[];
+}
+
+export interface SaveEvent {
+  save: boolean;
+  issuedBy: 'people' | 'projects';
+}
+
+export function isInstanceOfSaveEvent(object: any): object is SaveEvent {
+  return typeof object.save === 'boolean';
+}
+
 export interface AllocationDragDropEvent {
   id: string | null;
   elemType?: 'people' | 'projects';
@@ -56,8 +71,12 @@ export class AllocateService {
   peopleDataSet!: PersonEditable[];
   projectDataSet!: ProjectEditable[];
   registeredDragEvent!: RegisteredAllocationDragDropEvent | null;
-  subject: Subject<Dataset> = new Subject<Dataset>();
-  onDataset = this.subject.asObservable();
+  datasetSubject: Subject<Dataset> = new Subject<Dataset>();
+  deleteRecordSubject: Subject<DeletionEvent | SaveEvent> = new Subject<
+    DeletionEvent | SaveEvent
+  >();
+  onDataset = this.datasetSubject.asObservable();
+  onDeleteRecord = this.deleteRecordSubject.asObservable();
   weekOf!: Date;
 
   constructor(
@@ -120,6 +139,31 @@ export class AllocateService {
       }));
   }
 
+  handleDeleteRecord(
+    entry: PersonEditable | ProjectEditable,
+    entryType: 'people' | 'projects'
+  ): void {
+    const deletedID = entry.id;
+    const deletedRecordType = entryType;
+    const affectedSubIDs = Array.from(
+      new Set(
+        Object.values(entry.week)
+          .filter((val) => typeof val !== 'boolean')
+          .map((val) => val.id)
+      )
+    );
+
+    this.deleteRecordSubject.next({
+      deletedID,
+      deletedRecordType,
+      affectedSubIDs,
+    });
+  }
+
+  registerSaveEvent(save: boolean, entryType: 'people' | 'projects') {
+    this.deleteRecordSubject.next({ save, issuedBy: entryType });
+  }
+
   registerAllocation(weekOf: Date, entry: AllocationEntry): void {
     if (weekOf !== this.weekOf) {
       throw new Error('Date mismatch');
@@ -135,12 +179,12 @@ export class AllocateService {
           inEditMode: false,
         }));
 
-        this.subject.next({
+        this.datasetSubject.next({
           dataType: 'people',
           data: this.peopleDataSet,
           weekOf: this.weekOf,
         });
-        this.subject.next({
+        this.datasetSubject.next({
           dataType: 'projects',
           data: this.projectDataSet,
           weekOf: this.weekOf,
@@ -230,29 +274,20 @@ export class AllocateService {
       (elem) => (elem as any)?.client
     );
 
-    // const allocationCriteriaMet = Boolean(
-    //   personEntry &&
-    //     projectEntry &&
-    //     (dayTo === 'match' ||
-    //       (personEntry.week[dayTo as keyof Week] === true &&
-    //         projectEntry.week[dayTo as keyof Week] === true))
-    // );
-
     const allocationCriteriaMet = Boolean(personEntry && projectEntry);
 
     // Regular allocation
     if (allocationCriteriaMet) {
-      if (dayTo !== 'match') {
-        const allocationLegal = this._checkIfAllocationLegal(
-          draggable,
-          dayFrom as string,
-          dayTo as string
-        );
+      const allocationLegal = this._checkIfAllocationLegal(
+        draggable,
+        dayFrom as string,
+        dayTo as string
+      );
 
-        if (!allocationLegal) {
-          return;
-        }
+      if (!allocationLegal) {
+        return;
       }
+
       this.registerAllocation(this.weekOf, {
         person: {
           id: personEntry!.id,
@@ -344,7 +379,17 @@ export class AllocateService {
     data?: any
   ): boolean {
     // check if a person / project's destination day is free for reallocation
-    if (draggable && dayTo) {
+
+    if (draggable && dayTo === 'match') {
+      const { daysLeft } = draggable;
+
+      if (daysLeft === 0) {
+        this._highlightIllegalAllocation(draggable.id, dayTo);
+        return false;
+      }
+    }
+
+    if (draggable && dayTo !== 'match') {
       const isLegal =
         typeof draggable?.week[dayTo] === 'boolean' && draggable?.week[dayTo];
       if (!isLegal) {
@@ -384,7 +429,10 @@ export class AllocateService {
     return true;
   }
 
-  private _highlightIllegalAllocation(id: string, day: keyof Week): void {
+  private _highlightIllegalAllocation(
+    id: string,
+    day: keyof Week | 'match'
+  ): void {
     this.dayHighlighter.highlight(id, day);
   }
 

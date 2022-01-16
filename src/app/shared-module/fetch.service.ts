@@ -82,6 +82,8 @@ export class FetchService {
     const weekTs = weekOf.getTime();
     const pdmParam = encodeURIComponent(pdm);
 
+    console.log('SAVING PEOPLE LIST');
+
     return this.http
       .post<Person[]>(`${baseUrl}/people/${weekTs}/${pdmParam}`, data)
       .pipe(catchError(this.handleError));

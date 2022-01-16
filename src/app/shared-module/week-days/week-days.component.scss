@@ -18,22 +18,6 @@
   height: 38px;
 }
 
-.cal-entry--illegal {
-  animation: illegalAction 0.3s ease-in 0s 3;
-}
-
-@keyframes illegalAction {
-  0% {
-    background-color: none;
-  }
-  50% {
-    background-color: var(--bs-warning);
-  }
-  100% {
-    background-color: none;
-  }
-}
-
 .btn-allocated {
   background-color: rgba(25, 135, 84, 0.85);
   border-radius: 0.25rem;
