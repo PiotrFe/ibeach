@@ -96,11 +96,11 @@ export class ProjectEntryComponent extends EntryComponent implements OnInit {
     return `${baseClass}${sortedClass}${otherClass}`;
   }
 
-  canSendEmail(): boolean {
-    return Boolean(
-      Object.values(this.entryData.week).find((val) => typeof val !== 'boolean')
-    );
-  }
+  // canSendEmail(): boolean {
+  //   return Boolean(
+  //     Object.values(this.entryData.week).find((val) => typeof val !== 'boolean')
+  //   );
+  // }
 
   handleGenerateEmail() {
     generateEmail(this.entryData as ProjectEditable, this.entryContainer);

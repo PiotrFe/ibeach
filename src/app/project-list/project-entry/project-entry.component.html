@@ -120,11 +120,8 @@
     ></i>
   </div>
 
-  <i
-    class="bi bi-envelope send-icon"
-    [class.btn-grayed-out]="!canSendEmail()"
-    (click)="handleGenerateEmail()"
-  ></i>
+  <!-- [class.btn-grayed-out]="!canSendEmail()" -->
+  <i class="bi bi-envelope send-icon" (click)="handleGenerateEmail()"></i>
 </div>
 <div
   *ngIf="entryContainerWidth < 4"

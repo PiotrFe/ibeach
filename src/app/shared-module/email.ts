@@ -47,25 +47,8 @@ class EmailBuilder {
   _calString!: string;
   _daysString!: string;
 
-  withTo(week: Week) {
-    const people = Object.values(week)
-      .filter((val: string | boolean) => typeof val !== 'boolean')
-      .map(({ text }) => text);
-
-    const noDuplArr = Array.from(new Set(people));
-
-    if (noDuplArr.length > 1) {
-      Object.entries(week).forEach(([key, val]) => {
-        if (typeof val !== 'boolean') {
-          const day = capitalizeFirst(key);
-          const calString = `${day}: ${val.text.split(' ')[0]}%0D%0A`;
-
-          this._calString = this._calString
-            ? (this._calString += calString)
-            : calString;
-        }
-      });
-    }
+  withTo(contacts: string[]) {
+    const noDuplArr = Array.from(new Set(contacts));
 
     this._to = noDuplArr
       .map((person) => getEmail(person))
@@ -91,7 +74,36 @@ class EmailBuilder {
       return `${acc}${fName}`;
     }, '');
 
-    this._daysString = people.length === 5 ? 'Mon-Fri' : getDaysString(week);
+    return this;
+  }
+
+  withCalAllocation(week: Week) {
+    Object.entries(week).forEach(([key, val]) => {
+      if (typeof val !== 'boolean') {
+        const day = capitalizeFirst(key);
+        const calString = `${day}: ${val.text.split(' ')[0]}%0D%0A`;
+
+        this._calString = this._calString
+          ? (this._calString += calString)
+          : calString;
+      }
+    });
+
+    return this;
+  }
+
+  withDays(week: Week) {
+    const allocatedEntries = Object.values(week)
+      .filter((val) => typeof val !== 'boolean')
+      .map((entry) => entry.text);
+    this._daysString =
+      allocatedEntries.length === 5 ? 'Mon-Fri' : getDaysString(week);
+
+    const individuals = Array.from(new Set(allocatedEntries));
+
+    if (individuals.length > 1) {
+      this.withCalAllocation(week);
+    }
 
     return this;
   }
@@ -144,12 +156,12 @@ class EmailBuilder {
     return this;
   }
 
-  withBody(content: string | undefined = undefined) {
+  withBody(content: string | null = null, withAllocation: boolean) {
     const arr = ['a', 'e', 'i', 'o', 'u', 'l'];
 
     if (content) {
       this._body = content;
-    } else {
+    } else if (withAllocation) {
       const str = `Dear ${
         this._firstNameString
       },%0D%0A%0D%0AI hope you had a nice weekend.%0D%0A%0D%0ACould you support ${
@@ -161,7 +173,10 @@ class EmailBuilder {
       }? The team will be in touch soon with further details.${
         this._calString ? `%0D%0A%0D%0A${this._calString}` : ''
       }%0D%0A${this._calString ? '' : '%0D%0A'}Best,%0D%0APD Team`;
+
       this._body = str;
+    } else {
+      this._body = `Dear ${this._firstNameString},%0D%0A%0D%0AI hope you had a nice weekend.%0D%0A%0D%0AAt the moment we unfortunately do not have anyone who could support the above.  We will get in touch as soon as any beach resources free up.%0D%0A%0D%0ABest,%0D%0APD Team`;
     }
 
     return this;
@@ -187,15 +202,30 @@ export const generateEmail = (
 ) => {
   const emailBuilder = new EmailBuilder();
 
-  const email = emailBuilder
-    .withTo(project.week)
-    .withCC(project.leadership)
-    .withClient(project.client)
-    .withProjectType(project.type)
-    .withSubject()
+  const allocationDone = Object.values(project.week).find(
+    (val) => typeof val !== 'boolean'
+  );
 
-    .withBody()
-    .build();
+  const email = allocationDone
+    ? emailBuilder
+        .withTo(
+          Object.values(project.week)
+            .filter((val) => typeof val !== 'boolean')
+            .map((val) => val.text)
+        )
+        .withCC(project.leadership)
+        .withClient(project.client)
+        .withProjectType(project.type)
+        .withDays(project.week)
+        .withSubject()
+        .withBody(null, true)
+        .build()
+    : emailBuilder
+        .withTo(project.leadership)
+        .withClient(project.client)
+        .withSubject()
+        .withBody(null, false)
+        .build();
 
   let href = `mailto:${email.to}?`;
 
