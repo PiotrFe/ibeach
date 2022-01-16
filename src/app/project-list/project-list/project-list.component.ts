@@ -80,6 +80,7 @@ export class ProjectListComponent
             if (issuedBy === 'projects' || !this.modifiedEntries.length) {
               return;
             }
+
             if (save) {
               this.postChanges();
             } else {
@@ -207,7 +208,15 @@ export class ProjectListComponent
     week: Week;
     tags: Tag[];
     leadership: string[];
+    doDuplicate?: boolean;
   }) {
+    const { doDuplicate } = objParam;
+
+    if (doDuplicate) {
+      this.addProject(objParam);
+      return;
+    }
+
     const { id, client, type, comments, availDate, week, tags, leadership } =
       objParam;
 
@@ -241,10 +250,20 @@ export class ProjectListComponent
     week: Week;
     tags: Tag[];
     leadership: string[];
+    doDuplicate?: boolean;
   }) {
     this.sortService.clearSort();
-    const { id, client, type, comments, week, tags, availDate, leadership } =
-      objParam;
+    const {
+      id,
+      client,
+      type,
+      comments,
+      week,
+      tags,
+      availDate,
+      leadership,
+      doDuplicate,
+    } = objParam;
 
     const projectObj = {
       id,
@@ -259,14 +278,25 @@ export class ProjectListComponent
       leadership,
     };
 
-    this.dataSet.unshift(projectObj);
+    const entryIndex: number = this.newRows.findIndex((row) => row.id === id);
 
-    const indexToRemove: number = this.newRows.findIndex(
-      (row) => row.id === id
-    );
-
-    this.newRows.splice(indexToRemove, 1);
-    this.onChangeSaved();
+    if (doDuplicate) {
+      // this.dataSet.unshift({
+      //   ...projectObj,
+      //   id: uuidv4(),
+      //   inEditMode: true,
+      // });
+      this.dataSet.splice(entryIndex, 0, {
+        ...projectObj,
+        id: uuidv4(),
+        inEditMode: true,
+      });
+      this.updateFilteredView();
+    } else {
+      this.dataSet.unshift(projectObj);
+      this.newRows.splice(entryIndex, 1);
+      this.onChangeSaved();
+    }
   }
 
   removeExistingRow(id: string): void {
@@ -358,6 +388,12 @@ export class ProjectListComponent
         },
         complete: () => {},
       });
+  }
+
+  handleFormPending(): void {
+    setTimeout(() => {
+      this.saveChangesInProgress = false;
+    });
   }
 
   onChangeSaved(): void {

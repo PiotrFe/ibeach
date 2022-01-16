@@ -83,11 +83,14 @@
         <project-entry-form
           [id]="row.id"
           [referenceDate]="referenceDate"
+          [entryData]="row"
+          [cleanSlate]="true"
           [sortField]="sortService.sort.field"
           [entryContainerWidth]="entryContainerWidth"
           [dispatchToParentAndClose]="saveChangesInProgress"
           (deleteEvent)="removeRow($event)"
           (formSubmitEvent)="addProject($event)"
+          (formPendingEvent)="handleFormPending()"
         ></project-entry-form>
       </li>
     </ul>
@@ -112,6 +115,7 @@
           *ngSwitchCase="true"
           [id]="project.id"
           [entryData]="project"
+          [cleanSlate]="false"
           [sortField]="sortService.sort.field"
           [referenceDate]="referenceDate"
           [entryContainerWidth]="entryContainerWidth"
@@ -119,6 +123,7 @@
           (deleteEvent)="removeExistingRow($event)"
           (formEditEvent)="updateProjectDetails($event)"
           (tagChangeEvent)="handleUpdateTags($event)"
+          (formPendingEvent)="handleFormPending()"
         >
         </project-entry-form>
       </ng-container>

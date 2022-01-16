@@ -137,6 +137,7 @@
           [dispatchToParentAndClose]="saveChangesInProgress"
           (deleteEvent)="removeRow($event)"
           (formSubmitEvent)="addPerson($event)"
+          (formPendingEvent)="handleFormPending()"
         ></person-entry-form>
       </li>
     </ul>
@@ -171,6 +172,7 @@
           (deleteEvent)="removeExistingRow($event)"
           (formEditEvent)="updatePersonDetails($event)"
           (tagChangeEvent)="handleUpdateTags($event)"
+          (formPendingEvent)="handleFormPending()"
         ></person-entry-form>
       </ng-container>
     </li>

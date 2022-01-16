@@ -62,6 +62,8 @@ export class PersonEntryFormComponent
     tags: Tag[];
   }>();
 
+  @Output() formPendingEvent = new EventEmitter<any>();
+
   @ViewChild('entryContainer') entryContainer!: ElementRef;
 
   pdmArr: string[] = getPDMArr();
@@ -133,6 +135,9 @@ export class PersonEntryFormComponent
         block: 'start',
         inline: 'nearest',
       });
+      const nameInput =
+        this.entryContainer.nativeElement.querySelector('.input--name');
+      nameInput.focus();
     }
   }
 

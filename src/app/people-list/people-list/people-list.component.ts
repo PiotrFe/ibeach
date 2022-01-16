@@ -522,6 +522,12 @@ export class PeopleListComponent
     this.fetchData();
   }
 
+  handleFormPending(): void {
+    setTimeout(() => {
+      this.saveChangesInProgress = false;
+    });
+  }
+
   onChangeSaved(): void {
     if (this.saveChangesInProgress) {
       this.saveChanges();

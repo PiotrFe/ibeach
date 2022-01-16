@@ -36,6 +36,7 @@ export class ProjectEntryFormComponent
   implements OnInit, AfterViewInit
 {
   @Input() dispatchToParentAndClose: boolean = false;
+  @Input() cleanSlate!: boolean;
 
   @Output() formEditEvent = new EventEmitter<{
     id: string;
@@ -46,6 +47,7 @@ export class ProjectEntryFormComponent
     week: Week;
     tags: Tag[];
     leadership: string[];
+    doDuplicate?: boolean;
   }>();
   @Output() formSubmitEvent = new EventEmitter<{
     id: string;
@@ -56,7 +58,10 @@ export class ProjectEntryFormComponent
     week: Week;
     tags: Tag[];
     leadership: string[];
+    doDuplicate?: boolean;
   }>();
+
+  @Output() formPendingEvent = new EventEmitter<any>();
 
   @ViewChild('entryContainer') entryContainer!: ElementRef;
 
@@ -76,7 +81,7 @@ export class ProjectEntryFormComponent
         client,
         type,
         comments: comments || '',
-        availDate: availDate || '',
+        availDate: availDate || this.referenceDate,
         leadership: !leadership.length
           ? ''
           : leadership.reduce(
@@ -121,6 +126,9 @@ export class ProjectEntryFormComponent
         block: 'start',
         inline: 'nearest',
       });
+      const clientInput =
+        this.entryContainer.nativeElement.querySelector('.input--client');
+      clientInput.focus();
     }
   }
 
@@ -140,6 +148,37 @@ export class ProjectEntryFormComponent
 
   handleDelete(): void {
     this.deleteEvent.emit(this.id);
+  }
+
+  handleDuplicate(): void {
+    const { client, type, comments, availDate, leadership } =
+      this.projectForm.value;
+
+    if (!this.cleanSlate) {
+      this.formEditEvent.emit({
+        id: this.id,
+        client,
+        type,
+        comments,
+        availDate,
+        week: getNewWeek(),
+        tags: this.tags,
+        leadership: getLeadershipStringArr(leadership),
+        doDuplicate: true,
+      });
+    } else {
+      this.formSubmitEvent.emit({
+        id: this.id,
+        client,
+        type,
+        comments,
+        availDate,
+        week: getNewWeek(),
+        tags: this.tags,
+        leadership: getLeadershipStringArr(leadership),
+        doDuplicate: true,
+      });
+    }
   }
 
   onCalendarChange(calendarObj: Week) {
@@ -167,13 +206,14 @@ export class ProjectEntryFormComponent
   onSubmit(): void {
     if (!this.projectForm.valid) {
       this.validateFormFields();
+      this.formPendingEvent.emit();
       return;
     }
 
     const { client, type, comments, availDate, leadership } =
       this.projectForm.value;
 
-    if (this.entryData) {
+    if (!this.cleanSlate) {
       this.formEditEvent.emit({
         id: this.id,
         client,
@@ -256,6 +296,9 @@ const capitalizeFirst = (str: string): string => {
 };
 
 const getLeadershipStringArr = (str: string): string[] => {
+  if (str === '') {
+    return [];
+  }
   const arr = str
     .split(', ')
     .map((elem: string) => capitalizeFirst(elem.trim()));

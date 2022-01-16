@@ -45,7 +45,7 @@
   novalidate
 >
   <input
-    class="form-control section section-name data-entry-input mr-12 mw-6"
+    class="form-control section section-name data-entry-input input--client mr-12 mw-6"
     [class.is-invalid]="isFieldValid('client')"
     type="text"
     placeholder="Client"
@@ -73,6 +73,10 @@
       [inEditMode]="true"
     ></week-days>
   </div>
+  <i
+    class="bi bi-box-arrow-in-down i-active mr-5"
+    (click)="handleDuplicate()"
+  ></i>
 
   <div
     @insertRemoveTrigger
