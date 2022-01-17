@@ -94,6 +94,7 @@
     *ngIf="entryContainerWidth === 2 || entryContainerWidth > 2"
     [ngClass]="getFieldClasses('tags')"
     [class.no-width]="entryContainerWidth < 2"
+    [class.section-tags--edit-mode]="showAddTag"
   >
     <ng-container *ngTemplateOutlet="tagList"></ng-container>
   </div>
@@ -146,6 +147,7 @@
       *ngIf="entryContainerWidth < 2"
       [ngClass]="getFieldClasses('tags')"
       [class.section-tags-small]="true"
+      [class.section-tags--edit-mode]="showAddTag"
     >
       <ng-container *ngTemplateOutlet="tagList"></ng-container>
     </div>

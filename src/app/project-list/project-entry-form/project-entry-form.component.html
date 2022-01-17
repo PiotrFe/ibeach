@@ -82,6 +82,7 @@
     @insertRemoveTrigger
     *ngIf="entryContainerWidth === 2 || entryContainerWidth > 2"
     [ngClass]="getFieldClasses('tags')"
+    [class.section-tags--edit-mode]="showAddTag"
   >
     <ng-container *ngTemplateOutlet="tagList"></ng-container>
   </div>
@@ -134,7 +135,11 @@
       placeholder="Leadership"
       formControlName="leadership"
     />
-    <div *ngIf="entryContainerWidth < 2" [ngClass]="getFieldClasses('tags')">
+    <div
+      *ngIf="entryContainerWidth < 2"
+      [ngClass]="getFieldClasses('tags')"
+      [class.section-tags--edit-mode]="showAddTag"
+    >
       <ng-container *ngTemplateOutlet="tagList"></ng-container>
     </div>
     <span *ngIf="entryContainerWidth === 1" class="break-ver fs-12 mr-3">

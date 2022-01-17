@@ -78,6 +78,7 @@ export class EntryComponent {
 
   setShowAddTag(show: boolean): void {
     this.showAddTag = show;
+    console.log({ show });
     setTimeout(() => {
       this.addTagElem.nativeElement.focus();
     }, 0);

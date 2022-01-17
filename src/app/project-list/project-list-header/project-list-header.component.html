@@ -1,6 +1,6 @@
 <div class="entry-header tl-header">
   <span
-    class="section section-name mr-12 pl-3 clickable"
+    class="section section-name header-entry mr-12 pl-3 clickable"
     (click)="handleClick('name')"
     >Client
     <i
@@ -10,7 +10,7 @@
     <i *ngIf="getSort('name', -1)" class="bi bi-sort-up fs-085 ptop-3 ml-2"></i
   ></span>
   <span
-    class="section section-skill mr-12 pl-3 clickable"
+    class="section section-skill header-entry mr-12 pl-3 clickable"
     (click)="handleClick('skill')"
     >Type
     <i
@@ -20,32 +20,32 @@
     <i *ngIf="getSort('skill', -1)" class="bi bi-sort-up fs-085 ptop-3 ml-2"></i
   ></span>
   <span
-    class="section section-days mr-12 pl-3 clickable"
+    class="section section-days header-entry mr-12 pl-3 clickable"
     (click)="handleClick('days')"
-    >D
+    >Days
     <i
       *ngIf="getSort('days', 1)"
       class="bi bi-sort-down-alt fs-085 ptop-3 ml-2"
     ></i>
     <i *ngIf="getSort('days', -1)" class="bi bi-sort-up fs-085 ptop-3 ml-2"></i
   ></span>
-  <span class="calendar-group txt-center mr-12">Week</span>
+  <span class="calendar-group header-entry txt-center mr-12">Week</span>
   <span
     @insertRemoveTrigger
     *ngIf="entryContainerWidth === 2 || entryContainerWidth > 2"
-    class="section-tags section-tags-header txt-center pl-3 mr-12"
+    class="section-tags header-entry txt-center pl-3 mr-12"
     >Tags</span
   >
   <span
     @insertRemoveTrigger
     *ngIf="entryContainerWidth === 3 || entryContainerWidth > 3"
-    class="section section-leadership pl-3 mr-12"
+    class="section section-leadership header-entry pl-3 mr-12"
     >CST</span
   >
   <span
     @insertRemoveTrigger
     *ngIf="entryContainerWidth === 4 || entryContainerWidth > 4"
-    class="section section-comments section-comments--project section-comments--header txt-center pl-3"
+    class="section section-comments section-comments--project header-entry txt-center pl-3"
     >Comments</span
   >
   <div class="edit-entry-icons"></div>

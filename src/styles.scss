@@ -2,8 +2,8 @@
 // VARIABLES
 // ****************
 
-$content-width: 90vw;
-$content-height: 80vh;
+$content-width: 98vw;
+$content-height: 85vh;
 $menu-color: rgb(0, 55, 55);
 $menu-color-button: #406969;
 
@@ -46,8 +46,8 @@ li {
 }
 
 .sorted {
-  background-color: rgba(20, 162, 184, 0.2) !important;
-  background-image: none !important;
+  background-color: rgba(20, 162, 184, 0.2);
+  background-image: none;
   border-radius: 0px !important;
   height: 100% !important;
 }
@@ -160,6 +160,8 @@ li {
   &-name {
     width: 11%;
     min-width: max(5.5rem, 11%);
+    font-size: 0.88rem;
+    font-weight: 700;
   }
 
   &-skill {
@@ -170,6 +172,7 @@ li {
     // color: #fff;
     border-radius: 5px;
     padding-right: 3px;
+    font-size: 0.88rem;
 
     & > span {
       height: 30px;
@@ -228,6 +231,7 @@ li {
     width: 7%;
     min-width: 4rem;
     min-width: max(4rem, 7%);
+    font-size: 0.88rem;
   }
 
   &-days {
@@ -237,11 +241,13 @@ li {
     border-radius: 5px;
     justify-content: center;
     text-align: center;
+    font-size: 0.88rem;
   }
 
   &-comments {
     flex-grow: 1;
-    font-size: 0.85rem;
+    font-size: 0.88rem;
+    max-width: 20rem;
 
     &--project {
       max-width: 12rem;
@@ -250,7 +256,6 @@ li {
     &--header {
       font-size: 1.1rem;
     }
-
   }
 
   &-pdm {
@@ -264,9 +269,10 @@ li {
     min-width: max(10rem, 17%);
     position: relative;
     font-size: 0.8rem;
+    overflow-y: auto;
 
-    &-header {
-      font-size: 1.1rem;
+    &--edit-mode {
+      overflow-y: visible !important;
     }
 
     &-small {
@@ -278,6 +284,10 @@ li {
     width: 7rem;
     min-width: 7rem;
   }
+}
+
+.header-entry {
+  font-size: 1.1rem;
 }
 
 .project-list-envelope {
@@ -340,7 +350,7 @@ ul {
 
 .main-toolbar {
   background-color: #003737;
-  height: 3.3rem;
+  height: 3rem;
   width: 100%;
   display: flex;
   align-items: center;
@@ -380,7 +390,7 @@ ul {
 .people-content {
   width: 100%;
   height: 100%;
-  overflow-y: scroll;
+  overflow-y: auto;
   max-height: 62vh;
 }
 
@@ -396,7 +406,7 @@ ul {
     display: flex;
     justify-content: flex-start;
     flex-wrap: wrap;
-    overflow-y: scroll;
+    overflow-y: auto;
   }
 }
 
@@ -458,7 +468,6 @@ ul {
     transform: scale(0);
   }
 
-
   100% {
     transform: scale(1);
   }
@@ -506,6 +515,11 @@ ul {
 .btn-primary--light {
   background-color: rgba(13, 110, 253, 0.75) !important;
   border-color: rgba(13, 110, 253, 0.75) !important;
+  font-size: 0.88rem !important;
+}
+
+.badge {
+  font-weight: 550 !important;
 }
 
 .btn-menu {

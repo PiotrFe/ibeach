@@ -1,6 +1,6 @@
 <div class="entry-header tl-header">
   <span
-    class="section section-name mr-12 pl-3 clickable"
+    class="section section-name header-entry mr-12 pl-3 clickable"
     (click)="handleClick('name')"
     >Name
     <i
@@ -10,7 +10,7 @@
     <i *ngIf="getSort('name', -1)" class="bi bi-sort-up fs-085 ptop-3 ml-2"></i
   ></span>
   <span
-    class="section section-skill mr-12 pl-3 clickable"
+    class="section section-skill header-entry mr-12 pl-3 clickable"
     (click)="handleClick('skill')"
     >Skill
     <i
@@ -21,7 +21,7 @@
   ></span>
   <span
     *ngIf="displayedIn !== 'ALLOCATE'"
-    class="section section-availDate mr-12 pl-3 clickable"
+    class="section section-availDate header-entry mr-12 pl-3 clickable"
     (click)="handleClick('availDate')"
     >From
     <i
@@ -34,7 +34,7 @@
     ></i
   ></span>
   <span
-    class="section section-days mr-12 pl-3 clickable"
+    class="section section-days header-entry mr-12 pl-3 clickable"
     (click)="handleClick('days')"
     >Days
     <i
@@ -47,13 +47,13 @@
   <span
     @insertRemoveTrigger
     *ngIf="entryContainerWidth === 2 || entryContainerWidth > 2"
-    class="section-tags section-tags-header txt-center pl-3 mr-12"
+    class="section-tags section-tags-header header-entry txt-center pl-3 mr-12"
     >Tags</span
   >
   <span
     @insertRemoveTrigger
     *ngIf="entryContainerWidth === 3 || entryContainerWidth > 3"
-    class="section section-pdm pl-3 mr-12 clickable"
+    class="section section-pdm header-entry pl-3 mr-12 clickable"
     (click)="handleClick('pdm')"
     >PDM<i
       *ngIf="getSort('pdm', 1)"
@@ -64,7 +64,7 @@
   <span
     @insertRemoveTrigger
     *ngIf="entryContainerWidth === 4 || entryContainerWidth > 4"
-    class="section-comments section-comments--header txt-center pl-3"
+    class="section-comments section-comments--header header-entry txt-center pl-3"
     >Comments</span
   >
   <div class="edit-entry-icons"></div>

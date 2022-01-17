@@ -86,6 +86,7 @@
     @insertRemoveTrigger
     *ngIf="entryContainerWidth === 2 || entryContainerWidth > 2"
     [ngClass]="getFieldClasses('tags')"
+    [class.section-tags--edit-mode]="showAddTag"
   >
     <ng-container *ngTemplateOutlet="tagList"></ng-container>
   </div>
@@ -121,7 +122,10 @@
   </div>
 
   <!-- [class.btn-grayed-out]="!canSendEmail()" -->
-  <i class="bi bi-envelope send-icon project-list-envelope" (click)="handleGenerateEmail()"></i>
+  <i
+    class="bi bi-envelope send-icon project-list-envelope"
+    (click)="handleGenerateEmail()"
+  ></i>
 </div>
 <div
   *ngIf="entryContainerWidth < 4"
@@ -145,6 +149,7 @@
       *ngIf="entryContainerWidth < 2"
       [ngClass]="getFieldClasses('tags')"
       [class.section-tags-small]="true"
+      [class.section-tags--edit-mode]="showAddTag"
     >
       <ng-container *ngTemplateOutlet="tagList"></ng-container>
     </div>

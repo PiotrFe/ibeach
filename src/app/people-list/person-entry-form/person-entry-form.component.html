@@ -91,6 +91,7 @@
     @insertRemoveTrigger
     *ngIf="entryContainerWidth === 2 || entryContainerWidth > 2"
     [ngClass]="getFieldClasses('tags')"
+    [class.section-tags--edit-mode]="showAddTag"
   >
     <ng-container *ngTemplateOutlet="tagList"></ng-container>
   </div>
@@ -145,6 +146,7 @@
       @insertRemoveTrigger
       *ngIf="entryContainerWidth < 2"
       [ngClass]="getFieldClasses('tags')"
+      [class.section-tags--edit-mode]="showAddTag"
     >
       <ng-container *ngTemplateOutlet="tagList"></ng-container>
     </div>
