@@ -22,7 +22,7 @@
   <span
     class="section section-days mr-12 pl-3 clickable"
     (click)="handleClick('days')"
-    >Days
+    >D
     <i
       *ngIf="getSort('days', 1)"
       class="bi bi-sort-down-alt fs-085 ptop-3 ml-2"
@@ -45,8 +45,9 @@
   <span
     @insertRemoveTrigger
     *ngIf="entryContainerWidth === 4 || entryContainerWidth > 4"
-    class="section section-comments section-comments--project txt-center pl-3"
+    class="section section-comments section-comments--project section-comments--header txt-center pl-3"
     >Comments</span
   >
   <div class="edit-entry-icons"></div>
+  <div class="project-list-envelope"></div>
 </div>

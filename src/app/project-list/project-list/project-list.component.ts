@@ -281,11 +281,6 @@ export class ProjectListComponent
     const entryIndex: number = this.newRows.findIndex((row) => row.id === id);
 
     if (doDuplicate) {
-      // this.dataSet.unshift({
-      //   ...projectObj,
-      //   id: uuidv4(),
-      //   inEditMode: true,
-      // });
       this.dataSet.splice(entryIndex, 0, {
         ...projectObj,
         id: uuidv4(),

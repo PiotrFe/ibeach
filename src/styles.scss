@@ -241,10 +241,16 @@ li {
 
   &-comments {
     flex-grow: 1;
+    font-size: 0.85rem;
 
     &--project {
       max-width: 12rem;
     }
+
+    &--header {
+      font-size: 1.1rem;
+    }
+
   }
 
   &-pdm {
@@ -272,6 +278,10 @@ li {
     width: 7rem;
     min-width: 7rem;
   }
+}
+
+.project-list-envelope {
+  width: 17px;
 }
 
 .calendar-group {
@@ -448,9 +458,6 @@ ul {
     transform: scale(0);
   }
 
-  // 70% {
-  //   transform: scale(1.5);
-  // }
 
   100% {
     transform: scale(1);
