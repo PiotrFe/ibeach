@@ -51,7 +51,7 @@
     [ngClass]="getFieldClasses('name')"
     draggable="true"
     (dragstart)="handleDragStart($event)"
-    >{{ project.client | projectName }}</span
+    >{{ project.client | projectName | max25chars }}</span
   >
   <span
     *ngIf="entryContainerWidth < 4"
@@ -65,7 +65,7 @@
     [attr.aria-expanded]="isCollapsed"
     [attr.aria-controls]="'collapse-' + id"
   >
-    {{ project.client | projectName }}
+    {{ project.client | projectName | max25chars }}
   </span>
   <span [ngClass]="getFieldClasses('skill')">{{ project.type }}</span>
   <span [ngClass]="getFieldClasses('days')">{{ project.daysLeft }}</span>

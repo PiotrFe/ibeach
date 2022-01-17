@@ -51,7 +51,7 @@
     [ngClass]="getFieldClasses('name')"
     draggable="true"
     (dragstart)="handleDragStart($event)"
-    >{{ person.name }}</span
+    >{{ person.name | max25chars }}</span
   >
   <span
     *ngIf="entryContainerWidth < 4"
@@ -65,7 +65,7 @@
     [attr.aria-expanded]="isCollapsed"
     [attr.aria-controls]="'collapse-' + id"
   >
-    {{ person.name }}
+    {{ person.name | max25chars }}
   </span>
   <div [ngClass]="getFieldClasses('skill')">
     <span>{{ person.skill }}</span>
