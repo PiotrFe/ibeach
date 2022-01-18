@@ -25,6 +25,7 @@ export interface Tag {
 @Component({
   template: '',
   animations: [
+    trigger('blockInitialRenderAnimation', [transition(':enter', [])]),
     trigger('insertRemoveTrigger', [
       transition(':enter', [
         style({ opacity: 0 }),

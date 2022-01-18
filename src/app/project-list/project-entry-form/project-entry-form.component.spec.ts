@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { ProjectEntryFormComponent } from './project-entry-form.component';
 
@@ -8,9 +9,9 @@ describe('ProjectEntryFormComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ProjectEntryFormComponent ]
-    })
-    .compileComponents();
+      declarations: [ProjectEntryFormComponent],
+      imports: [BrowserAnimationsModule],
+    }).compileComponents();
   });
 
   beforeEach(() => {

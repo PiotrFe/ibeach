@@ -1,6 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { BsLocaleService } from 'ngx-bootstrap/datepicker';
 
 import { CalendarComponent } from './calendar.component';
+
+const mockLocaleService = {
+  use() {},
+};
 
 describe('CalendarComponent', () => {
   let component: CalendarComponent;
@@ -8,9 +13,9 @@ describe('CalendarComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ CalendarComponent ]
-    })
-    .compileComponents();
+      declarations: [CalendarComponent],
+      providers: [{ provide: BsLocaleService, useValue: mockLocaleService }],
+    }).compileComponents();
   });
 
   beforeEach(() => {

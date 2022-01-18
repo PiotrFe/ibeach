@@ -1,10 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Subject, Observable } from 'rxjs';
-import {
-  AllocateService,
-  AllocationDragDropEvent,
-  DropdownEntry,
-} from 'src/app/shared-module/allocate.service';
+import { AllocateService } from 'src/app/shared-module/allocate.service';
 import { Week } from './week-days/week';
 
 export interface DragAndDropEvent {
@@ -76,13 +72,20 @@ export class DragAndDropService {
     draggableElem.style.left = pageX - shiftX + 'px';
     draggableElem.style.top = pageY - shiftY + 'px';
     draggableElem.style.borderRadius = '150px';
+    draggableElem.style.fontSize = '1.3rem';
+    draggableElem.style.display = 'flex';
+    draggableElem.style.justifyContent = 'center';
+    draggableElem.style.alignItems = 'center';
+    draggableElem.style.padding = '0px';
+    draggableElem.style.margin = '0px';
+
     draggableElem.innerText = getInitials(draggableElem.innerText);
-    draggableElem.style.fontSize = '1.2rem';
+
     draggableElem.classList.add('phase-in');
     draggableElem.classList.remove('droppable');
 
     if (day === 'match') {
-      draggableElem.style.backgroundColor = '#6610f2';
+      draggableElem.style.backgroundColor = 'var(--bs-gray-700)';
       draggableElem.style.fontWeight = 'bold';
       draggableElem.style.justifyContent = 'center';
       draggableElem.style.color = '#fff';
@@ -217,5 +220,12 @@ const getInitials = (text: string | null): string => {
     return text[0];
   }
 
-  return `${arr[0][0].toUpperCase()} ${arr[arr.length - 1][0].toUpperCase()}`;
+  let lastChar = arr[arr.length - 1][0];
+
+  // if surname was shortened with dots, take the last actual char
+  if (lastChar === '.') {
+    lastChar = arr[arr.length - 4][0];
+  }
+
+  return `${arr[0][0].toUpperCase()} ${lastChar.toUpperCase()}`;
 };

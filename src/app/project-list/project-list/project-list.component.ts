@@ -213,7 +213,7 @@ export class ProjectListComponent
     const { doDuplicate } = objParam;
 
     if (doDuplicate) {
-      this.addProject(objParam);
+      this.addProject({ ...objParam, existing: true });
       return;
     }
 
@@ -251,6 +251,7 @@ export class ProjectListComponent
     tags: Tag[];
     leadership: string[];
     doDuplicate?: boolean;
+    existing?: boolean;
   }) {
     this.sortService.clearSort();
     const {
@@ -263,6 +264,7 @@ export class ProjectListComponent
       availDate,
       leadership,
       doDuplicate,
+      existing,
     } = objParam;
 
     const projectObj = {
@@ -278,10 +280,12 @@ export class ProjectListComponent
       leadership,
     };
 
-    const entryIndex: number = this.newRows.findIndex((row) => row.id === id);
+    const entryIndex: number = existing
+      ? this.dataSet.findIndex((row) => row.id === id)
+      : this.newRows.findIndex((row) => row.id === id);
 
     if (doDuplicate) {
-      this.dataSet.splice(entryIndex, 0, {
+      this.dataSet.splice(!existing ? entryIndex : entryIndex + 1, 0, {
         ...projectObj,
         id: uuidv4(),
         inEditMode: true,

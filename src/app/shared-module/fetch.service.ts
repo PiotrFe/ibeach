@@ -18,7 +18,7 @@ const config = {
   responseType: 'text',
 };
 
-const baseUrl = 'http://localhost:4000/api';
+export const baseUrl = 'http://localhost:4000/api';
 
 export interface WeeklyData {
   people: Person[];

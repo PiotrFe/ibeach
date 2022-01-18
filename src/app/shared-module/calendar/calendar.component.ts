@@ -26,6 +26,7 @@ export class CalendarComponent implements OnInit, OnChanges {
   @Input() showError: boolean = false;
   @Input() baseDay: number = 1;
   @Input() dateVal!: Date;
+  @Input() isSmall: boolean = false;
 
   @Output() dateChangeEvent = new EventEmitter<Date>();
 

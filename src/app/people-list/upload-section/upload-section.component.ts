@@ -18,10 +18,7 @@ import { WeeklyData } from 'src/app/shared-module/fetch.service';
   templateUrl: './upload-section.component.html',
   styleUrls: ['./upload-section.component.scss'],
 })
-export class UploadSectionComponent
-  extends PageComponent
-  implements OnInit, OnChanges
-{
+export class UploadSectionComponent extends PageComponent implements OnChanges {
   bsInlineValue: Date = new Date();
   referenceDateEnd: Date = new Date();
   fileSelected: boolean = false;
@@ -166,6 +163,4 @@ export class UploadSectionComponent
         },
       });
   }
-
-  ngOnInit(): void {}
 }

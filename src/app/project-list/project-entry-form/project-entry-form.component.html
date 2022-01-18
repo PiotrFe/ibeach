@@ -38,6 +38,7 @@
 
 <form
   #entryContainer
+  @blockInitialRenderAnimation
   [formGroup]="projectForm"
   (ngSubmit)="onSubmit()"
   class="entry-item entry-item--form tl-row"
@@ -122,6 +123,7 @@
   [isAnimated]="true"
 >
   <div
+    @blockInitialRenderAnimation
     class="collapsed-section entry-item--form no-select"
     [formGroup]="projectForm"
   >

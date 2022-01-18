@@ -13,7 +13,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { EntryComponent } from 'src/app/shared-module/entry/entry.component';
 import { TypeaheadService } from 'src/app/shared-module/typeahead.service';
 
-import { Project, ProjectEditable } from '../project-list/project';
+import { Project } from '../project-list/project';
 import { Tag } from 'src/app/shared-module/entry/entry.component';
 import {
   getWeekDayDate,
@@ -120,12 +120,13 @@ export class ProjectEntryFormComponent
   }
 
   ngAfterViewInit(): void {
-    if (!this.entryData) {
+    if (this.cleanSlate) {
       this.entryContainer.nativeElement.scrollIntoView({
         behavior: 'smooth',
         block: 'start',
         inline: 'nearest',
       });
+
       const clientInput =
         this.entryContainer.nativeElement.querySelector('.input--client');
       clientInput.focus();
@@ -285,6 +286,15 @@ export class ProjectEntryFormComponent
     ) {
       this.onSubmit();
     }
+  }
+
+  override getTagTypeahead(): string[] {
+    const tags = this.cleanSlate ? this.entryData.tags : this.tags;
+
+    return this.typeaheadService.getTypeahead(
+      this.typeaheadService.fields.Tag,
+      tags
+    );
   }
 }
 

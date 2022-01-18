@@ -4,12 +4,11 @@ import {
   AfterViewInit,
   ViewChild,
   ElementRef,
-  OnDestroy,
   Input,
 } from '@angular/core';
-import { trigger, style, animate, transition } from '@angular/animations';
+
 import { ResizeObserverService } from 'src/app/shared-module/resize-observer.service';
-import { PersonEntry, PersonEditable } from 'src/app/people-list/person';
+import { PersonEditable } from 'src/app/people-list/person';
 import { SortService } from 'src/app/utils/sortService';
 import { ProjectEditable } from 'src/app/project-list/project-list/project';
 import { Week } from 'src/app/shared-module/week-days/week';
@@ -82,6 +81,7 @@ export class PageComponent implements AfterViewInit {
   ngAfterViewInit(): void {
     const thisID = this.pageContainer.nativeElement.id;
     this.resizeObserverService.registerElem(this.pageContainer.nativeElement);
+
     this.resizeSubscription =
       this.resizeObserverService.currentWidth$.subscribe(
         ([elemID, width]: [string, number]) => {

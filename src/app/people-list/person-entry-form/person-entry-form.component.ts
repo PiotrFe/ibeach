@@ -195,10 +195,6 @@ export class PersonEntryFormComponent
   // INSTANCE METHODS
   // ***************
 
-  getDaysAvailable(): number {
-    return this.daysLeft;
-  }
-
   handleDelete(): void {
     this.deleteEvent.emit(this.id);
   }
@@ -245,12 +241,14 @@ export class PersonEntryFormComponent
     if (this.ignoreNextDateChange) {
       this.ignoreNextDateChange = false;
     } else {
-      this.personForm.patchValue({ availDate: date });
       const newCalendarObj = getCalendarFromDate(
         date,
         this.localCalendarObj,
         this.referenceDate
       );
+
+      this.personForm.patchValue({ availDate: date });
+      this.daysLeft = getDaysLeft(newCalendarObj);
       this.localCalendarObj = newCalendarObj;
     }
   }

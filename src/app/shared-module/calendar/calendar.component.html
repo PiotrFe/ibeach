@@ -1,13 +1,5 @@
 <div
-  class="
-    calendar
-    col-xs-12 col-12 col-md-6
-    mw-11
-    form-group
-    person-date-form
-    mr-20
-    flex flex-ctr-hor flex-ver-ctr
-  "
+  class="calendar col-xs-12 col-12 col-md-6 mw-11 form-group person-date-form mr-20 flex flex-ctr-hor flex-ver-ctr"
 >
   <i
     *ngIf="scrollable"
@@ -18,6 +10,7 @@
     type="text"
     placeholder="Datepicker"
     class="form-control no-select"
+    [class.data-entry-input]="isSmall"
     bsDatepicker
     [bsConfig]="{ isAnimated: true, dateInputFormat: 'DD-MMM-YYYY' }"
     [formControl]="displayDate"

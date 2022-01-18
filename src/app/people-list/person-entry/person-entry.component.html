@@ -39,6 +39,7 @@
 
 <div
   #entryContainer
+  @blockInitialRenderAnimation
   id="{{ id }}"
   class="entry-item tl-row no-select"
   [class.entry-item--uncollapsed]="entryContainerWidth < 4 && !isCollapsed"
@@ -133,7 +134,7 @@
   [collapse]="isCollapsed"
   [isAnimated]="true"
 >
-  <div class="collapsed-section no-select">
+  <div @blockInitialRenderAnimation class="collapsed-section no-select">
     <div
       @insertRemoveTrigger
       *ngIf="entryContainerWidth < 3"

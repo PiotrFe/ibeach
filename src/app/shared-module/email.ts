@@ -2,7 +2,7 @@ import { ElementRef } from '@angular/core';
 import { ProjectEditable } from 'src/app/project-list/project-list/project';
 import { Week } from 'src/app/shared-module/week-days/week';
 
-class Email {
+export class Email {
   to!: string;
   cc!: string;
   bcc!: string;

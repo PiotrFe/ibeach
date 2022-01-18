@@ -38,6 +38,7 @@
 
 <form
   #entryContainer
+  @blockInitialRenderAnimation
   [formGroup]="personForm"
   (ngSubmit)="onSubmit()"
   class="entry-item entry-item--form tl-row"
@@ -73,10 +74,11 @@
     [ngClass]="getFieldClasses('availDate')"
     [dateVal]="personForm.get('availDate')!.value"
     [showError]="isFieldValid('availDate')"
+    [isSmall]="true"
     (dateChangeEvent)="onDateChange($event)"
   ></calendar>
 
-  <span [ngClass]="getFieldClasses('days')">{{ getDaysAvailable() }}</span>
+  <span [ngClass]="getFieldClasses('days')">{{ daysLeft }}</span>
 
   <div class="calendar-group mr-12">
     <week-days
@@ -98,7 +100,7 @@
   <select
     @insertRemoveTrigger
     *ngIf="entryContainerWidth === 3 || entryContainerWidth > 3"
-    class="form-control section section-pdm mr-12 mw-4"
+    class="form-control section section-pdm data-entry-input mr-12 mw-4"
     formControlName="pdm"
   >
     <option value="pdm" selected hidden>PDM</option>
@@ -129,6 +131,7 @@
   [isAnimated]="true"
 >
   <div
+    @blockInitialRenderAnimation
     class="collapsed-section entry-item--form no-select"
     [formGroup]="personForm"
   >
