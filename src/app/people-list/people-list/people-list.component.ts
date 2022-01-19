@@ -415,7 +415,7 @@ export class PeopleListComponent
           // lookup table only sent on first fetch, where pdm not provided as parameter
           // if pdm provided as a parameter, he/she cancelled changes and is fetching the old list from server
 
-          if (!skipFetchingLookupTable) {
+          if (!skipFetchingLookupTable && lookupTable) {
             this.typeaheadService.storeLookupList(
               this.typeaheadService.tableTypes.People,
               lookupTable

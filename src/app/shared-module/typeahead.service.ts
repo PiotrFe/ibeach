@@ -60,23 +60,19 @@ export class TypeaheadService {
   }
 
   _getNameTypeahead(dataSet?: any[]): string[] {
-    const retVal = this._peopleList
-      .filter((person: Person) => {
-        if (!dataSet) {
-          return person;
-        }
-        const idx = dataSet.findIndex(
-          (displayedPerson: Person) => displayedPerson.id === person.id
-        );
-        // console.log({
-        //   list: this._peopleList,
-        //   dataSet,
-        //   person,
-        //   idx,
-        // });
-        return idx < 0;
-      })
-      .map((person: Person) => person.name);
+    const retVal = !this._peopleList
+      ? []
+      : this._peopleList
+          .filter((person: Person) => {
+            if (!dataSet) {
+              return person;
+            }
+            const idx = dataSet.findIndex(
+              (displayedPerson: Person) => displayedPerson.id === person.id
+            );
+            return idx < 0;
+          })
+          .map((person: Person) => person.name);
 
     return retVal;
   }
@@ -85,9 +81,11 @@ export class TypeaheadService {
     if (dataSet) {
       const currTags = dataSet.map((tag) => tag.value);
 
-      return this._tagList
-        .filter((tag) => !currTags.includes(tag.value))
-        .map((tag) => tag.value);
+      return !this._tagList
+        ? []
+        : this._tagList
+            .filter((tag) => !currTags.includes(tag.value))
+            .map((tag) => tag.value);
     }
 
     return this._tagList.map((tag) => tag.value);
