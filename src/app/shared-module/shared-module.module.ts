@@ -14,7 +14,6 @@ import { EntryComponent } from './entry/entry.component';
 import { TypeaheadModule } from 'ngx-bootstrap/typeahead';
 import { FirstInitialPipe } from './first-initial.pipe';
 import { ProjectNamePipe } from './project-name.pipe';
-import { EmailPreviewComponent } from './email-preview/email-preview.component';
 import { Max25charsPipe } from './max25chars.pipe';
 
 @NgModule({
@@ -29,7 +28,6 @@ import { Max25charsPipe } from './max25chars.pipe';
     EntryComponent,
     FirstInitialPipe,
     ProjectNamePipe,
-    EmailPreviewComponent,
     Max25charsPipe,
   ],
   imports: [

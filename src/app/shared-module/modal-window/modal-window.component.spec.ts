@@ -1,15 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
-import { Subscription } from 'rxjs';
+import { Subscription, of } from 'rxjs';
 
 import { ModalWindowComponent } from './modal-window.component';
 
 const mockModalService = {
-  onHide: {
-    subscribe() {},
+  onHide: of(),
+  show() {
+    return new BsModalRef();
   },
-  show() {},
 };
+
+const TITLE = 'modal title';
 
 describe('ModalWindowComponent', () => {
   let component: ModalWindowComponent;
@@ -26,11 +29,20 @@ describe('ModalWindowComponent', () => {
     fixture = TestBed.createComponent(ModalWindowComponent);
     component = fixture.componentInstance;
 
+    component.title = TITLE;
+
     fixture.detectChanges();
-    component.subscriptions = [];
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should emit closeEvent on close', () => {
+    spyOn(component.closeEvent, 'emit');
+
+    component.close(true);
+
+    expect(component.closeEvent.emit).toHaveBeenCalledWith(true);
   });
 });

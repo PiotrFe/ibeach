@@ -93,3 +93,35 @@ export class TypeaheadService {
 
   constructor() {}
 }
+
+export class TypeaheadServiceMock extends TypeaheadService {
+  override storeLookupList(type: TableTypes, list: any): void {}
+
+  override getTypeahead(field: Fields, dataSet?: any[]): string[] {
+    return [];
+  }
+
+  override checkIfTagLegal(val: string): boolean {
+    return true;
+  }
+
+  override getTagByVal(val: string): Tag | undefined {
+    return undefined;
+  }
+
+  override getPersonByName(name: string): Person | undefined {
+    return undefined;
+  }
+
+  override _getNameTypeahead(dataSet?: any[]): string[] {
+    return [];
+  }
+
+  override _getTagTypeahead(dataSet?: Tag[]): string[] {
+    return [];
+  }
+
+  constructor() {
+    super();
+  }
+}

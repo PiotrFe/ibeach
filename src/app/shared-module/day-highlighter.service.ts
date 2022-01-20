@@ -20,6 +20,7 @@ export class DayHighlighterService {
     elemToHighlight.scrollIntoView({ block: 'nearest' });
     setTimeout(() => {
       elemToHighlight.classList.add('cal-entry--illegal');
+      debugger;
       setTimeout(() => {
         elemToHighlight.classList.remove('cal-entry--illegal');
       }, 1500);

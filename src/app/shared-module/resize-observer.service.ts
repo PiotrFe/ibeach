@@ -43,3 +43,17 @@ export class ResizeObserverService {
     }
   }
 }
+
+export class ResizeObserverServiceMock extends ResizeObserverService {
+  override currentWidth$!: Observable<[string, number]>;
+
+  constructor() {
+    super();
+  }
+
+  override registerElem() {}
+
+  override deregisterElem() {}
+
+  override _processEntries() {}
+}

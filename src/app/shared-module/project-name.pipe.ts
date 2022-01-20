@@ -8,9 +8,6 @@ export class ProjectNamePipe implements PipeTransform {
     if (value === undefined) {
       return '';
     }
-    if (value.length <= 3) {
-      return value;
-    }
 
     if (value.length > 15) {
       let returnVal = '';
@@ -23,18 +20,6 @@ export class ProjectNamePipe implements PipeTransform {
       }
       return returnVal.slice(0, returnVal.length - 1);
     }
-
-    // const nameParts = value.split(' ');
-
-    // if (nameParts.length === 1) {
-    //   return value[0];
-    // }
-
-    // let returnVal = '';
-
-    // for (let part of nameParts) {
-    //   returnVal += part[0];
-    // }
 
     return value;
   }
