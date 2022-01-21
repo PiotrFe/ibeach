@@ -1,11 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
-import { of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 
 import { FetchService, WeeklyData, baseUrl } from './fetch.service';
 import { Person } from 'src/app/people-list/person';
 import { Project } from '../project-list/project-list/project';
 import { Week } from 'src/app/shared-module/week-days/week';
+import { AllocationEntry } from './allocate.service';
 
 let httpClientSpy: jasmine.SpyObj<HttpClient>;
 
@@ -115,3 +116,18 @@ describe('FetchService', () => {
     });
   });
 });
+
+export class FetchServiceStub extends FetchService {
+  constructor() {
+    const http: jasmine.SpyObj<HttpClient> = jasmine.createSpyObj(
+      'HttpClient',
+      {
+        get: of(''),
+        post: of(''),
+        patch: of(''),
+      }
+    );
+
+    super(http);
+  }
+}
