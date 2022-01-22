@@ -52,6 +52,14 @@ export function isInstanceOfSaveEvent(object: any): object is SaveEvent {
   return typeof object.save === 'boolean';
 }
 
+export function isInstanceOfDeleteEvent(object: any): object is DeletionEvent {
+  return (
+    'deletedID' in object &&
+    'deletedRecordType' in object &&
+    'affectedSubIDs' in object
+  );
+}
+
 export interface AllocationDragDropEvent {
   id: string | null;
   elemType?: 'people' | 'projects';

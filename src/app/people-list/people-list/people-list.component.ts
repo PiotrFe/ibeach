@@ -9,7 +9,6 @@ import {
 import { FormControl } from '@angular/forms';
 import { FetchService } from '../../shared-module/fetch.service';
 import { TypeaheadService } from '../../shared-module/typeahead.service';
-import { DragAndDropService } from 'src/app/shared-module/drag-and-drop.service';
 import { ResizeObserverService } from 'src/app/shared-module/resize-observer.service';
 import {
   AllocateService,
@@ -17,6 +16,7 @@ import {
   DeletionEvent,
   SaveEvent,
   isInstanceOfSaveEvent,
+  isInstanceOfDeleteEvent,
 } from 'src/app/shared-module/allocate.service';
 import { v4 as uuidv4 } from 'uuid';
 import { Subscription } from 'rxjs';
@@ -61,7 +61,6 @@ export class PeopleListComponent
   constructor(
     private fetchService: FetchService,
     private allocateService: AllocateService,
-    private dragAndDrop: DragAndDropService,
     typeaheadService: TypeaheadService,
     resizeObserverService: ResizeObserverService,
     ngZone: NgZone
@@ -124,80 +123,91 @@ export class PeopleListComponent
     this.deleteRecordSubscription =
       this.allocateService.onDeleteRecord.subscribe({
         next: (data: DeletionEvent | SaveEvent) => {
-          // save or discard changes
-          if (isInstanceOfSaveEvent(data)) {
-            const { save, issuedBy } = data;
-
-            if (issuedBy === 'people' || !this.modifiedEntries.length) {
-              return;
-            }
-            if (save) {
-              this.postChanges();
-            } else {
-              this.dataSet = this.dataSet.map((elem) => {
-                const modified = this.modifiedEntries.find(
-                  (modElem) => modElem.id === elem.id
-                );
-
-                if (modified) {
-                  return modified;
-                }
-
-                return elem;
-              });
-
-              this.updateFilteredView();
-            }
-            this.modifiedEntries = [];
-            return;
-          }
-          // clear people's calendars if a project entry has been deleted
-          const { deletedID, deletedRecordType, affectedSubIDs } = data;
-
-          if (deletedRecordType === 'people') {
-            return;
-          }
-
-          this.dataSet = (this.dataSet as PersonEditable[]).map(
-            (elem: PersonEditable): PersonEditable => {
-              if (!affectedSubIDs.includes(elem.id)) {
-                return elem;
-              }
-
-              const elemCopy = JSON.parse(JSON.stringify(elem));
-              this.modifiedEntries.push(elemCopy);
-
-              const updatedWeek = Object.entries(elem.week).reduce(
-                (acc, [key, val]): any => {
-                  if (val.id === deletedID) {
-                    return {
-                      ...acc,
-                      [key]: true,
-                    };
-                  }
-
-                  return {
-                    ...acc,
-                    [key]: val,
-                  };
-                },
-                {}
-              );
-
-              return {
-                ...elem,
-                week: updatedWeek as Week,
-                daysLeft: getDaysLeft(updatedWeek as Week),
-              };
-            }
-          );
-
-          this.updateFilteredView();
+          this._handleSaveOrDelete(data);
         },
         error: (err) => {
           this.fetchError = err;
         },
       });
+  }
+
+  _handleSaveOrDelete(data: DeletionEvent | SaveEvent) {
+    // save or discard changes
+    if (isInstanceOfSaveEvent(data)) {
+      this._handleSave(data);
+    } else if (isInstanceOfDeleteEvent(data)) {
+      this._handleDelete(data);
+    }
+  }
+
+  _handleSave(data: SaveEvent) {
+    const { save, issuedBy } = data;
+
+    if (issuedBy === 'people' || !this.modifiedEntries.length) {
+      return;
+    }
+    if (save) {
+      this.postChanges();
+    } else {
+      this.dataSet = this.dataSet.map((elem) => {
+        const modified = this.modifiedEntries.find(
+          (modElem) => modElem.id === elem.id
+        );
+
+        if (modified) {
+          return modified;
+        }
+
+        return elem;
+      });
+
+      this.updateFilteredView();
+    }
+    this.modifiedEntries = [];
+  }
+
+  _handleDelete(data: DeletionEvent) {
+    // clear people's calendars if a project entry has been deleted
+    const { deletedID, deletedRecordType, affectedSubIDs } = data;
+
+    if (deletedRecordType === 'people') {
+      return;
+    }
+
+    this.dataSet = (this.dataSet as PersonEditable[]).map(
+      (elem: PersonEditable): PersonEditable => {
+        if (!affectedSubIDs.includes(elem.id)) {
+          return elem;
+        }
+
+        const elemCopy = JSON.parse(JSON.stringify(elem));
+        this.modifiedEntries.push(elemCopy);
+
+        const updatedWeek = Object.entries(elem.week).reduce(
+          (acc, [key, val]): any => {
+            if (val.id === deletedID) {
+              return {
+                ...acc,
+                [key]: true,
+              };
+            }
+
+            return {
+              ...acc,
+              [key]: val,
+            };
+          },
+          {}
+        );
+
+        return {
+          ...elem,
+          week: updatedWeek as Week,
+          daysLeft: getDaysLeft(updatedWeek as Week),
+        };
+      }
+    );
+    this.updateFilteredView();
   }
 
   // *****************
