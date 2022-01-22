@@ -2,6 +2,33 @@ import { getNewWeek } from 'src/app/shared-module/week-days/week';
 import { ProjectEditable } from 'src/app/project-list/project-list/project';
 import { Person, PersonEditable } from 'src/app/people-list/person';
 
+export const personDataBasic: Person[] = [
+  {
+    id: 'a',
+    name: 'Peter Smith',
+    skill: 'manager',
+    week: getNewWeek(),
+    daysLeft: 5,
+    tags: [],
+  },
+  {
+    id: 'b',
+    name: 'Mary Bane',
+    skill: 'secretary',
+    week: getNewWeek(),
+    daysLeft: 5,
+    tags: [],
+  },
+  {
+    id: 'c',
+    name: 'Kay Heid',
+    skill: 'accountant',
+    week: getNewWeek(),
+    daysLeft: 5,
+    tags: [],
+  },
+];
+
 export const personData: PersonEditable[] = [
   {
     id: 'a',
@@ -11,6 +38,8 @@ export const personData: PersonEditable[] = [
     daysLeft: 5,
     tags: [],
     inEditMode: false,
+    pdm: 'John Wayne',
+    comments: 'Comment on Peter',
   },
   {
     id: 'b',

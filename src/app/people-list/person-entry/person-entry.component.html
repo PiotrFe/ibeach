@@ -104,15 +104,14 @@
     *ngIf="entryContainerWidth === 3 || entryContainerWidth > 3"
     [ngClass]="getFieldClasses('pdm')"
   >
-    <span class="bg-secondary-light"> {{ person.pdm | initials }}</span>
+    <span class="bg-secondary-light">{{ person.pdm | initials }}</span>
   </div>
   <span
     @insertRemoveTrigger
     *ngIf="entryContainerWidth === 4 || entryContainerWidth > 4"
     [ngClass]="getFieldClasses('comments')"
+    >{{ person.comments }}</span
   >
-    {{ person.comments }}
-  </span>
   <div class="edit-entry-icons">
     <i
       @insertRemoveTrigger
@@ -140,7 +139,7 @@
       *ngIf="entryContainerWidth < 3"
       [ngClass]="getFieldClasses('pdm')"
     >
-      <span class="bg-secondary-light"> {{ person.pdm | initials }}</span>
+      <span class="bg-secondary-light">{{ person.pdm | initials }}</span>
     </div>
     <span class="break-ver fs-12 mr-3"> | </span>
     <div
@@ -159,8 +158,7 @@
       @insertRemoveTrigger
       *ngIf="entryContainerWidth < 4"
       [ngClass]="getFieldClasses('comments')"
-    >
-      {{ person.comments }}
+      >{{ person.comments }}
     </span>
   </div>
 </div>

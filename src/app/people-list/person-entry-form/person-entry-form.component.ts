@@ -89,7 +89,6 @@ export class PersonEntryFormComponent
     }
 
     if (!this.entryData && this.pdm) {
-      console.log(this.pdm);
       this.personForm.patchValue({
         pdm: this.pdm,
       });
