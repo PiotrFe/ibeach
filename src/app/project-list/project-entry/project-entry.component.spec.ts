@@ -5,54 +5,93 @@ import { TypeaheadService } from 'src/app/shared-module/typeahead.service';
 import { DragAndDropService } from 'src/app/shared-module/drag-and-drop.service';
 import { AllocateService } from 'src/app/shared-module/allocate.service';
 import { Project } from 'src/app/project-list/project-list/project';
-import { getNewWeek, getDaysLeft } from 'src/app/shared-module/week-days/week';
+import {
+  getNewWeek,
+  getDaysLeft,
+  Week,
+} from 'src/app/shared-module/week-days/week';
+import { projectData } from 'src/app/utils/dummyData';
+
+const ID = 'COMPONENT_ID';
 
 describe('ProjectEntryComponent', () => {
   let component: ProjectEntryComponent;
   let fixture: ComponentFixture<ProjectEntryComponent>;
-  let project: Project;
+  let spyAllocate: jasmine.SpyObj<AllocateService>;
+  let spyDragAndDrop: jasmine.SpyObj<DragAndDropService>;
 
   beforeEach(async () => {
-    const spyAllocate = jasmine.createSpyObj('AllocateService', [
+    const spyAll = jasmine.createSpyObj('AllocateService', [
       'registerAllocation',
     ]);
-    const spyDragAndDrop = jasmine.createSpyObj('DragAndDropService', [
-      'onDragStart',
-    ]);
+    const spyDD = jasmine.createSpyObj('DragAndDropService', ['onDragStart']);
 
-    const week = getNewWeek();
-
-    project = {
-      id: '123',
-      client: 'test',
-      type: 'LOP',
-      availDate: new Date(),
-      week,
-      daysLeft: getDaysLeft(week),
-      leadership: ['Tom Pain', 'Mary Baley'],
-      comments: '',
-      tags: [],
+    const typeaheadStub = {
+      getTagByVal() {},
+      getTypeahead() {},
     };
 
     await TestBed.configureTestingModule({
       declarations: [ProjectEntryComponent],
       providers: [
-        TypeaheadService,
-        { provide: AllocateService, useValue: spyAllocate },
-        { provide: DragAndDropService, useValue: spyDragAndDrop },
+        { provide: TypeaheadService, useValue: typeaheadStub },
+        { provide: AllocateService, useValue: spyAll },
+        { provide: DragAndDropService, useValue: spyDD },
       ],
       imports: [BrowserAnimationsModule],
     }).compileComponents();
+
+    spyAllocate = TestBed.inject(
+      AllocateService
+    ) as jasmine.SpyObj<AllocateService>;
+    spyDragAndDrop = TestBed.inject(
+      DragAndDropService
+    ) as jasmine.SpyObj<DragAndDropService>;
   });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(ProjectEntryComponent);
     component = fixture.componentInstance;
-    component.entryData = project;
+    component.id = ID;
+    component.entryData = projectData[0];
     fixture.detectChanges();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('emits edit event', () => {
+    spyOn(component.editEvent, 'emit');
+    component.handleEdit();
+    expect(component.editEvent.emit).toHaveBeenCalledWith(ID);
+  });
+
+  it('emits delete event', () => {
+    spyOn(component.deleteEvent, 'emit');
+    component.handleDelete();
+    expect(component.deleteEvent.emit).toHaveBeenCalledWith(ID);
+  });
+
+  it('emits calendar change event', () => {
+    const cal: Week = getNewWeek();
+    spyOn(component.calendarChangeEvent, 'emit');
+    component.onCalendarChange(cal);
+    expect(component.calendarChangeEvent.emit).toHaveBeenCalledWith({
+      calendarObj: cal,
+      id: component.id,
+    });
+  });
+
+  it('register allocation', () => {
+    component.onAllocation('e');
+
+    expect(spyAllocate.registerAllocation).toHaveBeenCalled();
+  });
+
+  it('call d&d service on drag', () => {
+    component.handleDragStart('e');
+
+    expect(spyDragAndDrop.onDragStart).toHaveBeenCalled();
   });
 });

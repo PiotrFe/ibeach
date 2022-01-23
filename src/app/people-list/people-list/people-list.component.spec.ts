@@ -60,29 +60,10 @@ const resizeObserverSpy: jasmine.SpyObj<ResizeObserverService> =
     currentWidth$: of(),
   });
 
-const resizeObserverStub = {
-  registerElem() {},
-  currentWidth$: of('abc', 1000),
-  deregisterElem() {},
-};
+let resizeObserverStub: any;
 
-const typeaheadSpy: jasmine.SpyObj<TypeaheadService> = jasmine.createSpyObj(
-  'TypeaheadService',
-  ['storeLookupList']
-);
-
-const fetchSpy: jasmine.SpyObj<FetchService> = jasmine.createSpyObj(
-  'FetchService',
-  {
-    fetchWeeklyList: of({
-      people: [],
-      statusSummary: { pending: [], done: [] },
-      lookupTable: [],
-    }),
-    saveList: of(),
-    submitList: of(),
-  }
-);
+let typeaheadSpy: jasmine.SpyObj<TypeaheadService>;
+let fetchSpy: jasmine.SpyObj<FetchService>;
 
 const fakeDataSet = {
   dataType: 'people',
@@ -115,18 +96,38 @@ const deleteRecordSubject: Subject<DeletionEvent | SaveEvent> = new Subject<
 const onDataset = datasetSubject.asObservable();
 const onDeleteRecord = deleteRecordSubject.asObservable();
 
-const allocateStub = {
-  onDataset: onDataset,
-  onDeleteRecord: onDeleteRecord,
-  handleDeleteRecord() {},
-  registerDataset() {},
-  registerSaveEvent() {},
-};
+let allocateStub: any;
 
 describe('PeopleListComponent', () => {
   let component: PeopleListComponent;
   let fixture: ComponentFixture<PeopleListComponent>;
   let allocateService: AllocateService;
+
+  resizeObserverStub = {
+    registerElem() {},
+    currentWidth$: of('abc', 1000),
+    deregisterElem() {},
+  };
+
+  typeaheadSpy = jasmine.createSpyObj('TypeaheadService', ['storeLookupList']);
+
+  fetchSpy = jasmine.createSpyObj('FetchService', {
+    fetchWeeklyList: of({
+      people: [],
+      statusSummary: { pending: [], done: [] },
+      lookupTable: [],
+    }),
+    saveList: of(),
+    submitList: of(),
+  });
+
+  allocateStub = {
+    onDataset: onDataset,
+    onDeleteRecord: onDeleteRecord,
+    handleDeleteRecord() {},
+    registerDataset() {},
+    registerSaveEvent() {},
+  };
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
