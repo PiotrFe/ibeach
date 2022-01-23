@@ -19,7 +19,6 @@
     "@angular/platform-browser-dynamic": "~13.1.0",
     "@angular/router": "~13.1.0",
     "@schematics/angular": "^9.1.0",
-    "axios": "^0.24.0",
     "ngx-bootstrap": "^6.2.0",
     "rxjs": "~7.4.0",
     "tslib": "^2.3.0",

@@ -4,8 +4,6 @@ import {
   HttpResponse,
 } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import axios, { AxiosRequestConfig } from 'axios';
-import { kill } from 'process';
 import { throwError, catchError, Observable } from 'rxjs';
 import { Person } from 'src/app/people-list/person';
 import { Project } from 'src/app/project-list/project-list/project';

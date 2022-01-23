@@ -325,9 +325,9 @@ export class PeopleListComponent
     id: string;
     name: string;
     skill: string;
-    comments: string;
-    availDate: Date;
-    pdm: string;
+    comments?: string;
+    availDate?: Date;
+    pdm?: string;
     week: Week;
     tags: Tag[];
   }) {
@@ -358,9 +358,9 @@ export class PeopleListComponent
     id: string;
     name: string;
     skill: string;
-    comments: string;
-    availDate: Date;
-    pdm: string;
+    comments?: string;
+    availDate?: Date;
+    pdm?: string;
     week: Week;
     tags: Tag[];
   }) {
@@ -407,34 +407,7 @@ export class PeopleListComponent
       )
       .subscribe({
         next: (data: WeeklyData) => {
-          const { people, statusSummary, lookupTable } = data;
-          this.dataSet = this.sortService
-            .sortData(
-              people,
-              this.sortService.SORT_COLUMNS.NAME,
-              false,
-              true,
-              false
-            )
-            .map((person) => ({
-              ...person,
-              inEditMode: false,
-              availDate: new Date(Date.parse(person.availDate)),
-            }));
-
-          // lookup table only sent on first fetch, where pdm not provided as parameter
-          // if pdm provided as a parameter, he/she cancelled changes and is fetching the old list from server
-
-          if (!skipFetchingLookupTable && lookupTable) {
-            this.typeaheadService.storeLookupList(
-              this.typeaheadService.tableTypes.People,
-              lookupTable
-            );
-          }
-
-          this.status = statusSummary;
-          this.updateStatusLabel();
-          this.updateFilteredView();
+          this._onWeeklyData(data, skipFetchingLookupTable);
         },
         error: (e) => {
           if (e.message === 'No data') {
@@ -459,6 +432,31 @@ export class PeopleListComponent
           });
         },
       });
+  }
+
+  _onWeeklyData(data: WeeklyData, skipFetchingLookupTable: boolean) {
+    const { people, statusSummary, lookupTable } = data;
+    this.dataSet = this.sortService
+      .sortData(people, this.sortService.SORT_COLUMNS.NAME, false, true, false)
+      .map((person) => ({
+        ...person,
+        inEditMode: false,
+        availDate: new Date(Date.parse(person.availDate)),
+      }));
+
+    // lookup table only sent on first fetch, where pdm not provided as parameter
+    // if pdm provided as a parameter, he/she cancelled changes and is fetching the old list from server
+
+    if (!skipFetchingLookupTable && lookupTable) {
+      this.typeaheadService.storeLookupList(
+        this.typeaheadService.tableTypes.People,
+        lookupTable
+      );
+    }
+
+    this.status = statusSummary;
+    this.updateStatusLabel();
+    this.updateFilteredView();
   }
 
   postChanges() {

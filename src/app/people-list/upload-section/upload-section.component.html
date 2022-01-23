@@ -43,7 +43,7 @@
     ></people-list-header>
   </li>
   <div class="people-content">
-    <div *ngIf="fetchError" class="alert alert-danger">
+    <div *ngIf="fetchError && !uploaded" class="alert alert-danger">
       {{ fetchError }}
     </div>
     <div *ngIf="noData" class="alert alert-primary">No data available</div>
