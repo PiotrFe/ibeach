@@ -4,6 +4,9 @@ export const getTagsFromData = (
   data: string,
   tagType: 'ind' | 'fun'
 ): Tag[] => {
+  if (!data || data === "" || data?.length < 5) {
+    return []
+  }
   const dataArrRaw = data.split('; ');
   const regex = /\(\d{1,3}%\)/i;
   const tagArr = dataArrRaw
@@ -76,8 +79,8 @@ export const getAffiliations = (
   affiliation: string,
   type: 'ind' | 'fun'
 ): Tag[] => {
-  if (!affiliation) {
-    return [];
+  if (!affiliation || affiliation === "") {
+    return []
   }
 
   const tag =

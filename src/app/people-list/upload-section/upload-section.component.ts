@@ -98,11 +98,13 @@ export class UploadSectionComponent extends PageComponent implements OnChanges {
 
     this.clearUploadStatus();
 
-    reader.readAsText(file);
+    reader.readAsText(file, "UTF-8");
     reader.onload = () => {
       this.data = reader.result as string;
 
-      parse(this.data, { columns: true }, (err, data) => {
+      console.log(this.data);
+
+      parse(this.data, { encoding: "utf8", columns: true, relaxColumnCount: true }, (err, data) => {
         if (err) {
           console.log(err);
           this.fetchError = String(err);
