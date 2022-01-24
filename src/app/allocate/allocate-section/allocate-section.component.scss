@@ -16,7 +16,8 @@
 
 .drag-handle {
   background-color: var(--bs-dark);
-  width: 0.35rem;
+  width: 6px;
+  min-width: 6px;
 
   &:hover {
     cursor: grab;

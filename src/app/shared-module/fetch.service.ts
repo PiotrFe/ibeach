@@ -4,17 +4,10 @@ import {
   HttpResponse,
 } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { throwError, catchError, Observable } from 'rxjs';
+import { throwError, catchError, Observable, tap } from 'rxjs';
 import { Person } from 'src/app/people-list/person';
 import { Project } from 'src/app/project-list/project-list/project';
 import { AllocationEntry } from 'src/app/shared-module/allocate.service';
-
-const config = {
-  headers: {
-    'Content-Type': 'text/plain',
-  },
-  responseType: 'text',
-};
 
 export const baseUrl = 'http://localhost:4000/api';
 
@@ -114,6 +107,12 @@ export class FetchService {
 
     return this.http
       .patch<any>(`${baseUrl}/allocate/${weekTs}`, data)
+      .pipe(catchError(this.handleError));
+  }
+
+  fetchContactData(): Observable<any> {
+    return this.http
+      .get(`${baseUrl}/contacts`, { responseType: 'text' })
       .pipe(catchError(this.handleError));
   }
 }

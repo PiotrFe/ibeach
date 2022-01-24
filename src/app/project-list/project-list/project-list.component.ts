@@ -21,12 +21,19 @@ import { Week } from 'src/app/shared-module/week-days/week';
 import { Tag } from 'src/app/shared-module/entry/entry.component';
 import { v4 as uuidv4 } from 'uuid';
 import { Subscription } from 'rxjs';
+import { CsvParserService } from 'src/app/shared-module/csv-parser.service';
 import {
   Project,
   ProjectEditable,
 } from 'src/app/project-list/project-list/project';
 import { PageComponent } from 'src/app/shared-module/page/page.component';
 import { getNewWeek, getDaysLeft } from '../../shared-module/week-days/week';
+
+export interface ContactEntry {
+  first: string;
+  last: string;
+  email: string;
+}
 
 @Component({
   selector: 'project-list',
@@ -40,6 +47,7 @@ export class ProjectListComponent
   projectFilter = new FormControl('All');
   allocationDataSubscription!: Subscription;
   deleteRecordSubscription!: Subscription;
+  addressBook!: ContactEntry[];
 
   // arr used for storing entries modified by the people side of the app (e.g. by deleting people records - days free up then)
   // records are stored in this array until save / cancel event on the people side
@@ -50,6 +58,7 @@ export class ProjectListComponent
     private allocateService: AllocateService,
     typeaheadService: TypeaheadService,
     resizeObserverService: ResizeObserverService,
+    private csvParserService: CsvParserService,
     ngZone: NgZone
   ) {
     super(ngZone, resizeObserverService, typeaheadService);
@@ -148,6 +157,25 @@ export class ProjectListComponent
           this.fetchError = err;
         },
       });
+
+    const updateAddressBook = this._updateAddressBook.bind(this);
+
+    this.fetchService.fetchContactData().subscribe({
+      next: (data: string) => {
+        try {
+          this.csvParserService.parseContacts(data, updateAddressBook);
+        } catch (e: any) {
+          this.fetchError = 'Unable to load contacts';
+        }
+      },
+      error: () => {
+        this.fetchError = 'Cannot get contact list';
+      },
+    });
+  }
+
+  _updateAddressBook(addressBook: ContactEntry[]) {
+    this.addressBook = addressBook;
   }
 
   ngOnChanges(changes: SimpleChanges): void {

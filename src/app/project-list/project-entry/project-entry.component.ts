@@ -9,6 +9,7 @@ import {
   AllocateService,
   AllocationEntry,
 } from 'src/app/shared-module/allocate.service';
+import { ContactEntry } from 'src/app/project-list/project-list/project-list.component';
 
 @Component({
   selector: 'project-entry',
@@ -18,6 +19,7 @@ import {
 export class ProjectEntryComponent extends EntryComponent implements OnInit {
   project!: ProjectEditable;
 
+  @Input() addressBook: ContactEntry[] = [];
   @ViewChild('entryContainer') entryContainer!: ElementRef;
 
   constructor(
@@ -93,6 +95,10 @@ export class ProjectEntryComponent extends EntryComponent implements OnInit {
   }
 
   handleGenerateEmail() {
-    generateEmail(this.entryData as ProjectEditable, this.entryContainer);
+    generateEmail(
+      this.entryData as ProjectEditable,
+      this.entryContainer,
+      this.addressBook
+    );
   }
 }

@@ -5,10 +5,10 @@ import {
   OnChanges,
   SimpleChanges,
 } from '@angular/core';
-import { FetchService } from '../../shared-module/fetch.service';
-import { CsvParserService } from '../../shared-module/csv-parser.service';
+import { FetchService } from 'src/app/shared-module/fetch.service';
+import { CsvParserService } from 'src/app/shared-module/csv-parser.service';
 import { ResizeObserverService } from 'src/app/shared-module/resize-observer.service';
-import { parse } from '../../utils/csv-parser/index';
+import { parse } from 'src/app/utils/csv-parser/index';
 import { Person } from '../person';
 import { PageComponent } from 'src/app/shared-module/page/page.component';
 import { WeeklyData } from 'src/app/shared-module/fetch.service';
@@ -98,11 +98,9 @@ export class UploadSectionComponent extends PageComponent implements OnChanges {
 
     this.clearUploadStatus();
 
-    reader.readAsText(file, 'UTF-8');
+    reader.readAsText(file);
     reader.onload = () => {
       this.data = reader.result as string;
-
-      console.log(this.data);
 
       parse(
         this.data,

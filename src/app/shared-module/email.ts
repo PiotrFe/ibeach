@@ -1,6 +1,9 @@
 import { ElementRef } from '@angular/core';
 import { ProjectEditable } from 'src/app/project-list/project-list/project';
 import { Week } from 'src/app/shared-module/week-days/week';
+import { ContactEntry } from 'src/app/project-list/project-list/project-list.component';
+import { remove as removeDiacritics } from 'diacritics';
+import { compareTwoStrings } from 'string-similarity';
 
 export class Email {
   to!: string;
@@ -47,11 +50,13 @@ class EmailBuilder {
   _calString!: string;
   _daysString!: string;
 
+  constructor(private addressBook: ContactEntry[]) {}
+
   withTo(contacts: string[]) {
     const noDuplArr = Array.from(new Set(contacts));
 
     this._to = noDuplArr
-      .map((person) => getEmail(person))
+      .map((person) => getEmail(person, this.addressBook))
       .reduce((acc, item, idx, arr) => {
         if (idx < arr.length - 1) {
           return `${acc}${item};`;
@@ -59,6 +64,9 @@ class EmailBuilder {
 
         return `${acc}${item}`;
       }, '');
+
+    console.log('GOT TO:');
+    console.log(this._to);
 
     this._firstNameString = noDuplArr.reduce((acc, item, idx, arr): string => {
       const fName = item.split(' ')[0];
@@ -73,6 +81,36 @@ class EmailBuilder {
 
       return `${acc}${fName}`;
     }, '');
+
+    return this;
+  }
+
+  withCC(names: string[]) {
+    const ccList = Array.from(
+      new Set(names.map((name) => getEmail(name, this.addressBook)))
+    );
+
+    this._cc = ccList.reduce((acc, item, idx, arr) => {
+      if (idx < arr.length - 1) {
+        return `${acc}${item}, `;
+      }
+
+      return `${acc}${item}`;
+    }, '');
+
+    this._leadershipString = names
+      .map((entry) => entry.split(' ')[0])
+      .reduce((acc, item, idx, arr): string => {
+        if (idx < arr.length - 2) {
+          return `${acc}${item}, `;
+        }
+
+        if (idx === arr.length - 2) {
+          return `${acc}${item} and `;
+        }
+
+        return `${acc}${item}`;
+      }, '');
 
     return this;
   }
@@ -104,34 +142,6 @@ class EmailBuilder {
     if (individuals.length > 1) {
       this.withCalAllocation(week);
     }
-
-    return this;
-  }
-
-  withCC(names: string[]) {
-    const ccList = Array.from(new Set(names.map((name) => getEmail(name))));
-
-    this._cc = ccList.reduce((acc, item, idx, arr) => {
-      if (idx < arr.length - 1) {
-        return `${acc}${item}, `;
-      }
-
-      return `${acc}${item}`;
-    }, '');
-
-    this._leadershipString = names
-      .map((entry) => entry.split(' ')[0])
-      .reduce((acc, item, idx, arr): string => {
-        if (idx < arr.length - 2) {
-          return `${acc}${item}, `;
-        }
-
-        if (idx === arr.length - 2) {
-          return `${acc}${item} and `;
-        }
-
-        return `${acc}${item}`;
-      }, '');
 
     return this;
   }
@@ -187,20 +197,37 @@ class EmailBuilder {
   }
 }
 
-const getEmail = (name: string) => {
-  if (name === '') {
+const getEmail = (name: string, addressBook: ContactEntry[]): string => {
+  if (!name.length) {
     return '';
   }
-  const nameParts = name.split(' ');
 
-  return `${nameParts[0]}_${nameParts.slice(1).join()}@test.com`;
+  const nameCleared = removeDiacritics(name).toLowerCase();
+
+  const entry: ContactEntry | undefined = addressBook.find(
+    ({ first, last }) => {
+      const nameToCompare = `${first} ${last}`.toLowerCase();
+
+      const coverage = compareTwoStrings(nameCleared, nameToCompare);
+
+      if (coverage > 0.8) {
+        return true;
+      }
+      return false;
+    }
+  );
+
+  return entry
+    ? entry.email
+    : `${name.replace(' ', '_')}@email___not___found.com`;
 };
 
 export const generateEmail = (
   project: ProjectEditable,
-  container: ElementRef
+  container: ElementRef,
+  addressBook: ContactEntry[]
 ) => {
-  const emailBuilder = new EmailBuilder();
+  const emailBuilder = new EmailBuilder(addressBook);
 
   const allocationDone = Object.values(project.week).find(
     (val) => typeof val !== 'boolean'

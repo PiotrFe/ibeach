@@ -3,6 +3,7 @@ import { getDaysLeft } from 'src/app/shared-module/week-days/week';
 import { Person } from 'src/app/people-list/person';
 import { Week, getNewWeek } from 'src/app/shared-module/week-days/week';
 import { Tag } from 'src/app/shared-module/entry/entry.component';
+import { parse } from 'src/app/utils/csv-parser/index';
 import {
   getTagsFromData,
   sortTags,
@@ -10,6 +11,8 @@ import {
   clearTagDuplicates,
   getCalendarFromData,
 } from '../utils';
+
+import { ContactEntry } from 'src/app/project-list/project-list/project-list.component';
 
 @Injectable({
   providedIn: 'root',
@@ -92,4 +95,44 @@ export class CsvParserService {
 
     return returnData;
   }
+
+  parseContacts = (data: any, cb: Function): void => {
+    parse(
+      data,
+      { encoding: 'utf8', columns: true, relaxColumnCount: true },
+      (err, data) => {
+        if (err) {
+          console.log(err);
+          throw new Error(err.message);
+        }
+
+        this._mapContacts(data, cb);
+      }
+    );
+  };
+  _mapContacts = (data: any, cb: Function): void => {
+    const returnVal: ContactEntry[] = data.map((entry: any): ContactEntry => {
+      const firstNameKey = Object.keys(entry).find((key: string) => {
+        return key.toLowerCase().includes('first');
+      });
+      const lastNameKey = Object.keys(entry).find((key: string) => {
+        return key.toLowerCase().includes('last');
+      });
+      const emailKey = Object.keys(entry).find((key: string) => {
+        return (
+          key.toLowerCase().includes('email') ||
+          key.toLowerCase().includes('address')
+        );
+      });
+
+      const returnObj = {
+        first: entry[firstNameKey as keyof typeof entry],
+        last: entry[lastNameKey as keyof typeof entry],
+        email: entry[emailKey as keyof typeof entry],
+      };
+
+      return returnObj;
+    });
+    cb(returnVal);
+  };
 }
