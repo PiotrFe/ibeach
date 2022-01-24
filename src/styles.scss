@@ -164,12 +164,12 @@ li {
     font-weight: 700;
   }
 
-  &-skill {
+  &-skill,
+  &-type {
     width: 7%;
     min-width: max(3.5rem, 7%);
     justify-content: center;
     height: 30px;
-    // color: #fff;
     border-radius: 5px;
     padding-right: 3px;
     font-size: 0.88rem;
@@ -193,8 +193,6 @@ li {
           rgba(25, 135, 84, 0.4)
         );
       }
-
-      // background-color: rgba(25, 135, 84, 0.8);
     }
 
     &--yellow {
@@ -240,17 +238,22 @@ li {
     height: 30px;
     border-radius: 5px;
     justify-content: center;
-    text-align: center;
     font-size: 0.88rem;
+  }
+
+  &-add-project {
+    width: 17px;
+    min-width: 17px;
   }
 
   &-comments {
     flex-grow: 1;
     font-size: 0.88rem;
     max-width: 20rem;
+    justify-content: center;
 
     &--project {
-      max-width: 12rem;
+      max-width: 22rem;
     }
 
     &--header {
@@ -283,6 +286,7 @@ li {
   &-leadership {
     width: 7rem;
     min-width: 7rem;
+    max-width: 22rem;
   }
 }
 

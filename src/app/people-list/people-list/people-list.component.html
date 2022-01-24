@@ -120,14 +120,17 @@
   </li>
 
   <div class="people-content tl-content">
-    <div *ngIf="fetchError && !inEditMode" class="alert alert-danger">
+    <div
+      *ngIf="fetchError && !inEditMode && !newRows.length"
+      class="alert alert-danger"
+    >
       {{ fetchError }}
     </div>
     <div
-      *ngIf="noData && !inEditMode && dataSet.length === 0"
+      *ngIf="noData && !inEditMode && (!dataSet.length || !newRows.length)"
       class="alert alert-primary"
     >
-      No data available
+      No data to display
     </div>
     <ul *ngIf="inEditMode">
       <li *ngFor="let row of newRows">

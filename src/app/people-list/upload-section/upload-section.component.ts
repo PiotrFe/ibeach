@@ -62,7 +62,7 @@ export class UploadSectionComponent extends PageComponent implements OnChanges {
     this.noData = false;
     this.uploaded = false;
 
-    this.fetchService.fetchWeeklyList(this.referenceDate).subscribe({
+    this.fetchService.fetchWeeklyList(this.referenceDate, true).subscribe({
       next: (data: WeeklyData) => {
         const { people }: { people: Person[] } = data;
         this.previewData = people.sort(this.sortService.sortByName);
@@ -98,29 +98,33 @@ export class UploadSectionComponent extends PageComponent implements OnChanges {
 
     this.clearUploadStatus();
 
-    reader.readAsText(file, "UTF-8");
+    reader.readAsText(file, 'UTF-8');
     reader.onload = () => {
       this.data = reader.result as string;
 
       console.log(this.data);
 
-      parse(this.data, { encoding: "utf8", columns: true, relaxColumnCount: true }, (err, data) => {
-        if (err) {
-          console.log(err);
-          this.fetchError = String(err);
+      parse(
+        this.data,
+        { encoding: 'utf8', columns: true, relaxColumnCount: true },
+        (err, data) => {
+          if (err) {
+            console.log(err);
+            this.fetchError = String(err);
+          }
+          this.fileSelected = true;
+          this.previewData = this.csvParserService.parse(
+            data,
+            this.referenceDate,
+            this.referenceDateEnd
+          );
+          this.noData = false;
+
+          const parsed = this.csvParserService.parse(data);
+
+          this.fullData = parsed;
         }
-        this.fileSelected = true;
-        this.previewData = this.csvParserService.parse(
-          data,
-          this.referenceDate,
-          this.referenceDateEnd
-        );
-        this.noData = false;
-
-        const parsed = this.csvParserService.parse(data);
-
-        this.fullData = parsed;
-      });
+      );
     };
 
     reader.onerror = () => {

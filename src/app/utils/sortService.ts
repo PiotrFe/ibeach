@@ -16,6 +16,14 @@ const SKILL_INDEX = {
   INT: 1,
 };
 
+const PROJECT_INDEX = {
+  LOP: 6,
+  WS: 5,
+  MT: 4,
+  PD: 3,
+  OTH: 2,
+};
+
 interface SortEntry {
   field: string;
   order: 1 | 0 | -1;
@@ -53,6 +61,7 @@ export class SortService {
 
   SORT_COLUMNS = {
     NAME: 'name',
+    PROJECT_TYPE: 'type',
   };
 
   constructor() {}
@@ -80,7 +89,7 @@ export class SortService {
       }
     } else {
       this.sort.field = colName;
-      this.sort.order = ['skill', 'days'].includes(colName) ? -1 : 1;
+      this.sort.order = ['skill', 'days', 'type'].includes(colName) ? -1 : 1;
     }
   }
 
@@ -162,6 +171,31 @@ export class SortService {
     return 0;
   };
 
+  sortByProjectType = (
+    a: Project | ProjectEditable,
+    b: Project | ProjectEditable,
+    asc: boolean = false
+  ): number => {
+    const order = this.sort.order;
+    const typeA = a.type;
+    const typeB = b.type;
+
+    if (
+      PROJECT_INDEX[typeA as keyof typeof PROJECT_INDEX] <
+      PROJECT_INDEX[typeB as keyof typeof PROJECT_INDEX]
+    ) {
+      return asc ? -1 : order * -1;
+    }
+    if (
+      PROJECT_INDEX[typeA as keyof typeof PROJECT_INDEX] >
+      PROJECT_INDEX[typeB as keyof typeof PROJECT_INDEX]
+    ) {
+      return asc ? 1 : order;
+    }
+
+    return 0;
+  };
+
   sortByDate = (
     a: Person | PersonEditable,
     b: Person | PersonEditable,
@@ -232,6 +266,7 @@ export class SortService {
     }
 
     const sortBySkill = this.sortBySkill;
+    const sortByProjectType = this.sortByProjectType;
     const sortByName = this.sortByName;
     const sortByDays = this.sortByDays;
     const sortByDate = this.sortByDate;
@@ -247,41 +282,40 @@ export class SortService {
 
     if (colName === 'skill') {
       sortedDataSet.sort(function (a, b) {
-        // (1) sort by skill
         let returnVal: number = sortBySkill(a, b);
 
         if (returnVal !== 0) {
           return returnVal;
         }
-        // (2) sort by days (asc)
-        // returnVal = sortByDays(a, b, true);
 
-        // if (returnVal !== 0) {
-        //   return returnVal;
-        // }
+        return sortByName(a, b, true);
+      });
+    }
 
-        // (3) sort by name (asc)
+    if (colName === this.SORT_COLUMNS.PROJECT_TYPE) {
+      sortedDataSet.sort(function (a, b) {
+        let returnVal: number = sortByProjectType(a, b);
+
+        if (returnVal !== 0) {
+          return returnVal;
+        }
+
         return sortByName(a, b, true);
       });
     }
 
     if (colName === 'days') {
       sortedDataSet.sort(function (a, b) {
-        // (1) sort by days
         let returnVal: number = sortByDays(a, b);
 
         if (returnVal !== 0) {
           return returnVal;
         }
-
-        // (2) sort by name (skill)
         returnVal = sortBySkill(a, b);
 
         if (returnVal !== 0) {
           return returnVal;
         }
-
-        // (3) sort by name (asc)
         return sortByName(a, b, true);
       });
     }
@@ -292,13 +326,11 @@ export class SortService {
         if (returnVal !== 0) {
           return returnVal;
         }
-        // (2) sort by name (skill)
         returnVal = sortBySkill(a, b);
 
         if (returnVal !== 0) {
           return returnVal;
         }
-        // (3) sort by name (asc)
         return sortByName(a, b, true);
       });
     }

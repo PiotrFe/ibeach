@@ -78,6 +78,7 @@ export class DragAndDropService {
     draggableElem.style.alignItems = 'center';
     draggableElem.style.padding = '0px';
     draggableElem.style.margin = '0px';
+    draggableElem.style.backgroundColor = 'rgba(25, 135, 84, 1)';
 
     draggableElem.innerText = getInitials(draggableElem.innerText);
 

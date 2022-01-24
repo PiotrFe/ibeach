@@ -68,7 +68,7 @@
   >
     {{ project.client | projectName | max25chars }}
   </span>
-  <span [ngClass]="getFieldClasses('skill')">{{ project.type }}</span>
+  <span [ngClass]="getFieldClasses('type')">{{ project.type }}</span>
   <span [ngClass]="getFieldClasses('days')">{{ project.daysLeft }}</span>
   <div class="calendar-group mr-12">
     <week-days
@@ -82,7 +82,7 @@
       (allocation)="onAllocation($event)"
     ></week-days>
   </div>
-
+  <span class="section section-add-project">&nbsp;</span>
   <div
     @insertRemoveTrigger
     *ngIf="entryContainerWidth === 2 || entryContainerWidth > 2"

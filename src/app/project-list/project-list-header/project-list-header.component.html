@@ -11,13 +11,13 @@
   ></span>
   <span
     class="section section-skill header-entry mr-12 pl-3 clickable"
-    (click)="handleClick('skill')"
+    (click)="handleClick('type')"
     >Type
     <i
-      *ngIf="getSort('skill', 1)"
+      *ngIf="getSort('type', 1)"
       class="bi bi-sort-down-alt fs-085 ptop-3 ml-2"
     ></i>
-    <i *ngIf="getSort('skill', -1)" class="bi bi-sort-up fs-085 ptop-3 ml-2"></i
+    <i *ngIf="getSort('type', -1)" class="bi bi-sort-up fs-085 ptop-3 ml-2"></i
   ></span>
   <span
     class="section section-days header-entry mr-12 pl-3 clickable"
@@ -30,6 +30,7 @@
     <i *ngIf="getSort('days', -1)" class="bi bi-sort-up fs-085 ptop-3 ml-2"></i
   ></span>
   <span class="calendar-group header-entry txt-center mr-12">Week</span>
+  <span class="section section-add-project">&nbsp;</span>
   <span
     @insertRemoveTrigger
     *ngIf="entryContainerWidth === 2 || entryContainerWidth > 2"
@@ -45,7 +46,7 @@
   <span
     @insertRemoveTrigger
     *ngIf="entryContainerWidth === 4 || entryContainerWidth > 4"
-    class="section section-comments section-comments--project header-entry txt-center pl-3"
+    class="section section-comments section-comments--project header-entry txt-center pl-3 mr-12"
     >Comments</span
   >
   <div class="edit-entry-icons"></div>
