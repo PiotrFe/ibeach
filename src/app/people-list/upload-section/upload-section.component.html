@@ -46,7 +46,10 @@
     <div *ngIf="fetchError && !uploaded" class="alert alert-danger">
       {{ fetchError }}
     </div>
-    <div *ngIf="noData && !uploaded" class="alert alert-primary">
+    <div
+      *ngIf="(noData || !previewData.length) && !uploaded"
+      class="alert alert-primary"
+    >
       No data to display
     </div>
     <div *ngIf="uploaded" class="alert alert-success">

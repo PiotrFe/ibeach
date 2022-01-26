@@ -256,6 +256,9 @@ export class SortService {
     freshStart: boolean = false,
     updateCriteria: boolean = true
   ): any[] => {
+    if (!dataSet?.length) {
+      return dataSet;
+    }
     if (freshStart) {
       this.clearSort();
       this.updateSortCriteria(colName);

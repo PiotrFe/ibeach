@@ -72,6 +72,23 @@ li {
 }
 
 // ****************
+// LOGO
+// ****************
+
+.app-logo {
+  display: flex;
+  letter-spacing: 2px;
+  & > i {
+    margin-right: 1.3px;
+  }
+}
+
+.app-logo-icon {
+  height: 30px;
+  margin-left: 5px;
+}
+
+// ****************
 // TABLE SECTIONS
 // ****************
 
@@ -489,6 +506,18 @@ ul {
   100% {
     transform: scale(0);
   }
+}
+
+#settings-window {
+  height: 70vh;
+}
+
+#settings-window-content {
+  height: 90%;
+}
+
+#settings-list {
+  padding: 10px;
 }
 
 // ****************

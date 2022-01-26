@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { SettingsComponent } from 'src/app/settings/settings.component';
 
 export const PAGE_SECTIONS = {
   ALLOCATE: 'ALLOCATE',
@@ -16,6 +17,7 @@ export class AppComponent {
   title = 'client-dev-app';
   pageSection = PAGE_SECTIONS.ALLOCATE;
   referenceDate: Date = new Date();
+  showSettings: boolean = false;
 
   setPageSection(sectionName: keyof typeof PAGE_SECTIONS): void {
     this.pageSection = sectionName;
@@ -25,5 +27,10 @@ export class AppComponent {
     const newDate = date;
     newDate.setHours(0, 0, 0, 0);
     this.referenceDate = newDate;
+  }
+
+  toggleShowSettings() {
+    this.showSettings = !this.showSettings;
+    console.log(this.showSettings);
   }
 }

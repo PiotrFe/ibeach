@@ -14,6 +14,7 @@ import { Subscription } from 'rxjs';
 const MODAL_TYPES = {
   CONFIRM: 'CONFIRM',
   INFO: 'INFO',
+  SETTINGS: 'SETTINGS',
 };
 
 @Component({
@@ -23,7 +24,8 @@ const MODAL_TYPES = {
 })
 export class ModalWindowComponent implements OnInit, OnDestroy {
   @ViewChild('template') template!: TemplateRef<any>;
-  @ViewChild('template_simple') templateSimple!: TemplateRef<any>;
+  @ViewChild('templateSimple') templateSimple!: TemplateRef<any>;
+  @ViewChild('templateSettings') templateSettings!: TemplateRef<any>;
 
   @Input() title: string = '';
   @Input() text: string = '';
@@ -63,6 +65,10 @@ export class ModalWindowComponent implements OnInit, OnDestroy {
   }
 
   ngAfterViewInit() {
+    if (this.modalType === MODAL_TYPES.SETTINGS) {
+      this.modalRef = this.modalService.show(this.templateSettings);
+      return;
+    }
     if (this.title) {
       this.modalRef = this.modalService.show(this.template);
     } else {

@@ -8,6 +8,7 @@ import { throwError, catchError, Observable, tap } from 'rxjs';
 import { Person } from 'src/app/people-list/person';
 import { Project } from 'src/app/project-list/project-list/project';
 import { AllocationEntry } from 'src/app/shared-module/allocate.service';
+import { Config } from 'src/app/settings/settings.component';
 
 export const baseUrl = 'http://localhost:4000/api';
 
@@ -15,6 +16,7 @@ export interface WeeklyData {
   people: Person[];
   statusSummary: { pending: string[]; done: string[] };
   lookupTable: Person[];
+  config: Config;
 }
 
 @Injectable({
@@ -62,6 +64,10 @@ export class FetchService {
     finalUrl.searchParams.append(
       'skiplookup',
       String(Boolean(skipFetchingLookupTable))
+    );
+    finalUrl.searchParams.append(
+      'getconfig',
+      String(Boolean(!skipFetchingLookupTable))
     );
 
     return this.http

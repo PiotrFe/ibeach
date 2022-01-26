@@ -4,8 +4,8 @@ export const getTagsFromData = (
   data: string,
   tagType: 'ind' | 'fun'
 ): Tag[] => {
-  if (!data || data === "" || data?.length < 5) {
-    return []
+  if (!data || data === '' || data?.length < 5) {
+    return [];
   }
   const dataArrRaw = data.split('; ');
   const regex = /\(\d{1,3}%\)/i;
@@ -79,8 +79,8 @@ export const getAffiliations = (
   affiliation: string,
   type: 'ind' | 'fun'
 ): Tag[] => {
-  if (!affiliation || affiliation === "") {
-    return []
+  if (!affiliation || affiliation === '') {
+    return [];
   }
 
   const tag =
@@ -96,6 +96,20 @@ export const clearTagDuplicates = (tags: Tag[]): Tag[] => {
   const tagSet = new Set(tagStrArr);
 
   return Array.from(tagSet).map((str) => JSON.parse(str));
+};
+
+export const getAvailableTags = (): Tag[] => {
+  const indTags: Tag[] = [...Object.keys(ind)].map((indName) => ({
+    type: 'ind',
+    value: indName.toUpperCase(),
+  }));
+
+  const funTags = [...Object.keys(fun)].map((funName) => ({
+    type: 'fun',
+    value: funName.toUpperCase(),
+  }));
+
+  return [...indTags, ...funTags];
 };
 
 const ind = {

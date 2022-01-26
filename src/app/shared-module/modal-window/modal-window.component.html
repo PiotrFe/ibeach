@@ -12,7 +12,7 @@
   </div>
   <div class="modal-body">{{ text }}</div>
   <div class="modal-footer">
-    <button type="button" class="btn btn-success" (click)="close(true)">
+    <button type="button" class="btn btn-primary" (click)="close(true)">
       {{ btnConfirmText }}
     </button>
     <button type="button" class="btn btn-secondary" (click)="close(false)">
@@ -21,12 +21,12 @@
   </div>
 </ng-template>
 
-<ng-template #template_simple>
+<ng-template #templateSimple>
   <div class="modal-body text-center">
     <p>{{ text }}</p>
     <button
       type="button"
-      class="btn btn-sm btn-success mr-10"
+      class="btn btn-sm btn-primary mr-10"
       (click)="close(true)"
     >
       {{ btnConfirmText }}
@@ -36,6 +36,20 @@
       class="btn btn-sm btn-secondary"
       (click)="close(false)"
     >
+      {{ btnCloseText }}
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #templateSettings>
+  <div id="settings-window" class="modal-body text-center">
+    <div id="settings-window-content">
+      <ng-content></ng-content>
+    </div>
+    <button type="button" class="btn btn-primary mr-10" (click)="close(true)">
+      {{ btnConfirmText }}
+    </button>
+    <button type="button" class="btn btn-secondary" (click)="close(false)">
       {{ btnCloseText }}
     </button>
   </div>

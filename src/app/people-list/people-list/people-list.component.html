@@ -127,7 +127,7 @@
       {{ fetchError }}
     </div>
     <div
-      *ngIf="noData && !inEditMode && (!dataSet.length || !newRows.length)"
+      *ngIf="!inEditMode && !dataSet.length && !newRows.length"
       class="alert alert-primary"
     >
       No data to display

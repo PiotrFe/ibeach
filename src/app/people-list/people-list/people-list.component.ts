@@ -266,6 +266,10 @@ export class PeopleListComponent
   }
 
   updateStatusLabel() {
+    if (!this.dataSet.length) {
+      this.statusLabel = '';
+      return;
+    }
     if (this.status && this.pdmFilter.value === 'All') {
       if (!this.status.pending) {
         this.statusLabel = 'ready';
@@ -392,22 +396,19 @@ export class PeopleListComponent
   // SUBMIT HANDLERS
   // *****************
 
-  fetchData(skipFetchingLookupTable: boolean = false) {
+  fetchData(refetching = true) {
     this.fetching = true;
     this.fetchError = '';
     this.noData = false;
 
     const submittedOnly = this.displayedIn === 'ALLOCATE';
+    const skipLookupList = refetching;
 
     this.fetchService
-      .fetchWeeklyList(
-        this.referenceDate,
-        skipFetchingLookupTable,
-        submittedOnly
-      )
+      .fetchWeeklyList(this.referenceDate, skipLookupList, submittedOnly)
       .subscribe({
         next: (data: WeeklyData) => {
-          this._onWeeklyData(data, skipFetchingLookupTable);
+          this._onWeeklyData(data);
         },
         error: (e) => {
           if (e.message === 'No data') {
@@ -434,20 +435,29 @@ export class PeopleListComponent
       });
   }
 
-  _onWeeklyData(data: WeeklyData, skipFetchingLookupTable: boolean) {
-    const { people, statusSummary, lookupTable } = data;
-    this.dataSet = this.sortService
-      .sortData(people, this.sortService.SORT_COLUMNS.NAME, false, true, false)
-      .map((person) => ({
-        ...person,
-        inEditMode: false,
-        availDate: new Date(Date.parse(person.availDate)),
-      }));
+  _onWeeklyData(data: WeeklyData) {
+    const { people, statusSummary, lookupTable, config } = data;
+    console.log({ data });
+    this.dataSet = !people
+      ? []
+      : this.sortService
+          .sortData(
+            people,
+            this.sortService.SORT_COLUMNS.NAME,
+            false,
+            true,
+            false
+          )
+          .map((person) => ({
+            ...person,
+            inEditMode: false,
+            availDate: new Date(Date.parse(person.availDate)),
+          }));
 
     // lookup table only sent on first fetch, where pdm not provided as parameter
     // if pdm provided as a parameter, he/she cancelled changes and is fetching the old list from server
 
-    if (!skipFetchingLookupTable && lookupTable) {
+    if (lookupTable) {
       this.typeaheadService.storeLookupList(
         this.typeaheadService.tableTypes.People,
         lookupTable
@@ -512,7 +522,7 @@ export class PeopleListComponent
         )
         .subscribe({
           next: () => {
-            this.fetchData(true);
+            this.fetchData();
           },
           error: (e) => {
             this.fetchError = e;
@@ -527,7 +537,7 @@ export class PeopleListComponent
 
   handleDateChange(date: Date) {
     this.onDateChange(date);
-    this.fetchData();
+    this.fetchData(false);
   }
 
   handleFormPending(): void {
@@ -548,7 +558,7 @@ export class PeopleListComponent
   cancelChanges(): void {
     this.allocateService.registerSaveEvent(false, 'people');
     this.onCancelChanges();
-    this.fetchData(true);
+    this.fetchData();
   }
 
   handleUpdateTags(objParam: {

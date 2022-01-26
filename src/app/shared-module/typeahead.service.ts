@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { timeStamp } from 'console';
 import { Person } from 'src/app/people-list/person';
 import { Tag } from 'src/app/shared-module/entry/entry.component';
+import { getAvailableTags } from 'src/app/utils/getTagsFromData';
 
 enum TableTypes {
   People,
@@ -32,8 +33,6 @@ export class TypeaheadService {
         .filter((tags) => tags.length > 0)
         .map((tags) => tags.map((tag) => JSON.stringify(tag)))
         .flat();
-
-      this._tagList = Array.from(new Set(tags)).map((tag) => JSON.parse(tag));
     }
   }
 
@@ -91,7 +90,9 @@ export class TypeaheadService {
     return this._tagList.map((tag) => tag.value);
   }
 
-  constructor() {}
+  constructor() {
+    this._tagList = getAvailableTags();
+  }
 }
 
 export class TypeaheadServiceMock extends TypeaheadService {
