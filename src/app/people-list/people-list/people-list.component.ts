@@ -440,7 +440,7 @@ export class PeopleListComponent
   _onWeeklyData(data: WeeklyData) {
     const { people, statusSummary, lookupTable, config } = data;
 
-    this.dataSet = !people
+    this.dataSet = !people?.length
       ? []
       : this.sortService
           .sortData(

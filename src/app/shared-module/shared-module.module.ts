@@ -15,6 +15,8 @@ import { TypeaheadModule } from 'ngx-bootstrap/typeahead';
 import { FirstInitialPipe } from './first-initial.pipe';
 import { ProjectNamePipe } from './project-name.pipe';
 import { Max25charsPipe } from './max25chars.pipe';
+import { ArrayToListPipe } from './array-to-list.pipe';
+import { InputModalComponent } from './input-modal/input-modal.component';
 
 @NgModule({
   declarations: [
@@ -29,6 +31,8 @@ import { Max25charsPipe } from './max25chars.pipe';
     FirstInitialPipe,
     ProjectNamePipe,
     Max25charsPipe,
+    ArrayToListPipe,
+    InputModalComponent,
   ],
   imports: [
     CommonModule,
@@ -50,6 +54,8 @@ import { Max25charsPipe } from './max25chars.pipe';
     HeaderComponent,
     EntryComponent,
     Max25charsPipe,
+    ArrayToListPipe,
+    InputModalComponent,
   ],
   providers: [BsModalRef],
 })

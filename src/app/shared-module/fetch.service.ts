@@ -28,12 +28,9 @@ export class FetchService {
   private handleError(error: HttpErrorResponse) {
     if (error.status === 0) {
       console.log('An error occured: ', error.error);
-    } else if (error.status === 404) {
-      console.log('An 404 error occured: ', error.error);
-      return throwError(() => new Error('No data'));
     } else {
       console.error(
-        `Backend return code ${error.status}, body was: `,
+        `Backend returned code ${error.status}, body was: `,
         error.error
       );
     }

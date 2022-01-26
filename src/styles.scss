@@ -280,6 +280,10 @@ li {
     &--header {
       font-size: 1.1rem;
     }
+
+    &--left {
+      justify-content: flex-start;
+    }
   }
 
   &-pdm {
@@ -512,6 +516,10 @@ ul {
   }
 }
 
+// **********************
+// SETTINGS AND INPUT MODALS
+// **********************
+
 #settings-window {
   height: 70vh;
 }
@@ -521,7 +529,57 @@ ul {
 }
 
 #settings-list {
-  padding: 10px;
+  padding: 15px;
+  width: 100%;
+  height: 100%;
+}
+
+.settings-row {
+  width: 100%;
+  height: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.settings-label {
+  width: 40px;
+  min-width: 50px;
+  margin-right: 20px;
+  font-size: 1.2rem;
+}
+
+.settings-content {
+  flex-grow: 1;
+  font-size: 0.8rem;
+  overflow-y: scroll;
+  height: 100%;
+  margin-right: 20px;
+}
+
+.settings-icon {
+  width: 30px;
+}
+
+.settings-row {
+  width: 100%;
+  height: 70px;
+  border: 1px solid black;
+  font-size: 0.8rem !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.settings-list-entry {
+  display: block;
+}
+
+.modal-input--small {
+  height: 30vh;
+}
+.input-window-content {
+  height: 85%;
 }
 
 // ****************

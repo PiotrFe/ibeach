@@ -11,10 +11,11 @@ import {
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { Subscription } from 'rxjs';
 
-const MODAL_TYPES = {
+export const MODAL_TYPES = {
   CONFIRM: 'CONFIRM',
   INFO: 'INFO',
   SETTINGS: 'SETTINGS',
+  INPUT_SMALL: 'INPUT_SMALL',
 };
 
 @Component({
@@ -26,6 +27,7 @@ export class ModalWindowComponent implements OnInit, OnDestroy {
   @ViewChild('template') template!: TemplateRef<any>;
   @ViewChild('templateSimple') templateSimple!: TemplateRef<any>;
   @ViewChild('templateSettings') templateSettings!: TemplateRef<any>;
+  @ViewChild('templateInputSmall') templateInputSmall!: TemplateRef<any>;
 
   @Input() title: string = '';
   @Input() text: string = '';
@@ -67,6 +69,11 @@ export class ModalWindowComponent implements OnInit, OnDestroy {
   ngAfterViewInit() {
     if (this.modalType === MODAL_TYPES.SETTINGS) {
       this.modalRef = this.modalService.show(this.templateSettings);
+      return;
+    }
+    console.log(this.modalType);
+    if (this.modalType === MODAL_TYPES.INPUT_SMALL) {
+      this.modalRef = this.modalService.show(this.templateInputSmall);
       return;
     }
     if (this.title) {

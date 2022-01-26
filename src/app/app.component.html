@@ -109,4 +109,4 @@
     [referenceDate]="referenceDate"
   ></allocate-section>
 </div>
-<settings *ngIf="showSettings"></settings>
+<settings *ngIf="showSettings" (closeEvent)="closeSettings()"></settings>

@@ -143,7 +143,7 @@ export class PersonEntryFormComponent
   }
 
   ngOnDestroy() {
-    this.subscription && this.subscription.unsubscribe();
+    this.subscription.unsubscribe();
   }
 
   ngAfterViewInit(): void {

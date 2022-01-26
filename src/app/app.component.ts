@@ -31,6 +31,9 @@ export class AppComponent {
 
   toggleShowSettings() {
     this.showSettings = !this.showSettings;
-    console.log(this.showSettings);
+  }
+
+  closeSettings() {
+    this.showSettings = false;
   }
 }

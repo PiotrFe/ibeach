@@ -343,13 +343,15 @@ export class ProjectListComponent
 
     this.fetchService.fetchProjectList(this.referenceDate).subscribe({
       next: (data: Project[]) => {
-        const projects = data.map((entry: any) => {
-          const { availDate, ...otherProps } = entry;
-          return {
-            ...otherProps,
-            availDate: new Date(Date.parse(availDate)),
-          };
-        });
+        const projects = !data?.length
+          ? []
+          : data.map((entry: any) => {
+              const { availDate, ...otherProps } = entry;
+              return {
+                ...otherProps,
+                availDate: new Date(Date.parse(availDate)),
+              };
+            });
         this.dataSet = this.sortService
           .sortData(
             projects,

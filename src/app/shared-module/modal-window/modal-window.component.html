@@ -44,12 +44,34 @@
 <ng-template #templateSettings>
   <div id="settings-window" class="modal-body text-center">
     <div id="settings-window-content">
-      <ng-content></ng-content>
+      <ng-content select="[settings]"></ng-content>
     </div>
     <button type="button" class="btn btn-primary mr-10" (click)="close(true)">
       {{ btnConfirmText }}
     </button>
     <button type="button" class="btn btn-secondary" (click)="close(false)">
+      {{ btnCloseText }}
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #templateInputSmall>
+  <div class="modal-body text-center modal-input modal-input--small">
+    <div id="input-window-content">
+      <ng-content select="[input]"></ng-content>
+    </div>
+    <button
+      type="button"
+      class="btn btn-sm btn-primary mr-10"
+      (click)="close(true)"
+    >
+      {{ btnConfirmText }}
+    </button>
+    <button
+      type="button"
+      class="btn btn-sm btn-secondary"
+      (click)="close(false)"
+    >
       {{ btnCloseText }}
     </button>
   </div>

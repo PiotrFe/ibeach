@@ -91,6 +91,10 @@ export class ProjectEntryComponent extends EntryComponent implements OnInit {
       otherClass += ` fs-07`;
     }
 
+    if (fieldName === 'comments' && this.entryContainerWidth < 4) {
+      otherClass += ` section-comments--left`;
+    }
+
     return `${baseClass}${sortedClass}${otherClass}`;
   }
 

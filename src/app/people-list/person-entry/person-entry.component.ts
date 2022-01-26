@@ -74,6 +74,10 @@ export class PersonEntryComponent extends PersonEntry {
       otherClass += ` section-skill--${getSkillGroup(this.person.skill)}`;
     }
 
+    if (fieldName === 'comments' && this.entryContainerWidth < 4) {
+      otherClass += ` section-comments--left`;
+    }
+
     // if (this.entryData.daysLeft > 0) {
     //   otherClass += ' droppable droppable-projects';
     // }

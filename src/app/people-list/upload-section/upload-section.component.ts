@@ -65,7 +65,9 @@ export class UploadSectionComponent extends PageComponent implements OnChanges {
     this.fetchService.fetchWeeklyList(this.referenceDate, true).subscribe({
       next: (data: WeeklyData) => {
         const { people }: { people: Person[] } = data;
-        this.previewData = people.sort(this.sortService.sortByName);
+        this.previewData = !people.length
+          ? []
+          : people.sort(this.sortService.sortByName);
       },
       error: (e) => {
         console.log({ e });
