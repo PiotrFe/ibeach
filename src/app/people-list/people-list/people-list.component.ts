@@ -7,8 +7,9 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { FetchService } from '../../shared-module/fetch.service';
-import { TypeaheadService } from '../../shared-module/typeahead.service';
+import { FetchService } from 'src/app/shared-module/fetch.service';
+import { TypeaheadService } from 'src/app/shared-module/typeahead.service';
+import { ConfigService } from 'src/app/shared-module/config.service';
 import { ResizeObserverService } from 'src/app/shared-module/resize-observer.service';
 import {
   AllocateService,
@@ -20,7 +21,7 @@ import {
 } from 'src/app/shared-module/allocate.service';
 import { v4 as uuidv4 } from 'uuid';
 import { Subscription } from 'rxjs';
-import { Person, PersonEditable } from '../person';
+import { PersonEditable } from '../person';
 import { Tag } from 'src/app/shared-module/entry/entry.component';
 import { Week } from 'src/app/shared-module/week-days/week';
 
@@ -51,8 +52,7 @@ export class PeopleListComponent
   boundGetNameTypeahead!: Function;
   pdmArr!: String[];
 
-  allocationDataSubscription!: Subscription;
-  deleteRecordSubscription!: Subscription;
+  subscription: Subscription = new Subscription();
 
   // arr used for storing entries modified by the project side of the app (e.g. by deleting project records - days free up then)
   // records are stored in this array until save / cancel event on the project side
@@ -63,7 +63,8 @@ export class PeopleListComponent
     private allocateService: AllocateService,
     typeaheadService: TypeaheadService,
     resizeObserverService: ResizeObserverService,
-    ngZone: NgZone
+    ngZone: NgZone,
+    private configService: ConfigService
   ) {
     super(ngZone, resizeObserverService, typeaheadService);
   }
@@ -96,31 +97,29 @@ export class PeopleListComponent
   ngOnDestroy(): void {
     this.onPageDestroy();
 
-    if (this.allocationDataSubscription) {
-      this.allocationDataSubscription.unsubscribe();
-    }
-
-    if (this.deleteRecordSubscription) {
-      this.deleteRecordSubscription.unsubscribe();
+    if (this.subscription) {
+      this.subscription.unsubscribe();
     }
   }
 
   subscribeToAllocationServices(): void {
-    this.allocationDataSubscription = this.allocateService.onDataset.subscribe({
-      next: (newData: Dataset) => {
-        const { dataType, data } = newData;
+    const allocationDataSubscription = this.allocateService.onDataset.subscribe(
+      {
+        next: (newData: Dataset) => {
+          const { dataType, data } = newData;
 
-        if (dataType === 'people') {
-          this.dataSet = this.sortService.applyCurrentSort(data);
-          this.updateFilteredView();
-        }
-      },
-      error: (err) => {
-        this.fetchError = err;
-      },
-    });
+          if (dataType === 'people') {
+            this.dataSet = this.sortService.applyCurrentSort(data);
+            this.updateFilteredView();
+          }
+        },
+        error: (err) => {
+          this.fetchError = err;
+        },
+      }
+    );
 
-    this.deleteRecordSubscription =
+    const deleteRecordSubscription =
       this.allocateService.onDeleteRecord.subscribe({
         next: (data: DeletionEvent | SaveEvent) => {
           this._handleSaveOrDelete(data);
@@ -129,6 +128,9 @@ export class PeopleListComponent
           this.fetchError = err;
         },
       });
+
+    this.subscription.add(allocationDataSubscription);
+    this.subscription.add(deleteRecordSubscription);
   }
 
   _handleSaveOrDelete(data: DeletionEvent | SaveEvent) {
@@ -437,7 +439,7 @@ export class PeopleListComponent
 
   _onWeeklyData(data: WeeklyData) {
     const { people, statusSummary, lookupTable, config } = data;
-    console.log({ data });
+
     this.dataSet = !people
       ? []
       : this.sortService
@@ -462,6 +464,10 @@ export class PeopleListComponent
         this.typeaheadService.tableTypes.People,
         lookupTable
       );
+    }
+
+    if (config) {
+      this.configService.setConfig(config);
     }
 
     this.status = statusSummary;

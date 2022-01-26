@@ -1,6 +1,7 @@
 import {
   Component,
   OnInit,
+  OnDestroy,
   AfterViewInit,
   Input,
   Output,
@@ -10,11 +11,12 @@ import {
   ElementRef,
 } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { Subscription } from 'rxjs';
 import { TypeaheadMatch } from 'ngx-bootstrap/typeahead';
 import { PersonEntry } from '../person';
 import { Tag } from 'src/app/shared-module/entry/entry.component';
 import { TypeaheadService } from '../../shared-module/typeahead.service';
-import { getPDMArr } from '../../utils/getPDMArr';
+import { ConfigService, Config } from 'src/app/shared-module/config.service';
 import { Person } from '../person';
 import {
   getWeekDayDate,
@@ -35,7 +37,7 @@ import {
 })
 export class PersonEntryFormComponent
   extends PersonEntry
-  implements OnInit, AfterViewInit
+  implements OnInit, AfterViewInit, OnDestroy
 {
   @Input() dispatchToParentAndClose: boolean = false;
   @Input() pdm!: string;
@@ -66,16 +68,20 @@ export class PersonEntryFormComponent
 
   @ViewChild('entryContainer') entryContainer!: ElementRef;
 
-  pdmArr: string[] = getPDMArr();
+  pdmArr!: string[];
   fmno!: string;
   ignoreNextDateChange: boolean = false;
   initialDate!: Date;
+  subscription: Subscription = new Subscription();
 
   // ***************
   // CONSTRUCTOR
   // ***************
 
-  constructor(typeaheadService: TypeaheadService) {
+  constructor(
+    typeaheadService: TypeaheadService,
+    private configService: ConfigService
+  ) {
     super(typeaheadService);
   }
 
@@ -125,6 +131,19 @@ export class PersonEntryFormComponent
       this.localCalendarObj = getNewWeek();
       this.personForm.patchValue({ availDate: this.referenceDate });
     }
+
+    const configSubscr = this.configService.onConfig.subscribe({
+      next: (config: Config) => {
+        const { pdms } = config;
+        this.pdmArr = pdms;
+      },
+    });
+
+    this.subscription.add(configSubscr);
+  }
+
+  ngOnDestroy() {
+    this.subscription && this.subscription.unsubscribe();
   }
 
   ngAfterViewInit(): void {

@@ -8,7 +8,7 @@ import { throwError, catchError, Observable, tap } from 'rxjs';
 import { Person } from 'src/app/people-list/person';
 import { Project } from 'src/app/project-list/project-list/project';
 import { AllocationEntry } from 'src/app/shared-module/allocate.service';
-import { Config } from 'src/app/settings/settings.component';
+import { Config } from 'src/app/shared-module/config.service';
 
 export const baseUrl = 'http://localhost:4000/api';
 
