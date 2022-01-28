@@ -43,23 +43,47 @@
 
 <ng-template #templateSettings>
   <div id="settings-window" class="modal-body text-center">
-    <div id="settings-window-content">
+    <div class="modal-header">
+      <h4 class="modal-title pull-left">Settings</h4>
+      <button
+        type="button"
+        class="btn-close close pull-right"
+        aria-label="Close"
+        (click)="modalRef?.hide()"
+      >
+        <span aria-hidden="true" class="visually-hidden">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body" id="settings-window-content">
       <ng-content select="[settings]"></ng-content>
     </div>
-    <button type="button" class="btn btn-primary mr-10" (click)="close(true)">
-      {{ btnConfirmText }}
-    </button>
-    <button type="button" class="btn btn-secondary" (click)="close(false)">
-      {{ btnCloseText }}
-    </button>
+    <div class="modal-footer settings-buttons">
+      <button type="button" class="btn btn-primary mr-10" (click)="close(true)">
+        {{ btnConfirmText }}
+      </button>
+      <button type="button" class="btn btn-secondary" (click)="close(false)">
+        {{ btnCloseText }}
+      </button>
+    </div>
   </div>
 </ng-template>
 
 <ng-template #templateInputSmall>
-  <div class="modal-body text-center modal-input modal-input--small">
-    <div id="input-window-content">
-      <ng-content select="[input]"></ng-content>
-    </div>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">{{ title }}</h4>
+    <button
+      type="button"
+      class="btn-close close pull-right"
+      aria-label="Close"
+      (click)="modalRef?.hide()"
+    >
+      <span aria-hidden="true" class="visually-hidden">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <ng-content select="[input]"></ng-content>
+  </div>
+  <div class="modal-footer">
     <button
       type="button"
       class="btn btn-sm btn-primary mr-10"

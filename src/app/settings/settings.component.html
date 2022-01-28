@@ -2,29 +2,63 @@
   modalType="SETTINGS"
   btnConfirmText="Save"
   btnCloseText="Cancel"
+  [canSubmit]="true"
+  [hideOnBackdropClick]="!showInputModal"
   (closeEvent)="closeSettings()"
 >
-  <div id="settings-list" settings>
-    <div class="settings-row">
-      <label for="inputPDMs" class="settings-label">PDMs</label>
-
-      <div class="settings-content" id="inputPDMs">
-        <div class="settings-list-entry" *ngFor="let pdm of pdmArr">
-          {{ pdm }}
+  <div class="container" id="settings-list" settings>
+    <div class="row align-items-center settings-row settings-row--lg">
+      <div class="col-2 settings-col">
+        <label class="settings-label">PDMs</label>
+      </div>
+      <div class="col-8 settings-col">
+        <div class="settings-content">
+          {{ pdmArr.join(", ") }}
         </div>
       </div>
-      <div class="settings-icon">
-        <i
-          class="bi bi-pencil clickable"
-          (click)="toggleShowInputModal('pdm')"
-        ></i>
+      <div class="col-2 settings-col">
+        <div class="settings-icon">
+          <i
+            class="bi bi-pencil clickable"
+            (click)="toggleShowInputModal('pdm')"
+          ></i>
+        </div>
+      </div>
+    </div>
+    <div class="row align-items-center settings-row">
+      <div class="col-2 settings-col">
+        <label class="settings-label">CC</label>
+      </div>
+      <div class="col-8 settings-col">
+        <div class="settings-content">
+          {{ chargeCode }}
+        </div>
+      </div>
+      <div class="col-2 settings-col">
+        <div class="settings-icon">
+          <i
+            class="bi bi-pencil clickable"
+            (click)="toggleShowInputModal('chargeCode')"
+          ></i>
+        </div>
       </div>
     </div>
   </div>
 </modal-window>
-<input-modal
+<modal-window
   *ngIf="showInputModal"
-  size="SMALL"
-  [text]="inputModalContent"
-  (closeEvent)="closeInputModal()"
-></input-modal>
+  modalType="INPUT_SMALL"
+  btnConfirmText="Save"
+  btnCloseText="Cancel"
+  [canSubmit]="true"
+  [title]="inputModalTitle"
+  (closeEvent)="closeInputModal($event)"
+>
+  <div id="settings-list" input>
+    <textarea
+      class="form-control settings-text-area"
+      rows="10"
+      [formControl]="inputContent"
+    ></textarea>
+  </div>
+</modal-window>

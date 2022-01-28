@@ -521,11 +521,11 @@ ul {
 // **********************
 
 #settings-window {
-  height: 70vh;
+  height: clamp(300px, 75vh, 700px);
 }
 
 #settings-window-content {
-  height: 90%;
+  height: 75%;
 }
 
 #settings-list {
@@ -542,19 +542,44 @@ ul {
   align-items: center;
 }
 
-.settings-label {
-  width: 40px;
-  min-width: 50px;
-  margin-right: 20px;
-  font-size: 1.2rem;
+// .settings-label {
+//   width: 40px;
+//   min-width: 50px;
+//   margin-right: 20px;
+//   font-size: 1.2rem;
+// }
+
+// .settings-content {
+//   flex-grow: 1;
+//   font-size: 0.8rem;
+//   overflow-y: scroll;
+//   height: 100%;
+//   margin-right: 20px;
+// }
+
+.settings-row {
+  height: 50px;
+  max-height: 50px;
+
+  &--lg {
+    height: 100px;
+    max-height: 100px;
+  }
+  margin-bottom: 10px;
+}
+.settings-col {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .settings-content {
-  flex-grow: 1;
-  font-size: 0.8rem;
-  overflow-y: scroll;
   height: 100%;
-  margin-right: 20px;
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .settings-icon {

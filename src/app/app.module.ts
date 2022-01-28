@@ -8,10 +8,10 @@ import { PeopleListModule } from './people-list/people-list.module';
 import { ProjectListModule } from './project-list/project-list.module';
 import { AllocateModule } from './allocate/allocate.module';
 import { SharedModuleModule } from './shared-module/shared-module.module';
-import { SettingsComponent } from './settings/settings.component';
+import { SettingsModule } from './settings/settings.module';
 
 @NgModule({
-  declarations: [AppComponent, SettingsComponent],
+  declarations: [AppComponent],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
@@ -21,6 +21,7 @@ import { SettingsComponent } from './settings/settings.component';
     ProjectListModule,
     AllocateModule,
     SharedModuleModule,
+    SettingsModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

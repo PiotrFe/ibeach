@@ -5,8 +5,14 @@ import {
   Output,
   EventEmitter,
 } from '@angular/core';
+
+import { FormControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { ConfigService, Config } from 'src/app/shared-module/config.service';
+import {
+  ConfigService,
+  Config,
+  ConfigChange,
+} from 'src/app/shared-module/config.service';
 import { transformArrToListStr } from 'src/app/shared-module/array-to-list.pipe';
 
 @Component({
@@ -19,8 +25,13 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
   subscription: Subscription = new Subscription();
   pdmArr: string[] = [];
+  chargeCode: string = '';
   showInputModal: boolean = false;
-  inputModalContent: string = '';
+  inputModalTitle: string = '';
+  inputModalType!: null | 'pdms' | 'cc';
+  inputContent = new FormControl('');
+
+  configChanges: ConfigChange[] = [];
 
   constructor(private configService: ConfigService) {}
 
@@ -28,8 +39,9 @@ export class SettingsComponent implements OnInit, OnDestroy {
     const configSubscr = this.configService.onConfig.subscribe({
       next: (config: Config) => {
         // TODO: add a check to prevent unnecessary updates
-        const { pdms } = config;
+        const { pdms, cc } = config;
         this.pdmArr = pdms;
+        this.chargeCode = cc ? cc : '';
       },
     });
     this.subscription.add(configSubscr);
@@ -40,18 +52,57 @@ export class SettingsComponent implements OnInit, OnDestroy {
   }
 
   closeSettings(): void {
+    if (this.configChanges.length) {
+      this.configService.updateConfig(this.configChanges);
+      this.configChanges = [];
+    }
     this.closeEvent.emit();
   }
 
   toggleShowInputModal(showType: string): void {
     if (showType === 'pdm') {
-      this.inputModalContent = transformArrToListStr(this.pdmArr);
+      this.inputContent.setValue(transformArrToListStr(this.pdmArr));
+      this.inputModalTitle = 'Edit PDMs';
+      this.inputModalType = 'pdms';
     }
-    this.showInputModal = !this.showInputModal;
+    if (showType === 'chargeCode') {
+      this.inputContent.setValue(this.chargeCode);
+      this.inputModalTitle = 'Edit CC';
+      this.inputModalType = 'cc';
+    }
+    this.showInputModal = true;
   }
 
-  closeInputModal(): void {
+  closeInputModal(submitted: any): void {
+    if (this.inputContent.dirty && submitted) {
+      const configChange: ConfigChange = {
+        field: this.inputModalType!,
+        value: this._parseInputValue(this.inputContent.value),
+      };
+
+      this.configChanges.push(configChange);
+      this._updateLocalView(configChange);
+    }
     this.showInputModal = false;
-    this.inputModalContent = '';
+    this.inputContent.setValue('');
+    this.inputModalTitle = '';
+    this.inputModalType = null;
+  }
+
+  _updateLocalView(configChange: ConfigChange): void {
+    const { field, value } = configChange;
+
+    if (field === 'pdms') {
+      this.pdmArr = value as string[];
+    } else if (field === 'cc') {
+      this.chargeCode = value as string;
+    }
+  }
+
+  _parseInputValue(value: string): string | string[] {
+    if (this.inputModalType === 'pdms') {
+      return this.inputContent.value.split('\n');
+    }
+    return value;
   }
 }
