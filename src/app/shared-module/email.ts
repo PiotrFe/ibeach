@@ -4,6 +4,7 @@ import { Week } from 'src/app/shared-module/week-days/week';
 import { ContactEntry } from 'src/app/project-list/project-list/project-list.component';
 import { remove as removeDiacritics } from 'diacritics';
 import { compareTwoStrings } from 'string-similarity';
+import { EmailTemplate } from 'src/app/shared-module/config.service';
 
 export class Email {
   to!: string;
@@ -144,10 +145,24 @@ class EmailBuilder {
     return this;
   }
 
-  withSubject() {
-    this._subject = `Client development support${
-      this._client ? ` - ${this._client}` : ''
-    }${this._daysString ? ` (${this._daysString})` : ''}`;
+  withSubject(subject: string | undefined) {
+    const generateSubject = () => {
+      this._subject = subject!
+        .replace('[CLIENT]', `${this._client}`)
+        .replace('[DAYS]', `${this._daysString}`);
+    };
+
+    const setFallbackSubject = () => {
+      this._subject = `Client development support${
+        this._client ? ` - ${this._client}` : ''
+      }${this._daysString ? ` (${this._daysString})` : ''}`;
+    };
+
+    if (subject) {
+      generateSubject();
+    } else {
+      setFallbackSubject();
+    }
 
     return this;
   }
@@ -165,34 +180,61 @@ class EmailBuilder {
   }
 
   withBody(
-    content: string | null = null,
+    emailBody: EmailTemplate | undefined,
     withAllocation: boolean,
     chargeCode: string | undefined
   ) {
-    const arr = ['a', 'e', 'i', 'o', 'u', 'l'];
+    const generateBody = () => {
+      if (withAllocation) {
+        this._body = emailBody!.content
+          .replace('[FIRST]', `${this._firstNameString}`)
+          .replace('[CST]', `${this._leadershipString}`)
+          .replace('[TYPE]', `${this._projectType}`)
+          .replace('[CLIENT]', `${this._client}`)
+          .replace('[CC]', `${chargeCode}`)
+          .replace(
+            '[ALLOCATION]',
+            `${this._calString ? `${this._calString}` : ''}`
+          )
+          .replace('%0D%0A%0D%0ABest', '%0D%0ABest');
+      } else {
+        this._body = emailBody!.contentNoAllocation.replace(
+          '[FIRST]',
+          `${this._firstNameString}`
+        );
+      }
+    };
 
-    if (content) {
-      this._body = content;
-    } else if (withAllocation) {
-      const str = `Dear ${
-        this._firstNameString
-      },%0D%0A%0D%0AI hope you had a nice weekend.%0D%0A%0D%0ACould you support ${
-        this._leadershipString
-      } in preparing ${
-        arr.includes(this._projectType[0].toLowerCase()) ? 'an' : 'a'
-      } ${this._projectType} ${
-        this._client ? `for ${this._client}` : ''
-      }?  The team will be in touch soon with further details.${
-        chargeCode
-          ? `  For charging, please use ${chargeCode} for the time spent on the beach.`
-          : ''
-      }${this._calString ? `%0D%0A%0D%0A${this._calString}` : ''}%0D%0A${
-        this._calString ? '' : '%0D%0A'
-      }Best,%0D%0APD Team`;
+    const getFallbackBody = () => {
+      const arr = ['a', 'e', 'i', 'o', 'u', 'l'];
 
-      this._body = str;
+      if (withAllocation) {
+        const str = `Dear ${
+          this._firstNameString
+        },%0D%0A%0D%0AI hope you had a nice weekend.%0D%0A%0D%0ACould you support ${
+          this._leadershipString
+        } in preparing ${
+          arr.includes(this._projectType[0].toLowerCase()) ? 'an' : 'a'
+        } ${this._projectType} ${
+          this._client ? `for ${this._client}` : ''
+        }?  The team will be in touch soon with further details.${
+          chargeCode
+            ? `  On a timesheet, please use ${chargeCode} for the time spent on the beach.`
+            : ''
+        }${this._calString ? `%0D%0A%0D%0A${this._calString}` : ''}%0D%0A${
+          this._calString ? '' : '%0D%0A'
+        }Best,%0D%0APD Team`;
+
+        this._body = str;
+      } else {
+        this._body = `Dear ${this._firstNameString},%0D%0A%0D%0AI hope you had a nice weekend.%0D%0A%0D%0AAt the moment we unfortunately do not have anyone who could support the above.  We will get in touch as soon as any beach resources free up.%0D%0A%0D%0ABest,%0D%0APD Team`;
+      }
+    };
+
+    if (emailBody) {
+      generateBody();
     } else {
-      this._body = `Dear ${this._firstNameString},%0D%0A%0D%0AI hope you had a nice weekend.%0D%0A%0D%0AAt the moment we unfortunately do not have anyone who could support the above.  We will get in touch as soon as any beach resources free up.%0D%0A%0D%0ABest,%0D%0APD Team`;
+      getFallbackBody();
     }
 
     return this;
@@ -232,7 +274,8 @@ export const generateEmail = (
   project: ProjectEditable,
   container: ElementRef,
   addressBook: ContactEntry[],
-  chargeCode?: string
+  chargeCode?: string,
+  emailTemplate?: EmailTemplate
 ) => {
   const emailBuilder = new EmailBuilder(addressBook);
 
@@ -251,14 +294,14 @@ export const generateEmail = (
         .withClient(project.client)
         .withProjectType(project.type)
         .withDays(project.week)
-        .withSubject()
-        .withBody(null, true, chargeCode)
+        .withSubject(emailTemplate?.subject)
+        .withBody(emailTemplate, true, chargeCode)
         .build()
     : emailBuilder
         .withTo(project.leadership)
         .withClient(project.client)
-        .withSubject()
-        .withBody(null, false, chargeCode)
+        .withSubject(emailTemplate?.subject)
+        .withBody(emailTemplate, false, chargeCode)
         .build();
 
   let href = `mailto:${email.to}?`;

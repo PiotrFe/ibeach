@@ -6,12 +6,13 @@ import {
   EventEmitter,
 } from '@angular/core';
 
-import { FormControl } from '@angular/forms';
+import { FormControl, FormGroup } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import {
   ConfigService,
   Config,
   ConfigChange,
+  EmailTemplate,
 } from 'src/app/shared-module/config.service';
 import { transformArrToListStr } from 'src/app/shared-module/array-to-list.pipe';
 
@@ -26,10 +27,19 @@ export class SettingsComponent implements OnInit, OnDestroy {
   subscription: Subscription = new Subscription();
   pdmArr: string[] = [];
   chargeCode: string = '';
+  email!: {
+    current: EmailTemplate;
+    default: EmailTemplate;
+  };
   showInputModal: boolean = false;
   inputModalTitle: string = '';
-  inputModalType!: null | 'pdms' | 'cc';
+  inputModalType!: null | 'pdms' | 'cc' | 'email';
   inputContent = new FormControl('');
+  emailForm = new FormGroup({
+    subject: new FormControl(''),
+    content: new FormControl(''),
+    contentNoAllocation: new FormControl(''),
+  });
 
   configChanges: ConfigChange[] = [];
 
@@ -39,9 +49,10 @@ export class SettingsComponent implements OnInit, OnDestroy {
     const configSubscr = this.configService.onConfig.subscribe({
       next: (config: Config) => {
         // TODO: add a check to prevent unnecessary updates
-        const { pdms, cc } = config;
+        const { pdms, cc, email } = config;
         this.pdmArr = pdms;
         this.chargeCode = cc ? cc : '';
+        this.email = email;
       },
     });
     this.subscription.add(configSubscr);
@@ -64,12 +75,26 @@ export class SettingsComponent implements OnInit, OnDestroy {
       this.inputContent.setValue(transformArrToListStr(this.pdmArr));
       this.inputModalTitle = 'Edit PDMs';
       this.inputModalType = 'pdms';
-    }
-    if (showType === 'chargeCode') {
+    } else if (showType === 'chargeCode') {
       this.inputContent.setValue(this.chargeCode);
       this.inputModalTitle = 'Edit CC';
       this.inputModalType = 'cc';
+    } else if (showType === 'email') {
+      console.log(this.email);
+      if (this.email?.current) {
+        this.emailForm.setValue({
+          subject: this._decodeWhitespaces(this.email.current.subject),
+          content: this._decodeWhitespaces(this.email.current.content),
+          contentNoAllocation: this._decodeWhitespaces(
+            this.email.current.contentNoAllocation
+          ),
+        });
+      }
+
+      this.inputModalTitle = 'Email Template';
+      this.inputModalType = 'email';
     }
+
     this.showInputModal = true;
   }
 
@@ -104,5 +129,12 @@ export class SettingsComponent implements OnInit, OnDestroy {
       return this.inputContent.value.split('\n');
     }
     return value;
+  }
+
+  _decodeWhitespaces(str: string): string {
+    return str.replace(/%0D%0A/g, '\n');
+  }
+  _encodeWhitespaces(str: string): string {
+    return str.replace(/\n/g, '%0D%0A');
   }
 }

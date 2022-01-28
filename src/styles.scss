@@ -611,6 +611,10 @@ ul {
 // ELEMENT STYLING - VARIANTS
 // ****************
 
+.bld {
+  font-weight: bold !important;
+}
+
 .no-select {
   user-select: none;
   &::selection {
@@ -750,6 +754,36 @@ ul {
   }
   &-20 {
     margin-right: 20px;
+  }
+  &-21 {
+    margin-right: 21px;
+  }
+  &-22 {
+    margin-right: 22px;
+  }
+  &-23 {
+    margin-right: 23px;
+  }
+  &-24 {
+    margin-right: 24px;
+  }
+  &-25 {
+    margin-right: 25px;
+  }
+  &-26 {
+    margin-right: 26px;
+  }
+  &-27 {
+    margin-right: 27px;
+  }
+  &-28 {
+    margin-right: 28px;
+  }
+  &-29 {
+    margin-right: 29px;
+  }
+  &-30 {
+    margin-right: 30px;
   }
 }
 

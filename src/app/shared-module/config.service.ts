@@ -2,9 +2,19 @@ import { Injectable } from '@angular/core';
 import { ReplaySubject, Observable } from 'rxjs';
 import { FetchService } from 'src/app/shared-module/fetch.service';
 
+export interface EmailTemplate {
+  subject: string;
+  content: string;
+  contentNoAllocation: string;
+}
+
 export interface Config {
   pdms: string[];
   cc?: string;
+  email: {
+    current: EmailTemplate;
+    default: EmailTemplate;
+  };
 }
 
 export interface ConfigChange {

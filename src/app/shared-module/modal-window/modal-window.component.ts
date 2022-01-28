@@ -17,6 +17,7 @@ export const MODAL_TYPES = {
   INFO: 'INFO',
   SETTINGS: 'SETTINGS',
   INPUT_SMALL: 'INPUT_SMALL',
+  INPUT_LARGE: 'INPUT_LARGE',
 };
 
 @Component({
@@ -78,6 +79,11 @@ export class ModalWindowComponent implements OnInit, OnDestroy {
       return;
     }
     if (this.modalType === MODAL_TYPES.INPUT_SMALL) {
+      this.modalRef = this.modalService.show(this.templateInputSmall);
+      return;
+    }
+
+    if (this.modalType === MODAL_TYPES.INPUT_LARGE) {
       this.modalRef = this.modalService.show(this.templateInputSmall);
       return;
     }

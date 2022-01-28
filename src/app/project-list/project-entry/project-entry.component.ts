@@ -2,7 +2,11 @@ import { Component, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { TypeaheadService } from 'src/app/shared-module/typeahead.service';
 import { DragAndDropService } from 'src/app/shared-module/drag-and-drop.service';
-import { ConfigService, Config } from 'src/app/shared-module/config.service';
+import {
+  ConfigService,
+  Config,
+  EmailTemplate,
+} from 'src/app/shared-module/config.service';
 import { EntryComponent } from 'src/app/shared-module/entry/entry.component';
 import { Project, ProjectEditable } from '../project-list/project';
 import { Week } from 'src/app/shared-module/week-days/week';
@@ -22,6 +26,7 @@ export class ProjectEntryComponent extends EntryComponent implements OnInit {
   project!: ProjectEditable;
   subscription: Subscription = new Subscription();
   cc!: string;
+  emailTemplate!: EmailTemplate;
 
   @Input() addressBook: ContactEntry[] = [];
   @ViewChild('entryContainer') entryContainer!: ElementRef;
@@ -44,9 +49,16 @@ export class ProjectEntryComponent extends EntryComponent implements OnInit {
 
     const configSubscription = this.config.onConfig.subscribe({
       next: (config: Config) => {
-        const { cc } = config;
+        const { cc, email } = config;
         if (cc && cc !== this.cc) {
           this.cc = cc;
+        }
+        if (
+          email &&
+          (email?.current?.content !== this.emailTemplate?.content ||
+            email?.current?.subject !== this.emailTemplate?.subject)
+        ) {
+          this.emailTemplate = email.current;
         }
       },
     });
@@ -119,7 +131,8 @@ export class ProjectEntryComponent extends EntryComponent implements OnInit {
       this.entryData as ProjectEditable,
       this.entryContainer,
       this.addressBook,
-      this.cc
+      this.cc,
+      this.emailTemplate
     );
   }
 }

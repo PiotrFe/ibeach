@@ -43,10 +43,26 @@
         </div>
       </div>
     </div>
+    <div class="row align-items-center settings-row">
+      <div class="col-2 settings-col">
+        <label class="settings-label">Email</label>
+      </div>
+      <div class="col-8 settings-col">
+        <button
+          class="btn btn-dark btn-sm"
+          (click)="toggleShowInputModal('email')"
+        >
+          Edit
+        </button>
+      </div>
+      <div class="col-2 settings-col">
+        <div class="settings-icon"></div>
+      </div>
+    </div>
   </div>
 </modal-window>
 <modal-window
-  *ngIf="showInputModal"
+  *ngIf="showInputModal && inputModalType !== 'email'"
   modalType="INPUT_SMALL"
   btnConfirmText="Save"
   btnCloseText="Cancel"
@@ -57,8 +73,45 @@
   <div id="settings-list" input>
     <textarea
       class="form-control settings-text-area"
-      rows="10"
+      rows="17"
       [formControl]="inputContent"
     ></textarea>
+  </div>
+</modal-window>
+<modal-window
+  *ngIf="showInputModal && inputModalType === 'email'"
+  modalType="INPUT_LARGE"
+  btnConfirmText="Save"
+  btnCloseText="Cancel"
+  [canSubmit]="true"
+  [title]="inputModalTitle"
+  (closeEvent)="closeInputModal($event)"
+>
+  <div id="settings-list" input>
+    <form [formGroup]="emailForm">
+      <div class="mb-3">
+        <label class="form-label bld">Subject</label>
+        <input class="form-control" formControlName="subject" />
+      </div>
+      <div class="mb-3">
+        <label class="form-label bld">Main template</label>
+        <textarea
+          class="form-control"
+          rows="10"
+          formControlName="content"
+        ></textarea>
+      </div>
+      <div class="mb-3">
+        <label class="form-label bld">No allocation template</label>
+        <textarea
+          class="form-control"
+          rows="10"
+          formControlName="contentNoAllocation"
+        ></textarea>
+      </div>
+    </form>
+  </div>
+  <div buttons>
+    <button class="btn btn-warning mr-30">Restore default</button>
   </div>
 </modal-window>
