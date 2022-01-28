@@ -43,8 +43,8 @@
   id="{{ id }}"
   class="entry-item tl-row no-select"
   [class.entry-item--uncollapsed]="entryContainerWidth < 4 && !isCollapsed"
-  [class.droppable]="entryData.daysLeft > 0"
-  [class.droppable-projects]="entryData.daysLeft > 0"
+  [class.droppable]="!inEditMode && entryData.daysLeft > 0"
+  [class.droppable-projects]="!inEditMode && entryData.daysLeft > 0"
 >
   <span
     *ngIf="entryContainerWidth === 4"
@@ -83,7 +83,7 @@
       [id]="id"
       [weekObj]="person.week"
       [inEditMode]="inEditMode"
-      [droppable]="displayedIn === 'ALLOCATE'"
+      [droppable]="!inEditMode && displayedIn === 'ALLOCATE'"
       [displayedIn]="'people'"
       (calendarChange)="onCalendarChange($event)"
       (allocation)="onAllocation($event)"

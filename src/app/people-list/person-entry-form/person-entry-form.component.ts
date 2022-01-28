@@ -22,6 +22,7 @@ import {
   getWeekDayDate,
   getNewAvailDate,
   getCalendarFromDate,
+  removeExtraSpacesFromStr,
 } from '../../utils/';
 
 import {
@@ -134,6 +135,7 @@ export class PersonEntryFormComponent
 
     const configSubscr = this.configService.onConfig.subscribe({
       next: (config: Config) => {
+        // TODO: add a check to prevent unnecessary updates
         const { pdms } = config;
         this.pdmArr = pdms;
       },
@@ -228,9 +230,9 @@ export class PersonEntryFormComponent
     if (this.entryData) {
       this.formEditEvent.emit({
         id: this.fmno || this.id,
-        name,
+        name: removeExtraSpacesFromStr(name),
         skill,
-        comments,
+        comments: removeExtraSpacesFromStr(comments),
         availDate,
         pdm,
         week: this.localCalendarObj,
@@ -239,9 +241,9 @@ export class PersonEntryFormComponent
     } else {
       this.formSubmitEvent.emit({
         id: this.fmno || this.id,
-        name,
+        name: removeExtraSpacesFromStr(name),
         skill,
-        comments,
+        comments: removeExtraSpacesFromStr(comments),
         availDate,
         pdm,
         week: this.localCalendarObj,

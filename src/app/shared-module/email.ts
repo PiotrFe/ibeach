@@ -49,6 +49,7 @@ class EmailBuilder {
   _client!: string;
   _calString!: string;
   _daysString!: string;
+  _chargeCode!: string;
 
   constructor(private addressBook: ContactEntry[]) {}
 
@@ -64,9 +65,6 @@ class EmailBuilder {
 
         return `${acc}${item}`;
       }, '');
-
-    console.log('GOT TO:');
-    console.log(this._to);
 
     this._firstNameString = noDuplArr.reduce((acc, item, idx, arr): string => {
       const fName = item.split(' ')[0];
@@ -166,7 +164,11 @@ class EmailBuilder {
     return this;
   }
 
-  withBody(content: string | null = null, withAllocation: boolean) {
+  withBody(
+    content: string | null = null,
+    withAllocation: boolean,
+    chargeCode: string | undefined
+  ) {
     const arr = ['a', 'e', 'i', 'o', 'u', 'l'];
 
     if (content) {
@@ -180,9 +182,13 @@ class EmailBuilder {
         arr.includes(this._projectType[0].toLowerCase()) ? 'an' : 'a'
       } ${this._projectType} ${
         this._client ? `for ${this._client}` : ''
-      }? The team will be in touch soon with further details.${
-        this._calString ? `%0D%0A%0D%0A${this._calString}` : ''
-      }%0D%0A${this._calString ? '' : '%0D%0A'}Best,%0D%0APD Team`;
+      }?  The team will be in touch soon with further details.${
+        chargeCode
+          ? `  For charging, please use ${chargeCode} for the time spent on the beach.`
+          : ''
+      }${this._calString ? `%0D%0A%0D%0A${this._calString}` : ''}%0D%0A${
+        this._calString ? '' : '%0D%0A'
+      }Best,%0D%0APD Team`;
 
       this._body = str;
     } else {
@@ -225,7 +231,8 @@ const getEmail = (name: string, addressBook: ContactEntry[]): string => {
 export const generateEmail = (
   project: ProjectEditable,
   container: ElementRef,
-  addressBook: ContactEntry[]
+  addressBook: ContactEntry[],
+  chargeCode?: string
 ) => {
   const emailBuilder = new EmailBuilder(addressBook);
 
@@ -245,13 +252,13 @@ export const generateEmail = (
         .withProjectType(project.type)
         .withDays(project.week)
         .withSubject()
-        .withBody(null, true)
+        .withBody(null, true, chargeCode)
         .build()
     : emailBuilder
         .withTo(project.leadership)
         .withClient(project.client)
         .withSubject()
-        .withBody(null, false)
+        .withBody(null, false, chargeCode)
         .build();
 
   let href = `mailto:${email.to}?`;

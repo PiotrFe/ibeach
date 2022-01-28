@@ -27,6 +27,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     const configSubscr = this.configService.onConfig.subscribe({
       next: (config: Config) => {
+        // TODO: add a check to prevent unnecessary updates
         const { pdms } = config;
         this.pdmArr = pdms;
       },

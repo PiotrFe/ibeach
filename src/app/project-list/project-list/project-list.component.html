@@ -36,7 +36,13 @@
   </div>
   <div class="toolbar-group toolbar-group--center flex flex-ver-ctr"></div>
   <div class="toolbar-group toolbar-group--right flex flex-ver-ctr">
-    <div class="form-check form-switch">
+    <div
+      class="form-check form-switch"
+      tooltip="Show available only"
+      placement="bottom"
+      [adaptivePosition]="false"
+      [delay]="700"
+    >
       <input
         class="form-check-input"
         type="checkbox"
@@ -44,16 +50,14 @@
         id="flexSwitchCheckChecked"
         [checked]="showAvailableOnly"
         (click)="toggleShowAvailableOnly()"
-        tooltip="Show available only"
-        placement="top"
-        [delay]="600"
       />
     </div>
     <i
       [ngClass]="getClearFilterBtnClass()"
       tooltip="Clear filters"
-      placement="top"
-      [delay]="600"
+      placement="bottom"
+      [adaptivePosition]="false"
+      [delay]="700"
       (click)="clearFilters()"
     ></i>
   </div>

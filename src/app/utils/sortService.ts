@@ -11,9 +11,11 @@ const SKILL_INDEX = {
   PSSA: 3.6,
   SFDS: 3.5,
   FELL: 3,
-  BA: 2,
+  BA: 2.2,
+  PSSR: 2,
   SA: 1.1,
   INT: 1,
+  ECAI: 0.9,
 };
 
 const PROJECT_INDEX = {

@@ -167,10 +167,18 @@ export class WeekDaysComponent implements OnInit {
     }
 
     if (item.type === 'avail') {
-      return `btn btn-primary btn-primary--light${disabledCls} cal-entry cal-entry--${item.day} droppable droppable-${activeDragAndDropFor}`;
+      let classes = `btn btn-primary btn-primary--light${disabledCls} cal-entry cal-entry--${item.day}`;
+
+      return !this.inEditMode
+        ? `${classes} droppable droppable-${activeDragAndDropFor}`
+        : classes;
     }
 
-    return `btn-allocated cal-entry cal-entry--${item.day} draggable draggable-${activeDragAndDropFor} flex flex-hor-ctr flex-ver-ctr`;
+    let classes = `btn-allocated cal-entry cal-entry--${item.day} flex flex-hor-ctr flex-ver-ctr`;
+
+    return !this.inEditMode
+      ? `${classes} draggable draggable-${activeDragAndDropFor}`
+      : classes;
   }
 
   getDropdownClass(weekDay: string): string {

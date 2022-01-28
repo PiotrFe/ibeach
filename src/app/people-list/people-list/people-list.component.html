@@ -85,7 +85,14 @@
       <option value="BA" selected>BA</option>
       <option value="INT" selected>INT</option>
     </select>
-    <div class="form-check form-switch">
+    <div
+      class="form-check form-switch"
+      tooltip="Show available only"
+      placement="bottom"
+      [adaptivePosition]="false"
+      [delay]="700"
+      triggers="hover"
+    >
       <input
         class="form-check-input"
         type="checkbox"
@@ -93,16 +100,14 @@
         id="flexSwitchCheckChecked"
         [checked]="showAvailableOnly"
         (click)="toggleShowAvailableOnly()"
-        tooltip="Show available only"
-        placement="top"
-        [delay]="600"
       />
     </div>
     <i
       [ngClass]="getClearFilterBtnClass()"
       tooltip="Clear filters"
-      placement="top"
-      [delay]="600"
+      placement="bottom"
+      [adaptivePosition]="false"
+      [delay]="700"
       (click)="clearFilters()"
     ></i>
   </div>

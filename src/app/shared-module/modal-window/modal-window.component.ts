@@ -71,7 +71,6 @@ export class ModalWindowComponent implements OnInit, OnDestroy {
       this.modalRef = this.modalService.show(this.templateSettings);
       return;
     }
-    console.log(this.modalType);
     if (this.modalType === MODAL_TYPES.INPUT_SMALL) {
       this.modalRef = this.modalService.show(this.templateInputSmall);
       return;

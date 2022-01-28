@@ -3,6 +3,7 @@ import { ReplaySubject, Observable } from 'rxjs';
 
 export interface Config {
   pdms: string[];
+  cc?: string;
 }
 
 @Injectable({

@@ -66,7 +66,7 @@ export class PersonEntryComponent extends PersonEntry {
     const sortedClass = fieldName === this.sortField ? ' sorted' : '';
     let otherClass = fieldName === 'pdm' ? ' flex-ctr-hor' : '';
 
-    if (fieldName === 'name') {
+    if (!this.inEditMode && fieldName === 'name') {
       otherClass += ` draggable draggable-people`;
     }
 
@@ -90,13 +90,13 @@ const getSkillGroup = (skill: string): string => {
   if (['EM', 'PSSM', 'PE', 'EDS'].includes(skill)) {
     return 'green';
   }
-  if (['ASC', 'PSS', 'SRAS', 'SPDS'].includes(skill)) {
+  if (['ASC', 'PSSA', 'SRAS', 'SPDS'].includes(skill)) {
     return 'yellow';
   }
-  if (['BA', 'FELL', 'SFDS', 'PSSR'].includes(skill)) {
+  if (['BA', 'FELL', 'FDS', 'SFDS', 'PSSR'].includes(skill)) {
     return 'orange';
   }
-  if (['INT', 'SA'].includes(skill)) {
+  if (['INT', 'SA', 'ECAI'].includes(skill)) {
     return 'red';
   }
   return '';

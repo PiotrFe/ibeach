@@ -35,12 +35,12 @@ export class AllocateSectionComponent implements OnInit, OnDestroy {
   @Input() referenceDate: Date = new Date();
 
   dragging: boolean = false;
-  dragAndDropSubscription!: Subscription;
+  subsciption: Subscription = new Subscription();
 
   constructor(private dragAndDrop: DragAndDropService) {}
 
   ngOnInit(): void {
-    this.dragAndDropSubscription = this.dragAndDrop.onDragAndDrop$.subscribe({
+    const ddSubscription = this.dragAndDrop.onDragAndDrop$.subscribe({
       next: (event: DragAndDropEvent) => {
         if (event.type === 'dragstart') {
           this.dragging = true;
@@ -50,10 +50,12 @@ export class AllocateSectionComponent implements OnInit, OnDestroy {
         }
       },
     });
+
+    this.subsciption.add(ddSubscription);
   }
 
   ngOnDestroy(): void {
-    this.dragAndDropSubscription.unsubscribe();
+    this.subsciption.unsubscribe();
   }
 
   onDragHandleClick(e: any) {

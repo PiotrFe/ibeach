@@ -19,6 +19,7 @@ import {
   getWeekDayDate,
   getNewAvailDate,
   getCalendarFromDate,
+  removeExtraSpacesFromStr,
 } from 'src/app/utils';
 import {
   Week,
@@ -158,9 +159,9 @@ export class ProjectEntryFormComponent
     if (!this.cleanSlate) {
       this.formEditEvent.emit({
         id: this.id,
-        client,
+        client: removeExtraSpacesFromStr(client),
         type,
-        comments,
+        comments: removeExtraSpacesFromStr(comments),
         availDate,
         week: getNewWeek(),
         tags: this.tags,
@@ -170,9 +171,9 @@ export class ProjectEntryFormComponent
     } else {
       this.formSubmitEvent.emit({
         id: this.id,
-        client,
+        client: removeExtraSpacesFromStr(client),
         type,
-        comments,
+        comments: removeExtraSpacesFromStr(comments),
         availDate,
         week: getNewWeek(),
         tags: this.tags,
@@ -217,9 +218,9 @@ export class ProjectEntryFormComponent
     if (!this.cleanSlate) {
       this.formEditEvent.emit({
         id: this.id,
-        client,
+        client: removeExtraSpacesFromStr(client),
         type,
-        comments,
+        comments: removeExtraSpacesFromStr(comments),
         availDate,
         week: this.localCalendarObj,
         tags: this.tags,
@@ -228,9 +229,9 @@ export class ProjectEntryFormComponent
     } else {
       this.formSubmitEvent.emit({
         id: this.id,
-        client,
+        client: removeExtraSpacesFromStr(client),
         type,
-        comments,
+        comments: removeExtraSpacesFromStr(comments),
         availDate,
         week: this.localCalendarObj,
         tags: this.tags,
@@ -311,7 +312,7 @@ const getLeadershipStringArr = (str: string): string[] => {
   }
   const arr = str
     .split(', ')
-    .map((elem: string) => capitalizeFirst(elem.trim()));
+    .map((elem: string) => capitalizeFirst(removeExtraSpacesFromStr(elem)));
 
   return Array.from(new Set(arr));
 };

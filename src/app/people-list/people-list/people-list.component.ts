@@ -257,22 +257,22 @@ export class PeopleListComponent
     this.filters = [];
     this.showAvailableOnly = false;
     this.pdmFilter.setValue('All');
-    this.clearEditModeOptions();
+    this.updateStatusLabel(true);
     this.updateFilteredView();
   }
 
   clearEditModeOptions(): void {
-    this.statusLabel = '';
     this.inEditMode = false;
     this.newRows = [];
+    this.updateStatusLabel();
   }
 
-  updateStatusLabel() {
+  updateStatusLabel(clearedFilters: boolean = false) {
     if (!this.dataSet.length) {
       this.statusLabel = '';
       return;
     }
-    if (this.status && this.pdmFilter.value === 'All') {
+    if (this.status && (clearedFilters || this.pdmFilter.value === 'All')) {
       if (!this.status.pending) {
         this.statusLabel = 'ready';
       } else {

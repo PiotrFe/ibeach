@@ -1,6 +1,8 @@
 import { Component, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { TypeaheadService } from 'src/app/shared-module/typeahead.service';
 import { DragAndDropService } from 'src/app/shared-module/drag-and-drop.service';
+import { ConfigService, Config } from 'src/app/shared-module/config.service';
 import { EntryComponent } from 'src/app/shared-module/entry/entry.component';
 import { Project, ProjectEditable } from '../project-list/project';
 import { Week } from 'src/app/shared-module/week-days/week';
@@ -18,6 +20,8 @@ import { ContactEntry } from 'src/app/project-list/project-list/project-list.com
 })
 export class ProjectEntryComponent extends EntryComponent implements OnInit {
   project!: ProjectEditable;
+  subscription: Subscription = new Subscription();
+  cc!: string;
 
   @Input() addressBook: ContactEntry[] = [];
   @ViewChild('entryContainer') entryContainer!: ElementRef;
@@ -25,7 +29,8 @@ export class ProjectEntryComponent extends EntryComponent implements OnInit {
   constructor(
     private allocateService: AllocateService,
     private dragAndDrop: DragAndDropService,
-    typeaheadService: TypeaheadService
+    typeaheadService: TypeaheadService,
+    private config: ConfigService
   ) {
     super(typeaheadService);
   }
@@ -36,6 +41,17 @@ export class ProjectEntryComponent extends EntryComponent implements OnInit {
       ...entry,
       inEditMode: false,
     };
+
+    const configSubscription = this.config.onConfig.subscribe({
+      next: (config: Config) => {
+        const { cc } = config;
+        if (cc && cc !== this.cc) {
+          this.cc = cc;
+        }
+      },
+    });
+
+    this.subscription.add(configSubscription);
   }
 
   handleEdit(): void {
@@ -79,7 +95,7 @@ export class ProjectEntryComponent extends EntryComponent implements OnInit {
     const sortedClass = fieldName === this.sortField ? ' sorted' : '';
     let otherClass = '';
 
-    if (fieldName === 'name') {
+    if (!this.inEditMode && fieldName === 'name') {
       otherClass += ` draggable draggable-projects`;
     }
 
@@ -102,7 +118,8 @@ export class ProjectEntryComponent extends EntryComponent implements OnInit {
     generateEmail(
       this.entryData as ProjectEditable,
       this.entryContainer,
-      this.addressBook
+      this.addressBook,
+      this.cc
     );
   }
 }

@@ -10,3 +10,4 @@ export {
   clearTagDuplicates,
 } from './getTagsFromData';
 export { getCalendarFromData } from './getCalendarFromData';
+export { removeExtraSpacesFromStr } from './removeExtraSpacesFromStr';
