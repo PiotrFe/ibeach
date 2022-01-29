@@ -6,6 +6,7 @@
     class="bi bi-arrow-left clickable mr-5"
     (click)="setNew('prev')"
   ></i>
+
   <input
     type="text"
     placeholder="Datepicker"
@@ -14,12 +15,21 @@
     bsDatepicker
     [bsConfig]="{ isAnimated: true, dateInputFormat: 'DD-MMM-YYYY' }"
     [formControl]="displayDate"
-    (bsValueChange)="onDateChange($event)"
     [class.is-invalid]="showError"
+    (bsValueChange)="onDateChange($event)"
   />
+
   <i
     *ngIf="scrollable"
     class="bi bi-arrow-right clickable ml-5"
     (click)="setNew('next')"
   ></i>
 </div>
+<modal-window
+  *ngIf="showConfirmLeaveModal"
+  [text]="'You are in edit mode and may lose your changes.'"
+  [btnConfirmText]="'Continue'"
+  [btnCloseText]="'Cancel'"
+  [modalType]="'CONFIRM'"
+  (closeEvent)="handleModalClose($event)"
+></modal-window>

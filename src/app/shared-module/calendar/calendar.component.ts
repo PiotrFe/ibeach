@@ -11,7 +11,9 @@ import { FormControl } from '@angular/forms';
 import { BsLocaleService } from 'ngx-bootstrap/datepicker';
 import { defineLocale } from 'ngx-bootstrap/chronos';
 import { enGbLocale } from 'ngx-bootstrap/locale';
-import { getWeekDayDate } from '../../utils';
+import { getWeekDayDate } from 'src/app/utils';
+import { ListEditModeStatusService } from 'src/app/shared-module/list-edit-mode-status.service';
+import { createModalAction } from 'src/app/shared-module/modal-window/modal-window.component';
 
 defineLocale('uk', enGbLocale);
 
@@ -27,31 +29,49 @@ export class CalendarComponent implements OnInit, OnChanges {
   @Input() baseDay: number = 1;
   @Input() dateVal!: Date;
   @Input() isSmall: boolean = false;
+  @Input() askToConfirmDateChange: boolean = false;
 
   @Output() dateChangeEvent = new EventEmitter<Date>();
 
+  showConfirmLeaveModal: boolean = false;
   displayDate = new FormControl('');
 
-  constructor(private localeService: BsLocaleService) {}
+  modalAction!: { resolve: Function; reject: Function; wait: Function };
+  modalPromise!: Promise<any>;
+  currDate!: Date;
 
-  setNew(dir: 'prev' | 'next'): void {
+  constructor(
+    private localeService: BsLocaleService,
+    private listEditModeStatusService: ListEditModeStatusService
+  ) {}
+
+  setNew(dir: 'prev' | 'next') {
+    let date;
     if (this.weekly) {
-      this.displayDate.setValue(
-        getWeekDayDate(this.baseDay, dir, this.displayDate.value)
-      );
+      date = getWeekDayDate(this.baseDay, dir, this.displayDate.value);
     } else {
       const currVal: Date = this.displayDate.value;
       const multipl = dir === 'prev' ? -1 : 1;
-      this.displayDate.setValue(
-        new Date(currVal.getTime() + 1000 * 60 * 60 * 24 * multipl)
-      );
+      date = new Date(currVal.getTime() + 1000 * 60 * 60 * 24 * multipl);
     }
+    this.onDateChange(date);
   }
 
-  onDateChange(date: any): void {
+  async onDateChange(date: any) {
     if (!date) {
       return;
     }
+
+    if (date === this.currDate) {
+      return;
+    }
+    try {
+      await this._canProceedWithDateChange();
+    } catch (e) {
+      this.displayDate.setValue(this.currDate);
+      return;
+    }
+
     const refDate = new Date(date);
     refDate.setHours(0, 0, 0, 0);
 
@@ -64,6 +84,10 @@ export class CalendarComponent implements OnInit, OnChanges {
       } else {
         offsetDate = refDate;
       }
+      if (this.askToConfirmDateChange) {
+        this.listEditModeStatusService.onRefDateChange();
+      }
+
       this.dateChangeEvent.emit(offsetDate);
     }
   }
@@ -92,7 +116,32 @@ export class CalendarComponent implements OnInit, OnChanges {
         return;
       }
 
+      this.currDate = newDate;
       this.displayDate.setValue(newDate);
     }
+  }
+
+  handleModalClose(submit: boolean) {
+    this.showConfirmLeaveModal = false;
+    if (submit) {
+      this.modalAction.resolve();
+    } else {
+      this.modalAction.reject();
+    }
+  }
+
+  _canProceedWithDateChange(): Promise<any> {
+    if (
+      !this.askToConfirmDateChange ||
+      !this.listEditModeStatusService.isEditModeOpen()
+    ) {
+      return Promise.resolve();
+    }
+
+    this.modalAction = createModalAction();
+    this.modalPromise = this.modalAction.wait();
+    this.showConfirmLeaveModal = true;
+
+    return this.modalPromise;
   }
 }

@@ -10,6 +10,7 @@ import { FormControl } from '@angular/forms';
 import { FetchService } from '../../shared-module/fetch.service';
 import { TypeaheadService } from '../../shared-module/typeahead.service';
 import { ResizeObserverService } from 'src/app/shared-module/resize-observer.service';
+import { ListEditModeStatusService } from 'src/app/shared-module/list-edit-mode-status.service';
 import {
   AllocateService,
   Dataset,
@@ -59,7 +60,8 @@ export class ProjectListComponent
     typeaheadService: TypeaheadService,
     resizeObserverService: ResizeObserverService,
     private csvParserService: CsvParserService,
-    ngZone: NgZone
+    ngZone: NgZone,
+    private listEditModeStatusService: ListEditModeStatusService
   ) {
     super(ngZone, resizeObserverService, typeaheadService);
   }
@@ -390,6 +392,18 @@ export class ProjectListComponent
         });
       },
     });
+  }
+
+  setInEditMode(inEditMode: boolean): void {
+    this.inEditMode = inEditMode;
+
+    if (inEditMode) {
+      this.listEditModeStatusService.onEnterEditMode('projects');
+    }
+    if (!inEditMode) {
+      this.newRows = [];
+      this.listEditModeStatusService.onExitEditMode('projects');
+    }
   }
 
   async postChanges() {

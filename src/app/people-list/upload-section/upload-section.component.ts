@@ -1,10 +1,4 @@
-import {
-  Component,
-  OnInit,
-  NgZone,
-  OnChanges,
-  SimpleChanges,
-} from '@angular/core';
+import { Component, NgZone, OnChanges, SimpleChanges } from '@angular/core';
 import { FetchService } from 'src/app/shared-module/fetch.service';
 import { CsvParserService } from 'src/app/shared-module/csv-parser.service';
 import { ResizeObserverService } from 'src/app/shared-module/resize-observer.service';
@@ -61,11 +55,12 @@ export class UploadSectionComponent extends PageComponent implements OnChanges {
     this.fetchError = '';
     this.noData = false;
     this.uploaded = false;
+    console.log('setting to false');
 
     this.fetchService.fetchWeeklyList(this.referenceDate, true).subscribe({
       next: (data: WeeklyData) => {
         const { people }: { people: Person[] } = data;
-        this.previewData = !people.length
+        this.previewData = !people?.length
           ? []
           : people.sort(this.sortService.sortByName);
       },
@@ -89,9 +84,10 @@ export class UploadSectionComponent extends PageComponent implements OnChanges {
     if (this.fetching) {
       this.fetchError = '';
     }
-    if (this.uploaded) {
-      this.uploaded = false;
-    }
+
+    console.log('setting to false');
+    this.uploaded = false;
+    this.fileSelected = false;
   }
 
   onFileSelected(event: any) {
@@ -131,6 +127,7 @@ export class UploadSectionComponent extends PageComponent implements OnChanges {
       console.log(reader.error);
       this.fetchError = String(reader.error?.message);
     };
+    event.target.value = '';
   }
 
   // *****************
@@ -158,6 +155,7 @@ export class UploadSectionComponent extends PageComponent implements OnChanges {
       .subscribe({
         next: () => {
           this.uploaded = true;
+          console.log('setting to true');
         },
         error: (e) => {
           console.log({ e });

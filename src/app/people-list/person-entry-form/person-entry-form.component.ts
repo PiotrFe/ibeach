@@ -255,7 +255,6 @@ export class PersonEntryFormComponent
   onDateChange(date: Date) {
     if (this.entryData && !this.initialDate) {
       this.initialDate = this.entryData.availDate as Date;
-      return;
     }
 
     if (this.ignoreNextDateChange) {

@@ -194,8 +194,9 @@ class EmailBuilder {
           .replace('[CC]', `${chargeCode}`)
           .replace(
             '[ALLOCATION]',
-            `${this._calString ? `${this._calString}` : ''}`
+            `${this._calString ? `${this._calString}%0D%0A` : ''}`
           )
+          // .replace('%0D%0A%0D%0A%0D%0ABest', '%0D%0ABest')
           .replace('%0D%0A%0D%0ABest', '%0D%0ABest');
       } else {
         this._body = emailBody!.contentNoAllocation.replace(
@@ -248,6 +249,10 @@ class EmailBuilder {
 const getEmail = (name: string, addressBook: ContactEntry[]): string => {
   if (!name.length) {
     return '';
+  }
+
+  if (!addressBook) {
+    return `${name.replace(' ', '_')}@email___not___found.com`;
   }
 
   const nameCleared = removeDiacritics(name).toLowerCase();

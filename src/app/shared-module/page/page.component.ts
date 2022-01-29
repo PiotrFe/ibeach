@@ -227,13 +227,6 @@ export class PageComponent implements AfterViewInit {
     return Boolean(atLeastOneFormOpen);
   };
 
-  setInEditMode(inEditMode: boolean): void {
-    this.inEditMode = inEditMode;
-    if (!inEditMode) {
-      this.newRows = [];
-    }
-  }
-
   removeRow(id: string): void {
     this.newRows = this.newRows.filter((item) => item.id !== id);
   }

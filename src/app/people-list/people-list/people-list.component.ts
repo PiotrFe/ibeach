@@ -11,6 +11,7 @@ import { FetchService } from 'src/app/shared-module/fetch.service';
 import { TypeaheadService } from 'src/app/shared-module/typeahead.service';
 import { ConfigService } from 'src/app/shared-module/config.service';
 import { ResizeObserverService } from 'src/app/shared-module/resize-observer.service';
+import { ListEditModeStatusService } from 'src/app/shared-module/list-edit-mode-status.service';
 import {
   AllocateService,
   Dataset,
@@ -64,7 +65,8 @@ export class PeopleListComponent
     typeaheadService: TypeaheadService,
     resizeObserverService: ResizeObserverService,
     ngZone: NgZone,
-    private configService: ConfigService
+    private configService: ConfigService,
+    private listEditModeStatusService: ListEditModeStatusService
   ) {
     super(ngZone, resizeObserverService, typeaheadService);
   }
@@ -210,6 +212,18 @@ export class PeopleListComponent
       }
     );
     this.updateFilteredView();
+  }
+
+  setInEditMode(inEditMode: boolean): void {
+    this.inEditMode = inEditMode;
+    if (inEditMode) {
+      this.listEditModeStatusService.onEnterEditMode('people');
+    }
+
+    if (!inEditMode) {
+      this.newRows = [];
+      this.listEditModeStatusService.onExitEditMode('people');
+    }
   }
 
   // *****************
@@ -480,11 +494,14 @@ export class PeopleListComponent
     const pdmParam =
       this.displayedIn !== 'ALLOCATE' ? this.pdmFilter.value : 'allocator';
 
+    const dataset =
+      this.displayedIn !== 'ALLOCATE' ? this.filteredDataset : this.dataSet;
+
     this.fetchService
       .saveList(
         this.referenceDate,
         pdmParam,
-        (this.dataSet as any[]).map((person) => {
+        (dataset as any[]).map((person) => {
           const { inEditMode, ...otherProps } = person;
 
           return {

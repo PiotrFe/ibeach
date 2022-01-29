@@ -94,3 +94,19 @@ export class ModalWindowComponent implements OnInit, OnDestroy {
     }
   }
 }
+
+export function createModalAction() {
+  let resolve: any;
+  let reject: any;
+
+  const promise = new Promise<any>((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+
+  function wait() {
+    return promise;
+  }
+
+  return { resolve, reject, wait };
+}
