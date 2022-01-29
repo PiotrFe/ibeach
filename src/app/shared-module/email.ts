@@ -4,6 +4,7 @@ import { Week } from 'src/app/shared-module/week-days/week';
 import { ContactEntry } from 'src/app/project-list/project-list/project-list.component';
 import { remove as removeDiacritics } from 'diacritics';
 import { compareTwoStrings } from 'string-similarity';
+import { addWhitespaces } from 'src/app/utils';
 import { EmailTemplate } from 'src/app/shared-module/config.service';
 
 export class Email {
@@ -186,7 +187,7 @@ class EmailBuilder {
   ) {
     const generateBody = () => {
       if (withAllocation) {
-        this._body = emailBody!.content
+        const body = emailBody!.content
           .replace('[FIRST]', `${this._firstNameString}`)
           .replace('[CST]', `${this._leadershipString}`)
           .replace('[TYPE]', `${this._projectType}`)
@@ -194,15 +195,17 @@ class EmailBuilder {
           .replace('[CC]', `${chargeCode}`)
           .replace(
             '[ALLOCATION]',
-            `${this._calString ? `${this._calString}%0D%0A` : ''}`
-          )
-          // .replace('%0D%0A%0D%0A%0D%0ABest', '%0D%0ABest')
-          .replace('%0D%0A%0D%0ABest', '%0D%0ABest');
+            `${this._calString ? `${this._calString}` : ''}`
+          );
+
+        this._body = addWhitespaces(body);
       } else {
-        this._body = emailBody!.contentNoAllocation.replace(
+        const body = emailBody!.contentNoAllocation.replace(
           '[FIRST]',
           `${this._firstNameString}`
         );
+
+        this._body = addWhitespaces(body);
       }
     };
 

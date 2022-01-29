@@ -15,6 +15,7 @@ import {
   EmailTemplate,
 } from 'src/app/shared-module/config.service';
 import { transformArrToListStr } from 'src/app/shared-module/array-to-list.pipe';
+import { decodeWhitespaces, encodeWhitespaces } from 'src/app/utils';
 
 @Component({
   selector: 'settings',
@@ -80,12 +81,11 @@ export class SettingsComponent implements OnInit, OnDestroy {
       this.inputModalTitle = 'Edit CC';
       this.inputModalType = 'cc';
     } else if (showType === 'email') {
-      console.log(this.email);
       if (this.email?.current) {
         this.emailForm.setValue({
-          subject: this._decodeWhitespaces(this.email.current.subject),
-          content: this._decodeWhitespaces(this.email.current.content),
-          contentNoAllocation: this._decodeWhitespaces(
+          subject: decodeWhitespaces(this.email.current.subject),
+          content: decodeWhitespaces(this.email.current.content),
+          contentNoAllocation: decodeWhitespaces(
             this.email.current.contentNoAllocation
           ),
         });
@@ -129,12 +129,5 @@ export class SettingsComponent implements OnInit, OnDestroy {
       return this.inputContent.value.split('\n');
     }
     return value;
-  }
-
-  _decodeWhitespaces(str: string): string {
-    return str.replace(/%0D%0A/g, '\n');
-  }
-  _encodeWhitespaces(str: string): string {
-    return str.replace(/\n/g, '%0D%0A');
   }
 }
