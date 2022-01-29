@@ -45,6 +45,7 @@ export class PageComponent implements AfterViewInit {
   newRows: (PersonEditable | ProjectEditable)[] = [];
 
   inEditMode: boolean = false;
+  showPastRecordsLabel: boolean = false;
   filters: Filter[] = [];
 
   noData: boolean = false;

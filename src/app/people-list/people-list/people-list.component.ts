@@ -25,6 +25,7 @@ import { Subscription } from 'rxjs';
 import { PersonEditable } from '../person';
 import { Tag } from 'src/app/shared-module/entry/entry.component';
 import { Week } from 'src/app/shared-module/week-days/week';
+import { getClosestPastMonday } from 'src/app/utils';
 
 import {
   PageComponent,
@@ -218,10 +219,16 @@ export class PeopleListComponent
     this.inEditMode = inEditMode;
     if (inEditMode) {
       this.listEditModeStatusService.onEnterEditMode('people');
+
+      const closestLastMonday = getClosestPastMonday(new Date());
+      if (this.referenceDate < closestLastMonday) {
+        this.showPastRecordsLabel = true;
+      }
     }
 
     if (!inEditMode) {
       this.newRows = [];
+      this.showPastRecordsLabel = false;
       this.listEditModeStatusService.onExitEditMode('people');
     }
   }

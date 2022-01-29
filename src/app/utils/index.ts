@@ -11,3 +11,4 @@ export {
 } from './getTagsFromData';
 export { getCalendarFromData } from './getCalendarFromData';
 export { removeExtraSpacesFromStr } from './removeExtraSpacesFromStr';
+export { getClosestPastMonday } from './getClosestPastMonday';
