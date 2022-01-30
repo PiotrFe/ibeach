@@ -13,6 +13,7 @@ import {
   Config,
   ConfigChange,
   EmailTemplate,
+  EmailConfig,
 } from 'src/app/shared-module/config.service';
 import { transformArrToListStr } from 'src/app/shared-module/array-to-list.pipe';
 import { decodeWhitespaces, encodeWhitespaces } from 'src/app/utils';
@@ -27,14 +28,10 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
   subscription: Subscription = new Subscription();
   pdmArr: string[] = [];
-  chargeCode: string = '';
-  email!: {
-    current: EmailTemplate;
-    default: EmailTemplate;
-  };
+  email!: EmailConfig;
   showInputModal: boolean = false;
   inputModalTitle: string = '';
-  inputModalType!: null | 'pdms' | 'cc' | 'email';
+  inputModalType!: null | 'pdms' | 'email';
   inputContent = new FormControl('');
   emailForm = new FormGroup({
     subject: new FormControl(''),
@@ -50,9 +47,8 @@ export class SettingsComponent implements OnInit, OnDestroy {
     const configSubscr = this.configService.onConfig.subscribe({
       next: (config: Config) => {
         // TODO: add a check to prevent unnecessary updates
-        const { pdms, cc, email } = config;
+        const { pdms, email } = config;
         this.pdmArr = pdms;
-        this.chargeCode = cc ? cc : '';
         this.email = email;
       },
     });
@@ -63,23 +59,20 @@ export class SettingsComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
   }
 
-  closeSettings(): void {
-    if (this.configChanges.length) {
+  closeSettings(submit: any): void {
+    if (submit && this.configChanges.length) {
       this.configService.updateConfig(this.configChanges);
       this.configChanges = [];
     }
+
     this.closeEvent.emit();
   }
 
-  toggleShowInputModal(showType: string): void {
+  displayInputModal(showType: string): void {
     if (showType === 'pdm') {
       this.inputContent.setValue(transformArrToListStr(this.pdmArr));
       this.inputModalTitle = 'Edit PDMs';
       this.inputModalType = 'pdms';
-    } else if (showType === 'chargeCode') {
-      this.inputContent.setValue(this.chargeCode);
-      this.inputModalTitle = 'Edit CC';
-      this.inputModalType = 'cc';
     } else if (showType === 'email') {
       if (this.email?.current) {
         this.emailForm.setValue({
@@ -98,20 +91,47 @@ export class SettingsComponent implements OnInit, OnDestroy {
     this.showInputModal = true;
   }
 
-  closeInputModal(submitted: any): void {
-    if (this.inputContent.dirty && submitted) {
-      const configChange: ConfigChange = {
+  closeInputModal(submitted: any, inputType: string): void {
+    let configChange: ConfigChange | null = null;
+
+    if (inputType === 'pdms' && this.inputContent.dirty && submitted) {
+      configChange = {
         field: this.inputModalType!,
         value: this._parseInputValue(this.inputContent.value),
       };
-
-      this.configChanges.push(configChange);
-      this._updateLocalView(configChange);
     }
+
+    if (inputType === 'email' && this.emailForm.dirty && submitted) {
+      configChange = {
+        field: this.inputModalType!,
+        value: {
+          default: this.email.default,
+          current: this.emailForm.value,
+        },
+      };
+    }
+
     this.showInputModal = false;
     this.inputContent.setValue('');
     this.inputModalTitle = '';
     this.inputModalType = null;
+
+    if (!configChange) {
+      return;
+    }
+    this.configChanges.push(configChange);
+    this._updateLocalView(configChange);
+  }
+
+  restoreEmailToDefault(): void {
+    this.emailForm.setValue({
+      subject: decodeWhitespaces(this.email?.default?.subject),
+      content: decodeWhitespaces(this.email?.default?.content),
+      contentNoAllocation: decodeWhitespaces(
+        this.email?.default?.contentNoAllocation
+      ),
+    });
+    this.emailForm.markAsDirty();
   }
 
   _updateLocalView(configChange: ConfigChange): void {
@@ -119,8 +139,11 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
     if (field === 'pdms') {
       this.pdmArr = value as string[];
-    } else if (field === 'cc') {
-      this.chargeCode = value as string;
+      return;
+    }
+
+    if (field === 'email') {
+      this.email.current = (value as EmailConfig).current as EmailTemplate;
     }
   }
 

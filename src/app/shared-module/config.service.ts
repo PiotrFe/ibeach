@@ -8,18 +8,19 @@ export interface EmailTemplate {
   contentNoAllocation: string;
 }
 
+export interface EmailConfig {
+  current: EmailTemplate;
+  default: EmailTemplate;
+}
+
 export interface Config {
   pdms: string[];
-  cc?: string;
-  email: {
-    current: EmailTemplate;
-    default: EmailTemplate;
-  };
+  email: EmailConfig;
 }
 
 export interface ConfigChange {
   field: keyof Config;
-  value: string | string[];
+  value: string | string[] | EmailConfig;
 }
 
 @Injectable({

@@ -4,7 +4,7 @@
   btnCloseText="Cancel"
   [canSubmit]="true"
   [hideOnBackdropClick]="!showInputModal"
-  (closeEvent)="closeSettings()"
+  (closeEvent)="closeSettings($event)"
 >
   <div class="container" id="settings-list" settings>
     <div class="row align-items-center settings-row settings-row--lg">
@@ -20,25 +20,7 @@
         <div class="settings-icon">
           <i
             class="bi bi-pencil clickable"
-            (click)="toggleShowInputModal('pdm')"
-          ></i>
-        </div>
-      </div>
-    </div>
-    <div class="row align-items-center settings-row">
-      <div class="col-2 settings-col">
-        <label class="settings-label bld">CC</label>
-      </div>
-      <div class="col-8 settings-col">
-        <div class="settings-content">
-          {{ chargeCode }}
-        </div>
-      </div>
-      <div class="col-2 settings-col">
-        <div class="settings-icon">
-          <i
-            class="bi bi-pencil clickable"
-            (click)="toggleShowInputModal('chargeCode')"
+            (click)="displayInputModal('pdm')"
           ></i>
         </div>
       </div>
@@ -50,8 +32,9 @@
       <div class="col-8 settings-col">
         <button
           class="btn btn-dark btn-sm"
-          (click)="toggleShowInputModal('email')"
+          (click)="displayInputModal('email')"
         >
+          <i class="bi bi-pencil clickable mr-5"></i>
           Edit template
         </button>
       </div>
@@ -68,7 +51,7 @@
   btnCloseText="Cancel"
   [canSubmit]="true"
   [title]="inputModalTitle"
-  (closeEvent)="closeInputModal($event)"
+  (closeEvent)="closeInputModal($event, 'pdms')"
 >
   <div id="settings-list" input>
     <textarea
@@ -85,7 +68,7 @@
   btnCloseText="Cancel"
   [canSubmit]="true"
   [title]="inputModalTitle"
-  (closeEvent)="closeInputModal($event)"
+  (closeEvent)="closeInputModal($event, 'email')"
 >
   <div id="settings-list" input>
     <form [formGroup]="emailForm">
@@ -112,6 +95,8 @@
     </form>
   </div>
   <div buttons>
-    <button class="btn btn-warning mr-30">Restore default</button>
+    <button class="btn btn-warning mr-30" (click)="restoreEmailToDefault()">
+      Restore default
+    </button>
   </div>
 </modal-window>

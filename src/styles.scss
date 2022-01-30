@@ -416,11 +416,12 @@ ul {
   overflow-x: hidden;
 }
 
-.people-content {
+.people-content,
+.project-content {
   width: 100%;
   height: 100%;
   overflow-y: auto;
-  max-height: 66vh;
+  max-height: 70vh;
 }
 
 .tag-list {
@@ -542,12 +543,10 @@ ul {
   align-items: center;
 }
 
-// .settings-label {
-//   width: 40px;
-//   min-width: 50px;
-//   margin-right: 20px;
-//   font-size: 1.2rem;
-// }
+.settings-label {
+  font-size: 0.9rem;
+  width: 100%;
+}
 
 // .settings-content {
 //   flex-grow: 1;

@@ -25,7 +25,6 @@ import { ContactEntry } from 'src/app/project-list/project-list/project-list.com
 export class ProjectEntryComponent extends EntryComponent implements OnInit {
   project!: ProjectEditable;
   subscription: Subscription = new Subscription();
-  cc!: string;
   emailTemplate!: EmailTemplate;
 
   @Input() addressBook: ContactEntry[] = [];
@@ -49,10 +48,7 @@ export class ProjectEntryComponent extends EntryComponent implements OnInit {
 
     const configSubscription = this.config.onConfig.subscribe({
       next: (config: Config) => {
-        const { cc, email } = config;
-        if (cc && cc !== this.cc) {
-          this.cc = cc;
-        }
+        const { email } = config;
         if (
           email &&
           (email?.current?.content !== this.emailTemplate?.content ||
@@ -131,7 +127,6 @@ export class ProjectEntryComponent extends EntryComponent implements OnInit {
       this.entryData as ProjectEditable,
       this.entryContainer,
       this.addressBook,
-      this.cc,
       this.emailTemplate
     );
   }

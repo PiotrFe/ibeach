@@ -4,7 +4,7 @@ import { Week } from 'src/app/shared-module/week-days/week';
 import { ContactEntry } from 'src/app/project-list/project-list/project-list.component';
 import { remove as removeDiacritics } from 'diacritics';
 import { compareTwoStrings } from 'string-similarity';
-import { addWhitespaces } from 'src/app/utils';
+import { encodeWhitespaces } from 'src/app/utils';
 import { EmailTemplate } from 'src/app/shared-module/config.service';
 
 export class Email {
@@ -149,8 +149,9 @@ class EmailBuilder {
   withSubject(subject: string | undefined) {
     const generateSubject = () => {
       this._subject = subject!
-        .replace('[CLIENT]', `${this._client}`)
-        .replace('[DAYS]', `${this._daysString}`);
+        .replace(/\[CLIENT\]/g, `${this._client}`)
+        .replace(/\[DAYS\]/g, `${this._daysString ? this._daysString : ''}`)
+        .replace(/\(\)/g, '');
     };
 
     const setFallbackSubject = () => {
@@ -180,32 +181,31 @@ class EmailBuilder {
     return this;
   }
 
-  withBody(
-    emailBody: EmailTemplate | undefined,
-    withAllocation: boolean,
-    chargeCode: string | undefined
-  ) {
+  withBody(emailBody: EmailTemplate | undefined, withAllocation: boolean) {
     const generateBody = () => {
       if (withAllocation) {
         const body = emailBody!.content
-          .replace('[FIRST]', `${this._firstNameString}`)
-          .replace('[CST]', `${this._leadershipString}`)
-          .replace('[TYPE]', `${this._projectType}`)
-          .replace('[CLIENT]', `${this._client}`)
-          .replace('[CC]', `${chargeCode}`)
+          .replace(/\[FIRST\]/g, `${this._firstNameString}`)
+          .replace(/\[CST\]/g, `${this._leadershipString}`)
+          .replace(/\[TYPE\]/g, `${this._projectType}`)
+          .replace(/\[CLIENT\]/g, `${this._client}`)
           .replace(
-            '[ALLOCATION]',
-            `${this._calString ? `${this._calString}` : ''}`
+            /\n\n\[ALLOCATION\]\n\n/g,
+            `${this._calString ? `\n\n${this._calString}\n` : '\n\n'}`
+          )
+          .replace(
+            /\[ALLOCATION\]/g,
+            `${this._calString ? `${this._calString}` : ''}` // fallback replace if a user removes spaces under settings
           );
 
-        this._body = addWhitespaces(body);
+        this._body = encodeWhitespaces(body);
       } else {
-        const body = emailBody!.contentNoAllocation.replace(
-          '[FIRST]',
-          `${this._firstNameString}`
-        );
+        const body = emailBody!.contentNoAllocation
+          .replace(/\[CST\]/g, `${this._firstNameString}`)
+          .replace(/\[TYPE\]/g, `${this._projectType}`)
+          .replace(/\[CLIENT\]/g, `${this._client}`);
 
-        this._body = addWhitespaces(body);
+        this._body = encodeWhitespaces(body);
       }
     };
 
@@ -221,13 +221,9 @@ class EmailBuilder {
           arr.includes(this._projectType[0].toLowerCase()) ? 'an' : 'a'
         } ${this._projectType} ${
           this._client ? `for ${this._client}` : ''
-        }?  The team will be in touch soon with further details.${
-          chargeCode
-            ? `  On a timesheet, please use ${chargeCode} for the time spent on the beach.`
-            : ''
-        }${this._calString ? `%0D%0A%0D%0A${this._calString}` : ''}%0D%0A${
-          this._calString ? '' : '%0D%0A'
-        }Best,%0D%0APD Team`;
+        }?  The team will be in touch soon with further details. On a timesheet, please use XXX for the time spent on the beach.${
+          this._calString ? `%0D%0A%0D%0A${this._calString}` : ''
+        }%0D%0A${this._calString ? '' : '%0D%0A'}Best,%0D%0APD Team`;
 
         this._body = str;
       } else {
@@ -282,7 +278,6 @@ export const generateEmail = (
   project: ProjectEditable,
   container: ElementRef,
   addressBook: ContactEntry[],
-  chargeCode?: string,
   emailTemplate?: EmailTemplate
 ) => {
   const emailBuilder = new EmailBuilder(addressBook);
@@ -303,13 +298,14 @@ export const generateEmail = (
         .withProjectType(project.type)
         .withDays(project.week)
         .withSubject(emailTemplate?.subject)
-        .withBody(emailTemplate, true, chargeCode)
+        .withBody(emailTemplate, true)
         .build()
     : emailBuilder
         .withTo(project.leadership)
         .withClient(project.client)
+        .withProjectType(project.type)
         .withSubject(emailTemplate?.subject)
-        .withBody(emailTemplate, false, chargeCode)
+        .withBody(emailTemplate, false)
         .build();
 
   let href = `mailto:${email.to}?`;
