@@ -39,6 +39,14 @@
   </div>
   <div class="toolbar-group toolbar-group--center flex flex-ver-ctr"></div>
   <div class="toolbar-group toolbar-group--right flex flex-ver-ctr">
+    <button
+      type="button"
+      class="btn btn-menu mr-20"
+      (click)="downloadProjectList()"
+    >
+      <i class="bi bi-download download-project-icon"></i>
+    </button>
+
     <div
       class="form-check form-switch"
       tooltip="Show available only"

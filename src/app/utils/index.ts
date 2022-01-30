@@ -12,5 +12,5 @@ export {
 export { getCalendarFromData } from './getCalendarFromData';
 export { removeExtraSpacesFromStr } from './removeExtraSpacesFromStr';
 export { getClosestPastMonday } from './getClosestPastMonday';
-export { decodeWhitespaces, encodeWhitespaces } from // addWhitespaces,
-'./handleWhitespaces';
+export { decodeWhitespaces, encodeWhitespaces } from './handleWhitespaces'; // addWhitespaces,
+export { exportProjectListToPDF } from './exportProjectListToPDF';

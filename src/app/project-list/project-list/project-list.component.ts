@@ -29,7 +29,7 @@ import {
 } from 'src/app/project-list/project-list/project';
 import { PageComponent } from 'src/app/shared-module/page/page.component';
 import { getNewWeek, getDaysLeft } from '../../shared-module/week-days/week';
-import { getClosestPastMonday } from 'src/app/utils';
+import { getClosestPastMonday, exportProjectListToPDF } from 'src/app/utils';
 
 export interface ContactEntry {
   first: string;
@@ -483,5 +483,9 @@ export class ProjectListComponent
   }): void {
     this.updateTags(objParam);
     this.onChangeSaved();
+  }
+
+  downloadProjectList(): void {
+    exportProjectListToPDF(this.pageContainer.nativeElement);
   }
 }
