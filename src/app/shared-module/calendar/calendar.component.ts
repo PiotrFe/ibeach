@@ -87,7 +87,7 @@ export class CalendarComponent implements OnInit, OnChanges {
       if (this.askToConfirmDateChange) {
         this.listEditModeStatusService.onRefDateChange();
       }
-
+      this.currDate = offsetDate;
       this.dateChangeEvent.emit(offsetDate);
     }
   }
@@ -116,7 +116,6 @@ export class CalendarComponent implements OnInit, OnChanges {
         return;
       }
 
-      this.currDate = newDate;
       this.displayDate.setValue(newDate);
     }
   }
