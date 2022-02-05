@@ -73,9 +73,9 @@
               'nav-link': true,
               'nav-main': true,
               clickable: true,
-              active: pageSection === 'ARCHIVE'
+              active: pageSection === 'STATS'
             }"
-            (click)="setPageSection('ARCHIVE')"
+            (click)="setPageSection('STATS')"
             >Stats</span
           >
         </li>
@@ -109,5 +109,9 @@
     *ngIf="pageSection === 'ALLOCATE'"
     [referenceDate]="referenceDate"
   ></allocate-section>
+  <stats-section
+    *ngIf="pageSection === 'STATS'"
+    [referenceDate]="referenceDate"
+  ></stats-section>
 </div>
 <settings *ngIf="showSettings" (closeEvent)="closeSettings()"></settings>

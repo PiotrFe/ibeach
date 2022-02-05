@@ -1,11 +1,10 @@
 import { Component } from '@angular/core';
-import { SettingsComponent } from 'src/app/settings/settings.component';
 
 export const PAGE_SECTIONS = {
   ALLOCATE: 'ALLOCATE',
   SUBMIT: 'SUBMIT',
   UPLOAD: 'UPLOAD',
-  ARCHIVE: 'ARCHIVE',
+  STATS: 'STATS',
 };
 
 @Component({
@@ -15,7 +14,7 @@ export const PAGE_SECTIONS = {
 })
 export class AppComponent {
   title = 'client-dev-app';
-  pageSection = PAGE_SECTIONS.ALLOCATE;
+  pageSection = PAGE_SECTIONS.STATS;
   referenceDate: Date = new Date();
   showSettings: boolean = false;
 

@@ -1,0 +1,48 @@
+<nav class="main-toolbar">
+  <div class="toolbar-group toolbar-group--left flex flex-ver-ctr"></div>
+  <div class="toolbar-group toolbar-group--center flex flex-ver-ctr">
+    <calendar
+      [dateVal]="referenceDate"
+      [isSmall]="false"
+      [showRange]="true"
+      (rangeChangeEvent)="onDateRangeChange($event)"
+    ></calendar>
+    <button
+      *ngIf="true"
+      type="button"
+      class="btn btn-primary mr-20"
+      [disabled]="!dateRange || !dateRange.length"
+      (click)="onSubmit()"
+    >
+      Go
+    </button>
+  </div>
+  <div class="toolbar-group toolbar-group--right flex flex-ver-ctr"></div>
+</nav>
+
+<ul class="people" id="page-upload" #page>
+  <li>
+    <stats-header [entryContainerWidth]="entryContainerWidth"></stats-header>
+  </li>
+  <div class="people-content">
+    <div *ngIf="fetchError && !uploaded" class="alert alert-danger">
+      {{ fetchError }}
+    </div>
+    <div
+      *ngIf="(noData || !previewData.length) && !uploaded"
+      class="alert alert-primary"
+    >
+      No data to display
+    </div>
+    <!-- <li *ngFor="let person of previewData; let i = index">
+        <person-entry
+          [id]="person.id"
+          [entryData]="person"
+          [editable]="false"
+          [entryContainerWidth]="entryContainerWidth"
+          [isCollapsed]="isCollapsed(person.id)"
+          (collapseEvent)="handleCollapse($event)"
+        ></person-entry>
+      </li> -->
+  </div>
+</ul>

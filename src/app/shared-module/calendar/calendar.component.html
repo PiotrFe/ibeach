@@ -8,6 +8,7 @@
   ></i>
 
   <input
+    *ngIf="!showRange"
     type="text"
     placeholder="Datepicker"
     class="form-control no-select"
@@ -17,6 +18,22 @@
     [formControl]="displayDate"
     [class.is-invalid]="showError"
     (bsValueChange)="onDateChange($event)"
+    [placement]="placement"
+  />
+  <input
+    *ngIf="showRange"
+    type="text"
+    placeholder="Select dates"
+    [placement]="placement"
+    class="form-control no-select"
+    [class.data-entry-input]="isSmall"
+    bsDaterangepicker
+    ([ngModel])="(bsRangeValue)"
+    [bsConfig]="{
+      isAnimated: true,
+      rangeInputFormat: 'DD-MMM-YYYY'
+    }"
+    (bsValueChange)="onRangeChange($event)"
   />
 
   <i

@@ -124,4 +124,12 @@ export class FetchService {
       .patch<Config>(`${baseUrl}/config`, data)
       .pipe(catchError(this.handleError));
   }
+
+  fetchHistory(dateRange: [Date, Date]): Observable<any> {
+    const url = new URL('/history', `${baseUrl}`);
+    url.searchParams.set('from', String(dateRange[0].getTime()));
+    url.searchParams.set('to', String(dateRange[1].getTime()));
+
+    return this.http.get(url.href).pipe(catchError(this.handleError));
+  }
 }

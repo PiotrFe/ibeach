@@ -9,6 +9,7 @@ import { ProjectListModule } from './project-list/project-list.module';
 import { AllocateModule } from './allocate/allocate.module';
 import { SharedModuleModule } from './shared-module/shared-module.module';
 import { SettingsModule } from './settings/settings.module';
+import { StatsModule } from './stats/stats.module';
 
 @NgModule({
   declarations: [AppComponent],
@@ -22,6 +23,7 @@ import { SettingsModule } from './settings/settings.module';
     AllocateModule,
     SharedModuleModule,
     SettingsModule,
+    StatsModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

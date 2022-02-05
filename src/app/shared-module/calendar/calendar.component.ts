@@ -29,9 +29,12 @@ export class CalendarComponent implements OnInit, OnChanges {
   @Input() baseDay: number = 1;
   @Input() dateVal!: Date;
   @Input() isSmall: boolean = false;
+  @Input() showRange: boolean = false;
   @Input() askToConfirmDateChange: boolean = false;
+  @Input() placement: 'left' | 'top' | 'bottom' | 'right' = 'bottom';
 
   @Output() dateChangeEvent = new EventEmitter<Date>();
+  @Output() rangeChangeEvent = new EventEmitter<[Date, Date]>();
 
   showConfirmLeaveModal: boolean = false;
   displayDate = new FormControl('');
@@ -39,6 +42,7 @@ export class CalendarComponent implements OnInit, OnChanges {
   modalAction!: { resolve: Function; reject: Function; wait: Function };
   modalPromise!: Promise<any>;
   currDate!: Date;
+  bsRangeValue: Date[] = [];
 
   constructor(
     private localeService: BsLocaleService,
@@ -55,6 +59,18 @@ export class CalendarComponent implements OnInit, OnChanges {
       date = new Date(currVal.getTime() + 1000 * 60 * 60 * 24 * multipl);
     }
     this.onDateChange(date);
+  }
+
+  onRangeChange(event: any) {
+    const [from, to] = event as Array<Date>;
+
+    if (!from || !to) {
+      return;
+    }
+    this.rangeChangeEvent.emit([
+      new Date(from.setHours(0, 0, 0, 0)),
+      new Date(to.setHours(0, 0, 0, 0)),
+    ]);
   }
 
   async onDateChange(date: any) {
