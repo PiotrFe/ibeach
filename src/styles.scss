@@ -6,6 +6,7 @@ $content-width: 98vw;
 $content-height: 87vh;
 $menu-color: rgb(0, 55, 55);
 $menu-color-button: #406969;
+$menu-color-button-hover: rgba(var(--bs-dark-rgb), 0.75);
 
 // ****************
 // GLOBAL SETTINGS
@@ -426,7 +427,7 @@ ul {
   width: 100%;
   height: 100%;
   overflow-y: auto;
-  max-height: 70vh;
+  max-height: 68vh;
 }
 
 .tag-list {
@@ -644,6 +645,11 @@ ul {
   background-color: rgba(13, 110, 253, 0.75) !important;
   border-color: rgba(13, 110, 253, 0.75) !important;
   font-size: 0.88rem !important;
+
+  &-printable {
+    background-color: var(--bs-gray-400) !important;
+    border-color: var(--bs-gray-400) !important;
+  }
 }
 
 .badge {
@@ -656,6 +662,10 @@ ul {
 
   &:focus {
     box-shadow: 0 0 0 0.15rem #4b8080 !important;
+  }
+  &:hover {
+    background-color: $menu-color-button-hover !important;
+    border-color: $menu-color-button-hover !important;
   }
 }
 

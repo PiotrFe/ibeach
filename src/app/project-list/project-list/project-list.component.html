@@ -42,6 +42,7 @@
     <button
       type="button"
       class="btn btn-menu mr-20"
+      [disabled]="inEditMode"
       (click)="downloadProjectList()"
     >
       <i class="bi bi-download download-project-icon"></i>
