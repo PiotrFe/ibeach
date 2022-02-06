@@ -692,6 +692,7 @@ ul {
 }
 
 .btn-menu {
+  color: #fff;
   background-color: $menu-color-button !important;
   border-color: $menu-color-button !important;
 
@@ -701,6 +702,12 @@ ul {
   &:hover {
     background-color: $menu-color-button-hover !important;
     border-color: $menu-color-button-hover !important;
+  }
+
+  &--small {
+    padding: 3px 5px;
+    border-radius: 3px;
+    user-select: none;
   }
 }
 

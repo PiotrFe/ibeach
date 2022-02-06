@@ -122,10 +122,14 @@ export class FetchService {
       .pipe(catchError(this.handleError));
   }
 
-  fetchHistory(dateRange: [Date, Date]): Observable<StatsEntry[]> {
+  fetchHistory(
+    dateRange: [Date, Date],
+    cstView: boolean
+  ): Observable<StatsEntry[]> {
     const url = new URL('/history', `${baseUrl}`);
     url.searchParams.set('from', String(dateRange[0].getTime()));
     url.searchParams.set('to', String(dateRange[1].getTime()));
+    url.searchParams.set('cstView', String(Number(cstView)));
 
     return this.http
       .get<StatsEntry[]>(url.href)

@@ -1,8 +1,17 @@
-import { Component, OnInit, NgZone } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  AfterViewInit,
+  OnDestroy,
+  NgZone,
+  ElementRef,
+  ViewChild,
+} from '@angular/core';
 import { FetchService } from 'src/app/shared-module/fetch.service';
 import { StatsEntry } from 'src/app/stats/stats-entry/stats-entry.component';
 import { SortService } from 'src/app/utils/sortService';
 import { Filter } from 'src/app/shared-module/page/page.component';
+import { fromEvent, Observable, Subscription, debounceTime, pipe } from 'rxjs';
 
 const testData = [
   {
@@ -44,7 +53,8 @@ const testData = [
   templateUrl: './stats-section.component.html',
   styleUrls: ['./stats-section.component.scss'],
 })
-export class StatsSectionComponent implements OnInit {
+export class StatsSectionComponent implements OnInit, OnDestroy, AfterViewInit {
+  @ViewChild('searchBar') searchBar!: ElementRef;
   entries: StatsEntry[] = [];
   filteredEntries: StatsEntry[] = this.entries;
   dateRange!: [Date, Date];
@@ -52,15 +62,39 @@ export class StatsSectionComponent implements OnInit {
   fetchError!: string;
   filters: Filter[] = [];
   fetching: boolean = false;
+  searchSubscription!: Subscription;
+  cstView: boolean = false;
 
   constructor(ngZone: NgZone, private fetchService: FetchService) {}
 
   ngOnInit(): void {
     this.entries = this.sortService.applyCurrentSort(testData);
   }
+
+  updateCSTView(e: any): void {
+    this.cstView = e.target.checked;
+  }
+
+  ngAfterViewInit(): void {
+    this.searchSubscription = fromEvent<InputEvent>(
+      this.searchBar.nativeElement,
+      'input'
+    )
+      .pipe(debounceTime(600))
+      .subscribe({
+        next: (e: InputEvent) => {
+          const { value } = e.target as HTMLInputElement;
+          console.log(value);
+        },
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.searchSubscription.unsubscribe();
+  }
   onSubmit(): void {
     this.fetching = true;
-    this.fetchService.fetchHistory(this.dateRange).subscribe({
+    this.fetchService.fetchHistory(this.dateRange, this.cstView).subscribe({
       next: (data) => {
         const entries = Object.entries(data).map(([client, data]) => {
           const { days } = data;
