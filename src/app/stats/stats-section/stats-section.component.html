@@ -2,9 +2,9 @@
   <div class="toolbar-group toolbar-group--left flex flex-ver-ctr"></div>
   <div class="toolbar-group toolbar-group--center flex flex-ver-ctr">
     <calendar
-      [dateVal]="referenceDate"
       [isSmall]="false"
       [showRange]="true"
+      [contained]="true"
       (rangeChangeEvent)="onDateRangeChange($event)"
     ></calendar>
     <button
@@ -14,7 +14,7 @@
       [disabled]="!dateRange || !dateRange.length"
       (click)="onSubmit()"
     >
-      Go
+      Search
     </button>
   </div>
   <div class="toolbar-group toolbar-group--right flex flex-ver-ctr"></div>
@@ -22,27 +22,26 @@
 
 <ul class="people" id="page-upload" #page>
   <li>
-    <stats-header [entryContainerWidth]="entryContainerWidth"></stats-header>
+    <stats-header
+      [sortable]="true"
+      [currentSort]="sortService.sort"
+      (newSortEvent)="handleSort($event)"
+    ></stats-header>
   </li>
   <div class="people-content">
-    <div *ngIf="fetchError && !uploaded" class="alert alert-danger">
+    <div *ngIf="fetchError" class="alert alert-danger">
       {{ fetchError }}
     </div>
-    <div
-      *ngIf="(noData || !previewData.length) && !uploaded"
-      class="alert alert-primary"
-    >
+    <div *ngIf="!entries.length" class="alert alert-primary">
       No data to display
     </div>
-    <!-- <li *ngFor="let person of previewData; let i = index">
-        <person-entry
-          [id]="person.id"
-          [entryData]="person"
-          [editable]="false"
-          [entryContainerWidth]="entryContainerWidth"
-          [isCollapsed]="isCollapsed(person.id)"
-          (collapseEvent)="handleCollapse($event)"
-        ></person-entry>
-      </li> -->
+    <li *ngFor="let entry of entries; let i = index">
+      <stats-entry
+        [id]="i"
+        [entry]="entry"
+        [sortField]="sortService.sort.field"
+      ></stats-entry>
+    </li>
   </div>
 </ul>
+<loading-overlay *ngIf="fetching"> </loading-overlay>

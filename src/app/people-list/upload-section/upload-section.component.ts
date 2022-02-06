@@ -55,7 +55,6 @@ export class UploadSectionComponent extends PageComponent implements OnChanges {
     this.fetchError = '';
     this.noData = false;
     this.uploaded = false;
-    console.log('setting to false');
 
     this.fetchService.fetchWeeklyList(this.referenceDate, true).subscribe({
       next: (data: WeeklyData) => {
@@ -84,8 +83,6 @@ export class UploadSectionComponent extends PageComponent implements OnChanges {
     if (this.fetching) {
       this.fetchError = '';
     }
-
-    console.log('setting to false');
     this.uploaded = false;
     this.fileSelected = false;
   }
@@ -155,7 +152,6 @@ export class UploadSectionComponent extends PageComponent implements OnChanges {
       .subscribe({
         next: () => {
           this.uploaded = true;
-          console.log('setting to true');
         },
         error: (e) => {
           console.log({ e });

@@ -314,6 +314,41 @@ li {
     min-width: 7rem;
     max-width: 22rem;
   }
+
+  &-allocation {
+    width: 20rem;
+    max-width: 20rem;
+    display: flex;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &-chart {
+    flex-grow: 1;
+    max-width: 22rem;
+    display: inline-block;
+    text-align: center;
+  }
+}
+
+.stats-entry {
+  height: 3rem;
+
+  &--client {
+    font-size: 1.1rem;
+  }
+
+  &--figures {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+  }
+}
+
+.progress {
+  height: 1.5rem !important;
 }
 
 .header-entry {

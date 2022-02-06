@@ -23,6 +23,7 @@
       <ul class="navbar-nav">
         <div class="toolbar-group toolbar-group--center flex flex-ver-ctr">
           <calendar
+            *ngIf="pageSection !== 'STATS'"
             [scrollable]="true"
             [weekly]="true"
             [baseDay]="1"
@@ -109,9 +110,6 @@
     *ngIf="pageSection === 'ALLOCATE'"
     [referenceDate]="referenceDate"
   ></allocate-section>
-  <stats-section
-    *ngIf="pageSection === 'STATS'"
-    [referenceDate]="referenceDate"
-  ></stats-section>
+  <stats-section *ngIf="pageSection === 'STATS'"></stats-section>
 </div>
 <settings *ngIf="showSettings" (closeEvent)="closeSettings()"></settings>

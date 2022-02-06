@@ -1,0 +1,35 @@
+<div class="stats-entry entry-item">
+  <span
+    class="stats-entry--client section section-name"
+    [class.sorted]="sortField === 'name'"
+    >{{ entry.client }}</span
+  >
+  <div class="stats-entry--allocation section section-allocation">
+    <div
+      class="section stats-entry--figures"
+      [class.sorted]="sortField === 'got'"
+    >
+      {{ entry.days.got }}
+    </div>
+    <div
+      class="section stats-entry--figures"
+      [class.sorted]="sortField === 'asked'"
+    >
+      {{ entry.days.asked }}
+    </div>
+    <div
+      class="section stats-entry--figures"
+      [class.sorted]="sortField === 'ratio'"
+    >
+      {{ entry.days.got / entry.days.asked | percent }}
+    </div>
+  </div>
+  <div class="stats-entry--chart section section-chart">
+    <progressbar
+      [max]="1"
+      [value]="entry.days.got / entry.days.asked"
+      [animate]="true"
+      ><i> {{ entry.days.got / entry.days.asked | percent }}</i></progressbar
+    >
+  </div>
+</div>

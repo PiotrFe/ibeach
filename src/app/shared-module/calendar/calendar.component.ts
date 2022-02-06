@@ -24,6 +24,7 @@ defineLocale('uk', enGbLocale);
 })
 export class CalendarComponent implements OnInit, OnChanges {
   @Input() scrollable: boolean = false;
+  @Input() contained: boolean = false;
   @Input() weekly: boolean = false;
   @Input() showError: boolean = false;
   @Input() baseDay: number = 1;
@@ -32,6 +33,7 @@ export class CalendarComponent implements OnInit, OnChanges {
   @Input() showRange: boolean = false;
   @Input() askToConfirmDateChange: boolean = false;
   @Input() placement: 'left' | 'top' | 'bottom' | 'right' = 'bottom';
+  @Input() disabled: boolean = false;
 
   @Output() dateChangeEvent = new EventEmitter<Date>();
   @Output() rangeChangeEvent = new EventEmitter<[Date, Date]>();
@@ -113,6 +115,9 @@ export class CalendarComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    if (this.contained) {
+      return;
+    }
     if (changes['dateVal'].currentValue !== this.displayDate.value) {
       const newDate = new Date(changes['dateVal'].currentValue);
       const dayOfWeek = newDate.getDay();

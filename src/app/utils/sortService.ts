@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Person, PersonEditable } from 'src/app/people-list/person';
 import { Project, ProjectEditable } from '../project-list/project-list/project';
+import { StatsEntry } from 'src/app/stats/stats-entry/stats-entry.component';
 
 const SKILL_INDEX = {
   AP: 6,
@@ -44,7 +45,7 @@ function isPersonEditable(entry: any): entry is PersonEditable {
 }
 
 function isProject(entry: any): entry is Project {
-  return entry.client !== undefined && entry.client !== undefined;
+  return entry.client !== undefined;
 }
 
 function isProjectEditable(entry: any): entry is ProjectEditable {
@@ -91,13 +92,22 @@ export class SortService {
       }
     } else {
       this.sort.field = colName;
-      this.sort.order = ['skill', 'days', 'type'].includes(colName) ? -1 : 1;
+      this.sort.order = [
+        'skill',
+        'days',
+        'type',
+        'asked',
+        'got',
+        'ratio',
+      ].includes(colName)
+        ? -1
+        : 1;
     }
   }
 
   sortByName = (
-    a: Person | PersonEditable | Project | ProjectEditable,
-    b: Person | PersonEditable | Project | ProjectEditable,
+    a: Person | PersonEditable | Project | ProjectEditable | StatsEntry,
+    b: Person | PersonEditable | Project | ProjectEditable | StatsEntry,
     asc: boolean = false
   ): number => {
     const order = this.sort.order;
@@ -244,6 +254,35 @@ export class SortService {
     return 0;
   };
 
+  sortByStats = (
+    a: StatsEntry,
+    b: StatsEntry,
+    column: 'got' | 'asked' | 'ratio',
+    asc: boolean = false
+  ): number => {
+    const order = this.sort.order;
+
+    let valA;
+    let valB;
+
+    if (column === 'got' || column === 'asked') {
+      valA = a.days[column];
+      valB = b.days[column];
+    } else {
+      valA = a.days.got / a.days.asked;
+      valB = b.days.got / b.days.asked;
+    }
+
+    if (valA < valB) {
+      return asc ? -1 : order * -1;
+    }
+    if (valA > valB) {
+      return asc ? 1 : order;
+    }
+
+    return 0;
+  };
+
   applyCurrentSort = (dataSet: any[]): any[] => {
     if (this.sort.field) {
       return this.sortData(dataSet, this.sort.field, true, false, false);
@@ -276,6 +315,7 @@ export class SortService {
     const sortByDays = this.sortByDays;
     const sortByDate = this.sortByDate;
     const sortByPDM = this.sortByPDM;
+    const sortByStats = this.sortByStats;
 
     const sortedDataSet = [...dataSet];
 
@@ -348,6 +388,18 @@ export class SortService {
           return returnVal;
         }
         return sortBySkill(a, b);
+      });
+    }
+
+    if (colName === 'asked' || colName === 'got' || colName === 'ratio') {
+      sortedDataSet.sort(function (a, b) {
+        let returnVal: number = sortByStats(a, b, colName);
+
+        if (returnVal !== 0) {
+          return returnVal;
+        }
+
+        return sortByName(a, b, true);
       });
     }
 

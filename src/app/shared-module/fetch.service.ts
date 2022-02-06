@@ -1,14 +1,11 @@
-import {
-  HttpClient,
-  HttpErrorResponse,
-  HttpResponse,
-} from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { throwError, catchError, Observable, tap } from 'rxjs';
+import { throwError, catchError, Observable } from 'rxjs';
 import { Person } from 'src/app/people-list/person';
 import { Project } from 'src/app/project-list/project-list/project';
 import { AllocationEntry } from 'src/app/shared-module/allocate.service';
 import { Config, ConfigChange } from 'src/app/shared-module/config.service';
+import { StatsEntry } from 'src/app/stats/stats-entry/stats-entry.component';
 
 export const baseUrl = 'http://localhost:4000/api';
 
@@ -125,11 +122,13 @@ export class FetchService {
       .pipe(catchError(this.handleError));
   }
 
-  fetchHistory(dateRange: [Date, Date]): Observable<any> {
+  fetchHistory(dateRange: [Date, Date]): Observable<StatsEntry[]> {
     const url = new URL('/history', `${baseUrl}`);
     url.searchParams.set('from', String(dateRange[0].getTime()));
     url.searchParams.set('to', String(dateRange[1].getTime()));
 
-    return this.http.get(url.href).pipe(catchError(this.handleError));
+    return this.http
+      .get<StatsEntry[]>(url.href)
+      .pipe(catchError(this.handleError));
   }
 }

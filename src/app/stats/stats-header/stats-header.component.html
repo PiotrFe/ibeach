@@ -1,1 +1,49 @@
-<p>stats-header works!</p>
+<div class="entry-header tl-header">
+  <div
+    class="section section-name header-entry mr-12 pl-3 clickable"
+    (click)="handleClick('name')"
+  >
+    Client
+    <i
+      *ngIf="getSort('name', 1)"
+      class="bi bi-sort-down-alt fs-085 ptop-3 ml-2"
+    ></i>
+    <i *ngIf="getSort('name', -1)" class="bi bi-sort-up fs-085 ptop-3 ml-2"></i>
+  </div>
+  <div class="section section-allocation header-entry mr-12 pl-3 clickable">
+    <div class="stats-entry--figures" (click)="handleClick('got')">
+      Got
+      <i
+        *ngIf="getSort('got', 1)"
+        class="bi bi-sort-down-alt fs-085 ptop-3 ml-2"
+      ></i>
+      <i
+        *ngIf="getSort('got', -1)"
+        class="bi bi-sort-up fs-085 ptop-3 ml-2"
+      ></i>
+    </div>
+    <div class="stats-entry--figures" (click)="handleClick('asked')">
+      Asked
+      <i
+        *ngIf="getSort('asked', 1)"
+        class="bi bi-sort-down-alt fs-085 ptop-3 ml-2"
+      ></i>
+      <i
+        *ngIf="getSort('asked', -1)"
+        class="bi bi-sort-up fs-085 ptop-3 ml-2"
+      ></i>
+    </div>
+    <div class="stats-entry--figures" (click)="handleClick('ratio')">
+      %
+      <i
+        *ngIf="getSort('ratio', 1)"
+        class="bi bi-sort-down-alt fs-085 ptop-3 ml-2"
+      ></i>
+      <i
+        *ngIf="getSort('ratio', -1)"
+        class="bi bi-sort-up fs-085 ptop-3 ml-2"
+      ></i>
+    </div>
+  </div>
+  <div class="section section-chart header-entry">Chart</div>
+</div>

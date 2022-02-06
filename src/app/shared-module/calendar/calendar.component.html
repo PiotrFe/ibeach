@@ -1,8 +1,8 @@
 <div
-  class="calendar col-xs-12 col-12 col-md-6 mw-11 form-group person-date-form mr-20 flex flex-ctr-hor flex-ver-ctr"
+  class="calendar col-xs-12 col-12 col-md-6 form-group mr-20 flex flex-ctr-hor flex-ver-ctr"
 >
   <i
-    *ngIf="scrollable"
+    *ngIf="scrollable && !disabled"
     class="bi bi-arrow-left clickable mr-5"
     (click)="setNew('prev')"
   ></i>
@@ -16,6 +16,7 @@
     bsDatepicker
     [bsConfig]="{ isAnimated: true, dateInputFormat: 'DD-MMM-YYYY' }"
     [formControl]="displayDate"
+    [isDisabled]="disabled"
     [class.is-invalid]="showError"
     (bsValueChange)="onDateChange($event)"
     [placement]="placement"
@@ -25,19 +26,20 @@
     type="text"
     placeholder="Select dates"
     [placement]="placement"
-    class="form-control no-select"
+    class="form-control no-select cal-range"
     [class.data-entry-input]="isSmall"
     bsDaterangepicker
+    [isDisabled]="disabled"
     ([ngModel])="(bsRangeValue)"
     [bsConfig]="{
       isAnimated: true,
-      rangeInputFormat: 'DD-MMM-YYYY'
+      rangeInputFormat: 'DD-MMM-YY'
     }"
     (bsValueChange)="onRangeChange($event)"
   />
 
   <i
-    *ngIf="scrollable"
+    *ngIf="scrollable && !disabled"
     class="bi bi-arrow-right clickable ml-5"
     (click)="setNew('next')"
   ></i>
