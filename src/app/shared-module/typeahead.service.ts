@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { timeStamp } from 'console';
 import { Person } from 'src/app/people-list/person';
 import { Tag } from 'src/app/shared-module/entry/entry.component';
 import { getAvailableTags } from 'src/app/utils/getTagsFromData';

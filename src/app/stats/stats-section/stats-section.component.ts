@@ -63,7 +63,8 @@ export class StatsSectionComponent implements OnInit, OnDestroy, AfterViewInit {
   filters: Filter[] = [];
   fetching: boolean = false;
   searchSubscription!: Subscription;
-  cstView: boolean = false;
+  withCSTView: boolean = false;
+  withTags: boolean = false;
 
   constructor(ngZone: NgZone, private fetchService: FetchService) {}
 
@@ -72,7 +73,11 @@ export class StatsSectionComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   updateCSTView(e: any): void {
-    this.cstView = e.target.checked;
+    this.withCSTView = e.target.checked;
+  }
+
+  updateTags(e: any): void {
+    this.withTags = e.target.checked;
   }
 
   ngAfterViewInit(): void {
@@ -94,26 +99,28 @@ export class StatsSectionComponent implements OnInit, OnDestroy, AfterViewInit {
   }
   onSubmit(): void {
     this.fetching = true;
-    this.fetchService.fetchHistory(this.dateRange, this.cstView).subscribe({
-      next: (data) => {
-        const entries = Object.entries(data).map(([client, data]) => {
-          const { days } = data;
-          return {
-            client,
-            days,
-          } as StatsEntry;
-        });
+    this.fetchService
+      .fetchHistory(this.dateRange, this.withCSTView, this.withTags)
+      .subscribe({
+        next: (data) => {
+          const entries = Object.entries(data).map(([client, data]) => {
+            const { days } = data;
+            return {
+              client,
+              days,
+            } as StatsEntry;
+          });
 
-        this.entries = this.sortService.applyCurrentSort(entries);
-        console.log(this.entries);
-      },
-      error: (err) => {
-        this.fetchError = err;
-      },
-      complete: () => {
-        this.fetching = false;
-      },
-    });
+          this.entries = this.sortService.applyCurrentSort(entries);
+          console.log(this.entries);
+        },
+        error: (err) => {
+          this.fetchError = err;
+        },
+        complete: () => {
+          this.fetching = false;
+        },
+      });
   }
 
   onDateRangeChange(event: any): void {

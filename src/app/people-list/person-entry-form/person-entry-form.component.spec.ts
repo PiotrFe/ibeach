@@ -1,11 +1,15 @@
 import { Component, DebugElement, Input } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TypeaheadService } from 'src/app/shared-module/typeahead.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Person } from 'src/app/people-list/person';
 import { getNewWeek } from 'src/app/shared-module/week-days/week';
 import { PersonEntryFormComponent } from './person-entry-form.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { getWeekDayDate } from 'src/app/utils';
+import { ConfigService } from 'src/app/shared-module/config.service';
+import { dummyConfig } from 'src/app/shared-module/fetch.service.spec';
+import { of } from 'rxjs';
 
 const refDate = new Date();
 const person: Person = {
@@ -18,6 +22,17 @@ const person: Person = {
   comments: 'Comments on Peter',
   tags: [],
 };
+
+const configStub = {
+  setConfig() {},
+  updateConfig() {},
+  onConfig: of(dummyConfig),
+};
+
+const httpStub: jasmine.SpyObj<HttpClient> = jasmine.createSpyObj(
+  'HttpClient',
+  ['get', 'post', 'patch']
+);
 
 @Component({
   template:
@@ -46,17 +61,26 @@ describe('PersonEntryFormComponent', () => {
   let fixture: ComponentFixture<HostComponent>;
   let formDE: DebugElement;
   let formEl: HTMLElement;
+  let config: ConfigService;
 
   describe('displays properties received from host', () => {
     beforeEach(async () => {
       await TestBed.configureTestingModule({
         declarations: [HostComponent, WeekDaysStub, PersonEntryFormComponent],
         imports: [BrowserAnimationsModule, FormsModule, ReactiveFormsModule],
+        providers: [
+          TypeaheadService,
+          {
+            provide: ConfigService,
+            useValue: configStub,
+          },
+        ],
       }).compileComponents();
     });
 
     beforeEach(() => {
       fixture = TestBed.createComponent(HostComponent);
+      config = TestBed.inject(ConfigService);
       component = fixture.componentInstance;
 
       fixture.detectChanges();
@@ -97,6 +121,13 @@ describe('PersonEntryFormComponent', () => {
       TestBed.configureTestingModule({
         declarations: [WeekDaysStub, PersonEntryFormComponent],
         imports: [BrowserAnimationsModule, FormsModule, ReactiveFormsModule],
+        providers: [
+          TypeaheadService,
+          {
+            provide: ConfigService,
+            useValue: configStub,
+          },
+        ],
       }).compileComponents();
     });
 
@@ -121,7 +152,7 @@ describe('PersonEntryFormComponent', () => {
       expect(component.isCollapsed).toBeFalse();
     });
 
-    describe('should update and proplerly display form values', () => {
+    describe('should update and properly display form values', () => {
       it('initiates with correct form values', () => {
         const form = component.personForm;
         const expectedValues = {

@@ -81,7 +81,7 @@ export class PersonEntryFormComponent
 
   constructor(
     typeaheadService: TypeaheadService,
-    private configService: ConfigService
+    private config: ConfigService
   ) {
     super(typeaheadService);
   }
@@ -133,7 +133,7 @@ export class PersonEntryFormComponent
       this.personForm.patchValue({ availDate: this.referenceDate });
     }
 
-    const configSubscr = this.configService.onConfig.subscribe({
+    const configSubscr = this.config.onConfig.subscribe({
       next: (config: Config) => {
         // TODO: add a check to prevent unnecessary updates
         const { pdms } = config;

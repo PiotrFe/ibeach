@@ -15,7 +15,6 @@ export class ListEditModeStatusService {
   constructor() {}
 
   onRefDateChange(): void {
-    console.log('Clearing service status');
     this.listEditModeStatus.people = false;
     this.listEditModeStatus.projects = false;
   }

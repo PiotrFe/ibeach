@@ -10,6 +10,29 @@ import { AllocationEntry } from './allocate.service';
 
 let httpClientSpy: jasmine.SpyObj<HttpClient>;
 
+export const dummyConfig = {
+  pdms: ['john smith'],
+  email: {
+    current: {
+      subject: '',
+      content: '',
+      contentNoAllocation: '',
+    },
+    default: {
+      subject: '',
+      content: '',
+      contentNoAllocation: '',
+    },
+  },
+};
+
+export const dummyWeeklyData: WeeklyData = {
+  people: [],
+  statusSummary: { pending: [], done: [] },
+  lookupTable: [],
+  config: dummyConfig,
+};
+
 describe('FetchService', () => {
   let service: FetchService;
 
@@ -24,7 +47,6 @@ describe('FetchService', () => {
       providers: [{ provide: HttpClient, useValue: httpClientSpy }],
     });
     service = TestBed.inject(FetchService);
-    // httpClientSpy = TestBed.inject(HttpClient) as jasmine.SpyObj<HttpClient>;
   });
 
   it('should be created', () => {
@@ -32,11 +54,7 @@ describe('FetchService', () => {
   });
 
   it('should fetch and return weekly data', () => {
-    const expectedData = {
-      people: [],
-      statusSummary: { pending: [], done: [] },
-      lookupTable: [],
-    };
+    const expectedData = dummyWeeklyData;
 
     httpClientSpy.get.and.returnValue(of(expectedData));
 

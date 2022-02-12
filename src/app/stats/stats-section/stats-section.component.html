@@ -1,5 +1,28 @@
 <nav class="main-toolbar">
-  <div class="toolbar-group toolbar-group--left flex flex-ver-ctr"></div>
+  <div class="toolbar-group toolbar-group--left flex flex-ver-ctr">
+    <div class="custom-control custom-checkbox">
+      <input
+        type="checkbox"
+        class="custom-control-input"
+        id="withCST"
+        [checked]="withCSTView"
+        (change)="updateCSTView($event)"
+      />
+      <label class="btn-menu btn-menu--small ml-5" for="withCST"
+        >CST view</label
+      >
+    </div>
+    <div class="custom-control custom-checkbox ml-15">
+      <input
+        type="checkbox"
+        class="custom-control-input"
+        id="withTags"
+        [checked]="withTags"
+        (change)="updateTags($event)"
+      />
+      <label class="btn-menu btn-menu--small ml-5" for="withTags">Tags</label>
+    </div>
+  </div>
   <div class="toolbar-group toolbar-group--center flex flex-ver-ctr">
     <calendar
       [isSmall]="false"
@@ -16,17 +39,6 @@
     >
       Search
     </button>
-    <div class="custom-control custom-checkbox">
-      <input
-        type="checkbox"
-        class="custom-control-input"
-        id="withCST"
-        (change)="updateCSTView($event)"
-      />
-      <label class="btn-menu btn-menu--small ml-5" for="withCST"
-        >CST view</label
-      >
-    </div>
   </div>
   <div class="toolbar-group toolbar-group--right flex flex-ver-ctr">
     <input

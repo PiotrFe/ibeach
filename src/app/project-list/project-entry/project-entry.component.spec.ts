@@ -5,12 +5,21 @@ import { TypeaheadService } from 'src/app/shared-module/typeahead.service';
 import { DragAndDropService } from 'src/app/shared-module/drag-and-drop.service';
 import { AllocateService } from 'src/app/shared-module/allocate.service';
 import { Project } from 'src/app/project-list/project-list/project';
+import { ConfigService } from 'src/app/shared-module/config.service';
+import { dummyConfig } from 'src/app/shared-module/fetch.service.spec';
+import { of } from 'rxjs';
 import {
   getNewWeek,
   getDaysLeft,
   Week,
 } from 'src/app/shared-module/week-days/week';
 import { projectData } from 'src/app/utils/dummyData';
+
+const configStub = {
+  setConfig() {},
+  updateConfig() {},
+  onConfig: of(dummyConfig),
+};
 
 const ID = 'COMPONENT_ID';
 
@@ -19,6 +28,7 @@ describe('ProjectEntryComponent', () => {
   let fixture: ComponentFixture<ProjectEntryComponent>;
   let spyAllocate: jasmine.SpyObj<AllocateService>;
   let spyDragAndDrop: jasmine.SpyObj<DragAndDropService>;
+  let config: ConfigService;
 
   beforeEach(async () => {
     const spyAll = jasmine.createSpyObj('AllocateService', [
@@ -37,6 +47,10 @@ describe('ProjectEntryComponent', () => {
         { provide: TypeaheadService, useValue: typeaheadStub },
         { provide: AllocateService, useValue: spyAll },
         { provide: DragAndDropService, useValue: spyDD },
+        {
+          provide: ConfigService,
+          useValue: configStub,
+        },
       ],
       imports: [BrowserAnimationsModule],
     }).compileComponents();
@@ -47,6 +61,7 @@ describe('ProjectEntryComponent', () => {
     spyDragAndDrop = TestBed.inject(
       DragAndDropService
     ) as jasmine.SpyObj<DragAndDropService>;
+    config = TestBed.inject(ConfigService);
   });
 
   beforeEach(() => {

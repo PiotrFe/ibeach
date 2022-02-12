@@ -1,5 +1,6 @@
 <div
   class="calendar col-xs-12 col-12 col-md-6 form-group mr-20 flex flex-ctr-hor flex-ver-ctr"
+  [class.mw-11]="!showRange"
 >
   <i
     *ngIf="scrollable && !disabled"

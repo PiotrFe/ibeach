@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FetchService, WeeklyData } from 'src/app/shared-module/fetch.service';
+import { dummyWeeklyData } from 'src/app/shared-module/fetch.service.spec';
 import { CsvParserService } from 'src/app/shared-module/csv-parser.service';
 import { ResizeObserverService } from 'src/app/shared-module/resize-observer.service';
 import { of } from 'rxjs';
@@ -76,7 +77,6 @@ describe('UploadSectionComponent', () => {
   });
 
   it('fetches data on date change', () => {
-    const oldDate = new Date();
     const newDate = new Date();
 
     component.previewData = [...personDataBasic];
@@ -92,18 +92,14 @@ describe('UploadSectionComponent', () => {
   });
 
   it('fetches data from fetch service', () => {
-    const weeklyData: WeeklyData = {
-      people: [],
-      statusSummary: { pending: [], done: [] },
-      lookupTable: [],
-    };
+    const weeklyData: WeeklyData = dummyWeeklyData;
     fetchSpy.fetchWeeklyList.and.returnValue(of(weeklyData));
 
     const refDate = new Date();
     component.referenceDate = refDate;
 
     component.fetchData();
-    expect(fetchSpy.fetchWeeklyList).toHaveBeenCalledWith(refDate);
+    expect(fetchSpy.fetchWeeklyList).toHaveBeenCalledWith(refDate, true);
   });
 
   it('shows submit modal when data submitted', () => {

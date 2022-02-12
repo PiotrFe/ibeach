@@ -188,15 +188,6 @@ describe('PageComponent', () => {
     expect(component.typeaheadService.getTypeahead).toHaveBeenCalled();
   });
 
-  it('toggles editMode', () => {
-    component.setInEditMode(true);
-    expect(component.inEditMode).toBeTrue();
-
-    component.setInEditMode(false);
-    expect(component.inEditMode).toBeFalse();
-    expect(component.newRows.length).toBe(0);
-  });
-
   describe('Dataset edits', () => {
     let person1: PersonEditable,
       person2: PersonEditable,

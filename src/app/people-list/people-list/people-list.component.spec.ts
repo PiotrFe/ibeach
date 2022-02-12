@@ -14,6 +14,7 @@ import {
   DeletionEvent,
   SaveEvent,
 } from 'src/app/shared-module/allocate.service';
+import { ConfigService } from 'src/app/shared-module/config.service';
 import { Observable, of, Subscription, Subject } from 'rxjs';
 
 import { PeopleListComponent } from './people-list.component';
@@ -23,6 +24,10 @@ import {
   Filter,
   SubmissionStatus,
 } from 'src/app/shared-module/page/page.component';
+import {
+  dummyWeeklyData,
+  dummyConfig,
+} from 'src/app/shared-module/fetch.service.spec';
 
 @Component({
   selector: 'person-entry',
@@ -121,6 +126,12 @@ describe('PeopleListComponent', () => {
     submitList: of(),
   });
 
+  const configStub = {
+    setConfig() {},
+    updateConfig() {},
+    onConfig: of(dummyConfig),
+  };
+
   allocateStub = {
     onDataset: onDataset,
     onDeleteRecord: onDeleteRecord,
@@ -144,6 +155,10 @@ describe('PeopleListComponent', () => {
         { provide: FetchService, useValue: fetchSpy },
         { provide: TypeaheadService, useValue: typeaheadSpy },
         { provide: ResizeObserverService, useValue: resizeObserverStub },
+        {
+          provide: ConfigService,
+          useValue: configStub,
+        },
       ],
     }).compileComponents();
   });
@@ -163,27 +178,20 @@ describe('PeopleListComponent', () => {
   });
 
   it('subscribes to allocation services', () => {
+    spyOn(allocateService.onDataset, 'subscribe');
+    spyOn(allocateService.onDeleteRecord, 'subscribe');
+    spyOn(component.subscription, 'add');
+
     component.subscribeToAllocationServices();
-    expect(component.allocationDataSubscription).toBeInstanceOf(Subscription);
-    expect(component.deleteRecordSubscription).toBeInstanceOf(Subscription);
+    expect(component.subscription.add).toHaveBeenCalledTimes(2);
+    expect(allocateService.onDataset.subscribe).toHaveBeenCalled();
+    expect(allocateService.onDeleteRecord.subscribe).toHaveBeenCalled();
   });
 
   it('unsubscribes from services on destroy', () => {
-    component.allocationDataSubscription = new Subscription();
-    component.deleteRecordSubscription = new Subscription();
-    component.resizeSubscription = new Subscription();
-
-    spyOn(component.allocationDataSubscription, 'unsubscribe');
-    spyOn(component.deleteRecordSubscription, 'unsubscribe');
-    spyOn(component.resizeSubscription, 'unsubscribe');
-    spyOn(component.resizeObserverService, 'deregisterElem');
-
+    spyOn(component.subscription, 'unsubscribe');
     component.ngOnDestroy();
-
-    expect(component.allocationDataSubscription.unsubscribe).toHaveBeenCalled();
-    expect(component.deleteRecordSubscription.unsubscribe).toHaveBeenCalled();
-    expect(component.resizeSubscription.unsubscribe).toHaveBeenCalled();
-    expect(component.resizeObserverService.deregisterElem).toHaveBeenCalled();
+    expect(component.subscription.unsubscribe).toHaveBeenCalled();
   });
 
   it('posts changes on save event', () => {
@@ -372,7 +380,7 @@ describe('PeopleListComponent', () => {
     component.pdmFilter.setValue('All');
 
     component.updateStatusLabel();
-    expect(component.statusLabel).toBe('pending');
+    expect(component.statusLabel).toBe('');
 
     component.pdmFilter.setValue('Amy Wine');
     component.updateStatusLabel();
@@ -433,14 +441,7 @@ describe('PeopleListComponent', () => {
   });
 
   it('fetches weekly data', () => {
-    const data: WeeklyData = {
-      people: [],
-      statusSummary: {
-        pending: ['Mary Bane'],
-        done: [],
-      },
-      lookupTable: [],
-    };
+    const data: WeeklyData = dummyWeeklyData;
 
     fetchSpy.fetchWeeklyList.and.returnValue(of(data));
 
@@ -454,27 +455,20 @@ describe('PeopleListComponent', () => {
 
     expect(fetchSpy.fetchWeeklyList).toHaveBeenCalledWith(
       component.referenceDate,
-      false,
-      true
+      true,
+      false
     );
-    expect(component._onWeeklyData).toHaveBeenCalledOnceWith(data, false);
+    expect(component._onWeeklyData).toHaveBeenCalledOnceWith(data);
   });
 
   it('processes weekly data', () => {
     const peopleList: Person[] = [...personDataBasic];
 
-    const data: WeeklyData = {
-      people: peopleList,
-      statusSummary: {
-        pending: ['Mary Bane'],
-        done: [],
-      },
-      lookupTable: [],
-    };
+    const data: WeeklyData = dummyWeeklyData;
 
     spyOn(component, 'updateStatusLabel');
 
-    component._onWeeklyData(data, true);
+    component._onWeeklyData(data);
 
     expect(component.dataSet.length).toBe(3);
     expect(component.dataSet[0].inEditMode).toBe(false);
