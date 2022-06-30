@@ -105,6 +105,8 @@
   ></people-list>
   <upload-section
     *ngIf="pageSection === 'UPLOAD'"
+    [appInOfflineMode]="appInOfflineMode"
+    [dataStoreManager]="dataStoreManager"
     [referenceDate]="referenceDate"
   ></upload-section>
   <allocate-section
@@ -113,8 +115,8 @@
   ></allocate-section>
   <stats-section *ngIf="pageSection === 'STATS'"></stats-section>
   <select-datastore-page
-    *ngIf="dataStoreFile === undefined"
-    (newDatastoreEvent)="setDataStore($event)"
+    *ngIf="dataStoreManager.dataStoreFile === undefined"
+    (newDatastoreEvent)="dataStoreManager.setDataStore($event)"
   ></select-datastore-page>
 </div>
 <settings *ngIf="showSettings" (closeEvent)="closeSettings()"></settings>

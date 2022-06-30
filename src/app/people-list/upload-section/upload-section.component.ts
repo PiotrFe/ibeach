@@ -1,4 +1,10 @@
-import { Component, NgZone, OnChanges, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  NgZone,
+  OnChanges,
+  SimpleChanges,
+  Input,
+} from '@angular/core';
 import { FetchService } from 'src/app/shared-module/fetch.service';
 import { CsvParserService } from 'src/app/shared-module/csv-parser.service';
 import { ResizeObserverService } from 'src/app/shared-module/resize-observer.service';
@@ -13,6 +19,9 @@ import { WeeklyData } from 'src/app/shared-module/fetch.service';
   styleUrls: ['./upload-section.component.scss'],
 })
 export class UploadSectionComponent extends PageComponent implements OnChanges {
+  @Input() appInOfflineMode: Boolean = false;
+  @Input() dataStoreManager!: any;
+
   bsInlineValue: Date = new Date();
   referenceDateEnd: Date = new Date();
   fileSelected: boolean = false;
@@ -56,6 +65,14 @@ export class UploadSectionComponent extends PageComponent implements OnChanges {
     this.noData = false;
     this.uploaded = false;
 
+    if (!this.appInOfflineMode) {
+      this._fetchDataFromOnlineStore();
+    } else {
+      this._fetchDataFromLocalStore();
+    }
+  }
+
+  _fetchDataFromOnlineStore() {
     this.fetchService.fetchWeeklyList(this.referenceDate, true).subscribe({
       next: (data: WeeklyData) => {
         const { people }: { people: Person[] } = data;
@@ -77,6 +94,12 @@ export class UploadSectionComponent extends PageComponent implements OnChanges {
         this.fetching = false;
       },
     });
+  }
+
+  _fetchDataFromLocalStore() {
+    const ts = this.referenceDate.getTime();
+    this.fetching = false;
+    // this.previewData =
   }
 
   clearUploadStatus(): void {
@@ -114,7 +137,6 @@ export class UploadSectionComponent extends PageComponent implements OnChanges {
           this.noData = false;
 
           const parsed = this.csvParserService.parse(data);
-
           this.fullData = parsed;
         }
       );
@@ -142,6 +164,14 @@ export class UploadSectionComponent extends PageComponent implements OnChanges {
   }
 
   uploadData() {
+    if (!this.appInOfflineMode) {
+      this._storeDataOnline();
+    } else {
+      this._storeDataLocally();
+    }
+  }
+
+  _storeDataOnline() {
     this.uploading = true;
 
     this.fetchService
@@ -162,5 +192,12 @@ export class UploadSectionComponent extends PageComponent implements OnChanges {
           this.uploading = false;
         },
       });
+  }
+
+  _storeDataLocally() {
+    this.dataStoreManager.storeMasterList(this.referenceDate, {
+      week: this.previewData,
+      full: this.fullData,
+    });
   }
 }
