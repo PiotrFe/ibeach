@@ -44,15 +44,17 @@ export class PeopleListComponent
   implements OnInit, OnChanges
 {
   @Input() displayedIn!: 'SUBMIT' | 'ALLOCATE';
+  @Input() peopleData!: any;
+  @Input() appInOfflineMode!: Boolean;
 
+  boundGetNameTypeahead!: Function;
+  pdmArr!: String[];
   pdmFilter = new FormControl('All');
   skillFilter = new FormControl('All');
   showSubmitModal: boolean = false;
   status!: SubmissionStatus;
   statusLabel!: string;
   submitted!: boolean;
-  boundGetNameTypeahead!: Function;
-  pdmArr!: String[];
 
   subscription: Subscription = new Subscription();
 
@@ -424,9 +426,16 @@ export class PeopleListComponent
     this.fetchError = '';
     this.noData = false;
 
+    if (!this.appInOfflineMode) {
+      this._fetchFromOnlineStore(refetching);
+    } else {
+      this._fetchFromLocalStore(refetching);
+    }
+  }
+
+  _fetchFromOnlineStore(refetching = true) {
     const submittedOnly = this.displayedIn === 'ALLOCATE';
     const skipLookupList = refetching;
-
     this.fetchService
       .fetchWeeklyList(this.referenceDate, skipLookupList, submittedOnly)
       .subscribe({
@@ -456,6 +465,33 @@ export class PeopleListComponent
           });
         },
       });
+  }
+
+  _fetchFromLocalStore(refetching = true) {
+    const skipLookupList = refetching;
+
+    if (!this.peopleData) {
+      return;
+    }
+    try {
+      this._onWeeklyData(this.peopleData[this.referenceDate.getTime()]);
+      this.allocateService.registerDataset({
+        dataType: 'people',
+        data: this.dataSet as PersonEditable[],
+        weekOf: this.referenceDate,
+      });
+    } catch (e: any) {
+      if (e.message === 'No data') {
+        this.noData = true;
+      } else {
+        this.fetchError = e.message;
+      }
+    } finally {
+      this.fetching = false;
+      if (this.inEditMode) {
+        this.setInEditMode(false);
+      }
+    }
   }
 
   _onWeeklyData(data: WeeklyData) {

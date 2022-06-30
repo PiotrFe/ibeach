@@ -99,6 +99,7 @@
 <div class="content-container">
   <people-list
     *ngIf="pageSection === 'SUBMIT'"
+    [appInOfflineMode]="appInOfflineMode"
     [displayedIn]="'SUBMIT'"
     [referenceDate]="referenceDate"
   ></people-list>
