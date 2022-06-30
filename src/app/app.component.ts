@@ -14,7 +14,9 @@ export const PAGE_SECTIONS = {
 })
 export class AppComponent {
   title = 'client-dev-app';
-  pageSection = PAGE_SECTIONS.STATS;
+
+  dataStoreFile: File | undefined = undefined;
+  pageSection = PAGE_SECTIONS.ALLOCATE;
   referenceDate: Date = new Date();
   showSettings: boolean = false;
 
@@ -34,5 +36,9 @@ export class AppComponent {
 
   closeSettings() {
     this.showSettings = false;
+  }
+
+  setDataStore(file: File) {
+    this.dataStoreFile = file;
   }
 }

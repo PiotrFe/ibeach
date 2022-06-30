@@ -10,17 +10,18 @@ import { AllocateModule } from './allocate/allocate.module';
 import { SharedModuleModule } from './shared-module/shared-module.module';
 import { SettingsModule } from './settings/settings.module';
 import { StatsModule } from './stats/stats.module';
+import { SelectDatastorePageComponent } from './select-datastore-page/select-datastore-page.component';
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent, SelectDatastorePageComponent],
   imports: [
+    AllocateModule,
     BrowserModule,
     BrowserAnimationsModule,
     FormsModule,
     HttpClientModule,
     PeopleListModule,
     ProjectListModule,
-    AllocateModule,
     SharedModuleModule,
     SettingsModule,
     StatsModule,

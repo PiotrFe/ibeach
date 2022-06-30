@@ -111,5 +111,9 @@
     [referenceDate]="referenceDate"
   ></allocate-section>
   <stats-section *ngIf="pageSection === 'STATS'"></stats-section>
+  <select-datastore-page
+    *ngIf="dataStoreFile === undefined"
+    (newDatastoreEvent)="setDataStore($event)"
+  ></select-datastore-page>
 </div>
 <settings *ngIf="showSettings" (closeEvent)="closeSettings()"></settings>
