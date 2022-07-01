@@ -22,12 +22,18 @@ export interface StoreManager {
   dataStore: DataStore | undefined;
   dataStoreError: string | undefined;
   dataStoreFile: File | undefined;
+
   getEmptyStore: () => DataStore;
-  getWeeklyMasterList: (week: Date, submittedOnly?: boolean) => WeeklyData;
+  getWeeklyMasterList: (
+    week: Date,
+    submittedOnly?: boolean,
+    customStore?: DataStore
+  ) => WeeklyData;
   saveChangesToPeopleList: (weekOf: Date, pdm: string, data: Person[]) => void;
   saveListForLookup: (data: any) => void;
   setDataStore: (f: File) => void;
   storeMasterList: (week: Date, data: any) => void;
+  submitPeopleList: (weekOf: Date, pdm: string, data: Person[]) => void;
 }
 
 export class DataStoreManager implements StoreManager {
@@ -70,11 +76,17 @@ export class DataStoreManager implements StoreManager {
     };
   }
 
-  getWeeklyMasterList(week: Date, submittedOnly?: boolean): WeeklyData {
+  getWeeklyMasterList(
+    week: Date,
+    submittedOnly?: boolean,
+    customStore?: DataStore
+  ): WeeklyData {
     const ts = week.getTime();
-    const storeObj = this.dataStore?.master[ts] || {};
+    const store = customStore || this.dataStore;
+    const weekObj = store?.master[ts] || {};
+
     const { pending, submitted, pendingPDMNames, submittedPDMNames } =
-      Object.entries(storeObj).reduce(
+      Object.entries(weekObj).reduce(
         (acc: any, [key, val]) => {
           const { people, isSubmitted } = val;
 
@@ -204,5 +216,17 @@ export class DataStoreManager implements StoreManager {
     this.dataStore.updatedAtTs = updatedAtTs;
 
     this.saveListForLookup(full);
+  }
+
+  submitPeopleList(weekOf: Date, pdm: string, data: Person[]) {
+    const weekTs = weekOf.getTime();
+
+    this.dataStore!.master[weekTs][pdm] = {
+      ...this.dataStore!.master[weekTs][pdm],
+      people: data,
+      isSubmitted: true,
+    };
+
+    this.#syncLocalStorage();
   }
 }

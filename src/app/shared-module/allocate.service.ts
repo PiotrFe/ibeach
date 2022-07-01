@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Subject, Observable } from 'rxjs';
+import { Subject } from 'rxjs';
 import { Person, PersonEditable } from 'src/app/people-list/person';
 import {
   Project,

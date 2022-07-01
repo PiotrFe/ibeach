@@ -35,6 +35,7 @@ import {
   SubmissionStatus,
 } from 'src/app/shared-module/page/page.component';
 
+import { DataStore } from 'src/app/utils/StorageManager';
 import { getClosestPastMonday } from 'src/app/utils';
 import { getNewWeek, getDaysLeft } from '../../shared-module/week-days/week';
 import { ProjectEditable } from 'src/app/project-list/project-list/project';
@@ -87,6 +88,7 @@ export class PeopleListComponent
   ngOnInit(): void {
     this.boundGetNameTypeahead = this.getNameTypeAhead.bind(this);
     this.updateFilteredView();
+    this.subscribeToStoreServices();
 
     if (this.displayedIn === 'ALLOCATE') {
       this.subscribeToAllocationServices();
@@ -142,6 +144,29 @@ export class PeopleListComponent
 
     this.subscription.add(allocationDataSubscription);
     this.subscription.add(deleteRecordSubscription);
+  }
+
+  subscribeToStoreServices() {
+    const dataStoreSubscription = this.dataStoreService.storeData$.subscribe({
+      next: (data: DataStore) => {
+        const newWeeklyData = this.dataStoreService.getWeeklyMasterList(
+          this.referenceDate,
+          this.displayedIn === 'ALLOCATE',
+          data
+        );
+
+        console.log({
+          newWeeklyData,
+        });
+
+        this.#onNewWeeklyData(newWeeklyData);
+      },
+      error: (err) => {
+        this.fetchError = err;
+      },
+    });
+
+    this.subscription.add(dataStoreSubscription);
   }
 
   _handleSaveOrDelete(data: DeletionEvent | SaveEvent) {
@@ -481,12 +506,7 @@ export class PeopleListComponent
     );
 
     if (data) {
-      this._onWeeklyData(data);
-      this.allocateService.registerDataset({
-        dataType: 'people',
-        data: this.dataSet as PersonEditable[],
-        weekOf: this.referenceDate,
-      });
+      this.#onNewWeeklyData(data);
     } else {
       this.noData = true;
       this.fetchError = 'No data available';
@@ -495,6 +515,15 @@ export class PeopleListComponent
     if (this.inEditMode) {
       this.setInEditMode(false);
     }
+  }
+
+  #onNewWeeklyData(data: WeeklyData) {
+    this._onWeeklyData(data);
+    this.allocateService.registerDataset({
+      dataType: 'people',
+      data: this.dataSet as PersonEditable[],
+      weekOf: this.referenceDate,
+    });
   }
 
   _onWeeklyData(data: WeeklyData) {
@@ -597,32 +626,45 @@ export class PeopleListComponent
     this.showSubmitModal = false;
     if (submit) {
       this.uploading = true;
+      const dataset = (this.filteredDataset as any[]).map((person) => {
+        const { inEditMode, ...otherProps } = person;
 
-      this.fetchService
-        .submitList(
-          this.referenceDate,
-          this.pdmFilter.value,
-          (this.filteredDataset as any[]).map((person) => {
-            const { inEditMode, ...otherProps } = person;
-
-            return {
-              ...otherProps,
-            };
-          })
-        )
-        .subscribe({
-          next: () => {
-            this.fetchData();
-          },
-          error: (e) => {
-            this.fetchError = e;
-            this.uploading = false;
-          },
-          complete: () => {
-            this.uploading = false;
-          },
-        });
+        return {
+          ...otherProps,
+        };
+      });
+      if (!this.appInOfflineMode) {
+        this.#submitToOnlineStore(dataset);
+      } else {
+        this.#submitToLocalStore(dataset);
+      }
     }
+  }
+
+  #submitToOnlineStore(dataset: Person[]) {
+    this.fetchService
+      .submitList(this.referenceDate, this.pdmFilter.value, dataset)
+      .subscribe({
+        next: () => {
+          this.fetchData();
+        },
+        error: (e) => {
+          this.fetchError = e;
+          this.uploading = false;
+        },
+        complete: () => {
+          this.uploading = false;
+        },
+      });
+  }
+
+  #submitToLocalStore(dataset: Person[]) {
+    this.dataStoreService.submitPeopleList(
+      this.referenceDate,
+      this.pdmFilter.value,
+      dataset
+    );
+    this.uploading = false;
   }
 
   handleDateChange(date: Date) {
