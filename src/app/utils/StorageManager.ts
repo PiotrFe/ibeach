@@ -5,8 +5,10 @@ import { WeeklyData } from 'src/app/shared-module/fetch.service';
 export interface DataStore {
   master: {
     [key: number]: {
-      pending: Person[];
-      submitted: Person[];
+      [pdm: string]: {
+        people: Person[];
+        isSubmitted: boolean;
+      };
     };
   };
   people: Person[];
@@ -22,6 +24,7 @@ export interface StoreManager {
   dataStoreFile: File | undefined;
   getEmptyStore: () => DataStore;
   getWeeklyMasterList: (week: Date, submittedOnly?: boolean) => WeeklyData;
+  saveChangesToPeopleList: (weekOf: Date, pdm: string, data: Person[]) => void;
   saveListForLookup: (data: any) => void;
   setDataStore: (f: File) => void;
   storeMasterList: (week: Date, data: any) => void;
@@ -52,6 +55,10 @@ export class DataStoreManager implements StoreManager {
     };
   }
 
+  #syncLocalStorage() {
+    window.localStorage.setItem('iBeach', JSON.stringify(this.dataStore));
+  }
+
   getEmptyStore() {
     return {
       master: {},
@@ -65,19 +72,39 @@ export class DataStoreManager implements StoreManager {
 
   getWeeklyMasterList(week: Date, submittedOnly?: boolean): WeeklyData {
     const ts = week.getTime();
-    const { pending = [], submitted = [] } = this.dataStore?.master[ts] || {};
+    const storeObj = this.dataStore?.master[ts] || {};
+    const { pending, submitted, pendingPDMNames, submittedPDMNames } =
+      Object.entries(storeObj).reduce(
+        (acc: any, [key, val]) => {
+          const { people, isSubmitted } = val;
+
+          if (isSubmitted) {
+            return {
+              ...acc,
+              submitted: [...acc.submitted, ...people],
+              submittedPDMNames: [...acc.submittedPDMNames, key],
+            };
+          }
+          return {
+            ...acc,
+            pending: [...acc.pending, ...people],
+            pendingPDMNames: [...acc.pendingPDMNames, key],
+          };
+        },
+        {
+          pending: [],
+          submitted: [],
+          pendingPDMNames: [],
+          submittedPDMNames: [],
+        }
+      );
+
     const lookupTable = this.dataStore?.lookup || [];
     const config = this.dataStore?.config || this.#getDefaultConfig();
-    const pendingPDMArr: string[] = !this.dataStore
-      ? []
-      : Array.from(new Set(pending.map(({ pdm }) => pdm as string)));
-    const submittedPDMArr: string[] = !this.dataStore
-      ? []
-      : Array.from(new Set(submitted.map(({ pdm }) => pdm as string)));
 
     const statusSummary = {
-      pending: pendingPDMArr,
-      done: submittedPDMArr,
+      pending: pendingPDMNames,
+      done: submittedPDMNames,
     };
 
     return {
@@ -96,12 +123,18 @@ export class DataStoreManager implements StoreManager {
     this.dataStore.lookup = data;
     this.dataStore.updatedAtTs = updateTs;
 
-    const storeStr = window.localStorage.getItem('iBeach');
-    let store = JSON.parse(storeStr as string) as DataStore;
+    this.#syncLocalStorage();
+  }
 
-    store.lookup = data;
-    store.updatedAtTs = updateTs;
-    window.localStorage.setItem('iBeach', JSON.stringify(store));
+  saveChangesToPeopleList(weekOf: Date, pdm: string, data: Person[]) {
+    const weekTs = weekOf.getTime();
+
+    this.dataStore!.master[weekTs][pdm] = {
+      ...this.dataStore!.master[weekTs][pdm],
+      people: data,
+    };
+
+    this.#syncLocalStorage();
   }
 
   async setDataStore(file: File) {
@@ -122,14 +155,20 @@ export class DataStoreManager implements StoreManager {
         };
       });
       this.dataStore = storeDataJSON;
-      window.localStorage.setItem('iBeach', JSON.stringify(storeDataJSON));
+      this.#syncLocalStorage();
     } catch (e) {
       console.log(e);
       this.dataStoreError = 'Unable to read file. Try again';
     }
   }
 
-  storeMasterList(weekOf: Date, data: any) {
+  storeMasterList(
+    weekOf: Date,
+    data: {
+      week: Person[];
+      full: Person[];
+    }
+  ) {
     const weekTs = weekOf.getTime();
 
     if (!this.dataStoreFile || this.dataStore === undefined) {
@@ -144,23 +183,26 @@ export class DataStoreManager implements StoreManager {
       this.dataStore.master = {};
     }
 
-    const weeklyData = {
-      pending: week,
-      submitted: [],
-    };
+    // take pdm list from configuration or - if not available - from the uploaded list
+    const pdmArr = this.dataStore.config.pdms.length
+      ? this.dataStore.config.pdms
+      : Array.from(new Set(full.map(({ pdm }) => pdm)));
+
+    const weeklyData = week.reduce((acc: any, personEntry) => {
+      const pdm = personEntry.pdm as string;
+      return {
+        ...acc,
+        [pdm]: {
+          ...acc[pdm],
+          isSubmitted: false,
+          people: [...(acc[pdm]?.people || []), personEntry],
+        },
+      };
+    }, {});
 
     this.dataStore.master[weekTs] = weeklyData;
     this.dataStore.updatedAtTs = updatedAtTs;
 
-    const storeStr = window.localStorage.getItem('iBeach');
-    let store = JSON.parse(storeStr as string) as DataStore;
-
-    if (!store) {
-      store = this.getEmptyStore();
-    }
-    store.master[weekTs] = weeklyData;
-    store.updatedAtTs = Date.now();
-    window.localStorage.setItem('iBeach', JSON.stringify(store));
     this.saveListForLookup(full);
   }
 }

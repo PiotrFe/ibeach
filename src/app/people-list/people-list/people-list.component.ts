@@ -26,7 +26,7 @@ import {
 } from 'src/app/shared-module/allocate.service';
 import { WeeklyData } from 'src/app/shared-module/fetch.service';
 
-import { PersonEditable } from '../person';
+import { Person, PersonEditable } from '../person';
 import { Tag } from 'src/app/shared-module/entry/entry.component';
 import { Week } from 'src/app/shared-module/week-days/week';
 
@@ -37,6 +37,7 @@ import {
 
 import { getClosestPastMonday } from 'src/app/utils';
 import { getNewWeek, getDaysLeft } from '../../shared-module/week-days/week';
+import { ProjectEditable } from 'src/app/project-list/project-list/project';
 
 @Component({
   selector: 'people-list',
@@ -432,13 +433,13 @@ export class PeopleListComponent
     this.noData = false;
 
     if (!this.appInOfflineMode) {
-      this._fetchFromOnlineStore(refetching);
+      this.#fetchFromOnlineStore(refetching);
     } else {
-      this._fetchFromLocalStore();
+      this.#fetchFromLocalStore();
     }
   }
 
-  _fetchFromOnlineStore(refetching = true) {
+  #fetchFromOnlineStore(refetching = true) {
     const submittedOnly = this.displayedIn === 'ALLOCATE';
     const skipLookupList = refetching;
     this.fetchService
@@ -472,7 +473,7 @@ export class PeopleListComponent
       });
   }
 
-  _fetchFromLocalStore() {
+  #fetchFromLocalStore() {
     const submittedOnly = this.displayedIn === 'ALLOCATE';
     const data = this.dataStoreService.getWeeklyMasterList(
       this.referenceDate,
@@ -488,7 +489,6 @@ export class PeopleListComponent
       });
     } else {
       this.noData = true;
-
       this.fetchError = 'No data available';
     }
     this.fetching = false;
@@ -537,24 +537,33 @@ export class PeopleListComponent
 
   postChanges() {
     this.fetching = true;
+    this.fetchError = '';
     const pdmParam =
       this.displayedIn !== 'ALLOCATE' ? this.pdmFilter.value : 'allocator';
 
     const dataset =
-      this.displayedIn !== 'ALLOCATE' ? this.filteredDataset : this.dataSet;
+      this.displayedIn !== 'ALLOCATE'
+        ? (this.filteredDataset as ProjectEditable[])
+        : (this.dataSet as ProjectEditable[]);
 
+    const mappedDataset = (dataset as any[]).map((person) => {
+      const { inEditMode, ...otherProps } = person;
+
+      return {
+        ...otherProps,
+      };
+    }) as Person[];
+
+    if (!this.appInOfflineMode) {
+      this.#postToOnlineStore(pdmParam, mappedDataset);
+    } else {
+      this.#postToLocalStore(pdmParam, mappedDataset);
+    }
+  }
+
+  #postToOnlineStore(pdmParam: string, dataset: Person[]) {
     this.fetchService
-      .saveList(
-        this.referenceDate,
-        pdmParam,
-        (dataset as any[]).map((person) => {
-          const { inEditMode, ...otherProps } = person;
-
-          return {
-            ...otherProps,
-          };
-        })
-      )
+      .saveList(this.referenceDate, pdmParam, dataset)
       .subscribe({
         next: () => {
           this.fetchData();
@@ -564,8 +573,20 @@ export class PeopleListComponent
           this.fetching = false;
           this.setInEditMode(false);
         },
-        complete: () => {},
+        complete: () => {
+          this.fetching = false;
+        },
       });
+  }
+
+  #postToLocalStore(pdmParam: string, dataset: Person[]) {
+    this.dataStoreService.saveChangesToPeopleList(
+      this.referenceDate,
+      pdmParam,
+      dataset
+    );
+    this.setInEditMode(false);
+    this.fetching = false;
   }
 
   onSubmit() {
