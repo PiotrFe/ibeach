@@ -31,18 +31,14 @@ export class ConfigService {
   _configSubject: ReplaySubject<Config> = new ReplaySubject<Config>();
   onConfig: Observable<Config> = this._configSubject.asObservable();
 
-  constructor(private fetch: FetchService) {
-    console.log('RUNNING REAL CONFIG SERVICE');
-  }
+  constructor(private fetch: FetchService) {}
 
   setConfig(config: Config): void {
-    console.log('RUNNING REAL CONFIG SERVICE');
     this._config = config;
     this._configSubject.next(config);
   }
 
   updateConfig(changes: ConfigChange[]): void {
-    console.log('RUNNING REAL CONFIG SERVICE');
     this.fetch.saveConfig(changes).subscribe({
       next: (updatedConfig: Config) => {
         this._config = updatedConfig;

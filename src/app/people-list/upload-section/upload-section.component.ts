@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 import { FetchService } from 'src/app/shared-module/fetch.service';
 import { CsvParserService } from 'src/app/shared-module/csv-parser.service';
+import { DataStoreService } from 'src/app/shared-module/data-store.service';
 import { ResizeObserverService } from 'src/app/shared-module/resize-observer.service';
 import { parse } from 'src/app/utils/csv-parser/index';
 import { Person } from '../person';
@@ -20,19 +21,19 @@ import { WeeklyData } from 'src/app/shared-module/fetch.service';
 })
 export class UploadSectionComponent extends PageComponent implements OnChanges {
   @Input() appInOfflineMode: Boolean = false;
-  @Input() dataStoreManager!: any;
 
   bsInlineValue: Date = new Date();
-  referenceDateEnd: Date = new Date();
-  fileSelected: boolean = false;
   data!: string;
-  previewData: Person[] = [];
+  fileSelected: boolean = false;
   fullData: Person[] = [];
+  previewData: Person[] = [];
+  referenceDateEnd: Date = new Date();
   showUploadModal: boolean = false;
 
   constructor(
     ngZone: NgZone,
     resizeObserverService: ResizeObserverService,
+    private dataStoreService: DataStoreService,
     private fetchService: FetchService,
     private csvParserService: CsvParserService
   ) {
@@ -195,7 +196,7 @@ export class UploadSectionComponent extends PageComponent implements OnChanges {
   }
 
   _storeDataLocally() {
-    this.dataStoreManager.storeMasterList(this.referenceDate, {
+    this.dataStoreService.storeMasterList(this.referenceDate, {
       week: this.previewData,
       full: this.fullData,
     });

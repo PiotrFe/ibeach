@@ -1,4 +1,5 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { DataStoreService } from 'src/app/shared-module/data-store.service';
 
 @Component({
   selector: 'select-datastore-page',
@@ -6,16 +7,13 @@ import { Component, OnInit, Output, EventEmitter } from '@angular/core';
   styleUrls: ['./select-datastore-page.component.scss'],
 })
 export class SelectDatastorePageComponent implements OnInit {
-  @Output() newDatastoreEvent = new EventEmitter<File>();
-
-  constructor() {}
+  constructor(private dataStoreService: DataStoreService) {}
 
   ngOnInit(): void {}
 
   setDataStore(e: any) {
     if (e?.target?.files?.length) {
-      console.log(e.target.files[0]);
-      this.newDatastoreEvent.emit(e.target.files[0]);
+      this.dataStoreService.setDataStore(e.target.files[0]);
     }
   }
 }

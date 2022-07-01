@@ -106,7 +106,6 @@
   <upload-section
     *ngIf="pageSection === 'UPLOAD'"
     [appInOfflineMode]="appInOfflineMode"
-    [dataStoreManager]="dataStoreManager"
     [referenceDate]="referenceDate"
   ></upload-section>
   <allocate-section
@@ -115,8 +114,7 @@
   ></allocate-section>
   <stats-section *ngIf="pageSection === 'STATS'"></stats-section>
   <select-datastore-page
-    *ngIf="dataStoreManager.dataStoreFile === undefined"
-    (newDatastoreEvent)="dataStoreManager.setDataStore($event)"
+    *ngIf="!dataStoreService.hasActiveDataStore"
   ></select-datastore-page>
 </div>
 <settings *ngIf="showSettings" (closeEvent)="closeSettings()"></settings>

@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from 'uuid';
+import { Subscription } from 'rxjs';
 import {
   Component,
   OnInit,
@@ -7,32 +9,34 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { FetchService } from 'src/app/shared-module/fetch.service';
-import { TypeaheadService } from 'src/app/shared-module/typeahead.service';
+
 import { ConfigService } from 'src/app/shared-module/config.service';
-import { ResizeObserverService } from 'src/app/shared-module/resize-observer.service';
+import { DataStoreService } from 'src/app/shared-module/data-store.service';
+import { FetchService } from 'src/app/shared-module/fetch.service';
 import { ListEditModeStatusService } from 'src/app/shared-module/list-edit-mode-status.service';
+import { TypeaheadService } from 'src/app/shared-module/typeahead.service';
+import { ResizeObserverService } from 'src/app/shared-module/resize-observer.service';
 import {
   AllocateService,
   Dataset,
   DeletionEvent,
-  SaveEvent,
   isInstanceOfSaveEvent,
   isInstanceOfDeleteEvent,
+  SaveEvent,
 } from 'src/app/shared-module/allocate.service';
-import { v4 as uuidv4 } from 'uuid';
-import { Subscription } from 'rxjs';
+import { WeeklyData } from 'src/app/shared-module/fetch.service';
+
 import { PersonEditable } from '../person';
 import { Tag } from 'src/app/shared-module/entry/entry.component';
 import { Week } from 'src/app/shared-module/week-days/week';
-import { getClosestPastMonday } from 'src/app/utils';
 
 import {
   PageComponent,
   SubmissionStatus,
 } from 'src/app/shared-module/page/page.component';
+
+import { getClosestPastMonday } from 'src/app/utils';
 import { getNewWeek, getDaysLeft } from '../../shared-module/week-days/week';
-import { WeeklyData } from 'src/app/shared-module/fetch.service';
 
 @Component({
   selector: 'people-list',
@@ -63,13 +67,14 @@ export class PeopleListComponent
   modifiedEntries: PersonEditable[] = [];
 
   constructor(
-    private fetchService: FetchService,
     private allocateService: AllocateService,
-    typeaheadService: TypeaheadService,
-    resizeObserverService: ResizeObserverService,
-    ngZone: NgZone,
     private configService: ConfigService,
-    private listEditModeStatusService: ListEditModeStatusService
+    private dataStoreService: DataStoreService,
+    private fetchService: FetchService,
+    private listEditModeStatusService: ListEditModeStatusService,
+    ngZone: NgZone,
+    resizeObserverService: ResizeObserverService,
+    typeaheadService: TypeaheadService
   ) {
     super(ngZone, resizeObserverService, typeaheadService);
   }
@@ -429,7 +434,7 @@ export class PeopleListComponent
     if (!this.appInOfflineMode) {
       this._fetchFromOnlineStore(refetching);
     } else {
-      this._fetchFromLocalStore(refetching);
+      this._fetchFromLocalStore();
     }
   }
 
@@ -467,30 +472,28 @@ export class PeopleListComponent
       });
   }
 
-  _fetchFromLocalStore(refetching = true) {
-    const skipLookupList = refetching;
+  _fetchFromLocalStore() {
+    const submittedOnly = this.displayedIn === 'ALLOCATE';
+    const data = this.dataStoreService.getWeeklyMasterList(
+      this.referenceDate,
+      submittedOnly
+    );
 
-    if (!this.peopleData) {
-      return;
-    }
-    try {
-      this._onWeeklyData(this.peopleData[this.referenceDate.getTime()]);
+    if (data) {
+      this._onWeeklyData(data);
       this.allocateService.registerDataset({
         dataType: 'people',
         data: this.dataSet as PersonEditable[],
         weekOf: this.referenceDate,
       });
-    } catch (e: any) {
-      if (e.message === 'No data') {
-        this.noData = true;
-      } else {
-        this.fetchError = e.message;
-      }
-    } finally {
-      this.fetching = false;
-      if (this.inEditMode) {
-        this.setInEditMode(false);
-      }
+    } else {
+      this.noData = true;
+
+      this.fetchError = 'No data available';
+    }
+    this.fetching = false;
+    if (this.inEditMode) {
+      this.setInEditMode(false);
     }
   }
 

@@ -8,13 +8,15 @@ import {
 } from '@angular/core';
 
 import { ResizeObserverService } from 'src/app/shared-module/resize-observer.service';
-import { PersonEditable } from 'src/app/people-list/person';
 import { SortService } from 'src/app/utils/sortService';
+import { TypeaheadService } from '../typeahead.service';
+
+import { PersonEditable } from 'src/app/people-list/person';
 import { ProjectEditable } from 'src/app/project-list/project-list/project';
 import { Week } from 'src/app/shared-module/week-days/week';
-import { getNewAvailDate, sortTags } from 'src/app/utils';
+
 import { getDaysLeft } from 'src/app/shared-module/week-days/week';
-import { TypeaheadService } from '../typeahead.service';
+import { getNewAvailDate, sortTags } from 'src/app/utils';
 
 export interface Filter {
   field: string;
