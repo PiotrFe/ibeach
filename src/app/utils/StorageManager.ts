@@ -1,5 +1,6 @@
 import { Config } from 'src/app/shared-module/config.service';
 import { Person } from 'src/app/people-list/person';
+import { Project } from 'src/app/project-list/project-list/project';
 import { WeeklyData } from 'src/app/shared-module/fetch.service';
 
 export interface DataStore {
@@ -11,25 +12,31 @@ export interface DataStore {
       };
     };
   };
-  people: Person[];
-  projects: any;
+  people: {
+    [key: number]: Person[];
+  };
+  projects: {
+    [key: number]: Project[];
+  };
   lookup: Person[];
   config: Config;
   updatedAtTs: number;
 }
 
 export interface StoreManager {
-  dataStore: DataStore | undefined;
+  dataStore: DataStore;
   dataStoreError: string | undefined;
   dataStoreFile: File | undefined;
 
   getEmptyStore: () => DataStore;
+  getProjectList: (week: Date) => Project[];
   getWeeklyMasterList: (
     week: Date,
     submittedOnly?: boolean,
     customStore?: DataStore
   ) => WeeklyData;
   saveChangesToPeopleList: (weekOf: Date, pdm: string, data: Person[]) => void;
+  saveChangesToProjectList: (weekOf: Date, data: Project[]) => void;
   saveListForLookup: (data: any) => void;
   setDataStore: (f: File) => void;
   storeMasterList: (week: Date, data: any) => void;
@@ -38,10 +45,12 @@ export interface StoreManager {
 
 export class DataStoreManager implements StoreManager {
   dataStoreFile: File | undefined = undefined;
-  dataStore: DataStore | undefined = undefined;
+  dataStore!: DataStore;
   dataStoreError: string | undefined = undefined;
 
-  constructor() {}
+  constructor() {
+    this.dataStore = this.getEmptyStore();
+  }
 
   #getDefaultConfig(): Config {
     return {
@@ -76,6 +85,11 @@ export class DataStoreManager implements StoreManager {
     };
   }
 
+  getProjectList(week: Date): Project[] {
+    const ts = week.getTime();
+    return this.dataStore.projects[ts] || [];
+  }
+
   getWeeklyMasterList(
     week: Date,
     submittedOnly?: boolean,
@@ -83,7 +97,7 @@ export class DataStoreManager implements StoreManager {
   ): WeeklyData {
     const ts = week.getTime();
     const store = customStore || this.dataStore;
-    const weekObj = store?.master[ts] || {};
+    const weekObj = store.master[ts] || {};
 
     const { pending, submitted, pendingPDMNames, submittedPDMNames } =
       Object.entries(weekObj).reduce(
@@ -111,8 +125,8 @@ export class DataStoreManager implements StoreManager {
         }
       );
 
-    const lookupTable = this.dataStore?.lookup || [];
-    const config = this.dataStore?.config || this.#getDefaultConfig();
+    const lookupTable = this.dataStore.lookup || [];
+    const config = this.dataStore.config || this.#getDefaultConfig();
 
     const statusSummary = {
       pending: pendingPDMNames,
@@ -141,12 +155,17 @@ export class DataStoreManager implements StoreManager {
   saveChangesToPeopleList(weekOf: Date, pdm: string, data: Person[]) {
     const weekTs = weekOf.getTime();
 
-    this.dataStore!.master[weekTs][pdm] = {
+    this.dataStore.master[weekTs][pdm] = {
       ...this.dataStore!.master[weekTs][pdm],
       people: data,
     };
 
     this.#syncLocalStorage();
+  }
+
+  saveChangesToProjectList(weekOf: Date, data: Project[]) {
+    const weekTs = weekOf.getTime();
+    this.dataStore.projects[weekTs] = data;
   }
 
   async setDataStore(file: File) {

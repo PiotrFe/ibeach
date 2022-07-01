@@ -1,5 +1,8 @@
+import { v4 as uuidv4 } from 'uuid';
+import { Subscription } from 'rxjs';
 import {
   Component,
+  Input,
   OnInit,
   NgZone,
   OnChanges,
@@ -7,10 +10,13 @@ import {
   OnDestroy,
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
+
+import { CsvParserService } from 'src/app/shared-module/csv-parser.service';
+import { DataStoreService } from 'src/app/shared-module/data-store.service';
 import { FetchService } from '../../shared-module/fetch.service';
-import { TypeaheadService } from '../../shared-module/typeahead.service';
-import { ResizeObserverService } from 'src/app/shared-module/resize-observer.service';
 import { ListEditModeStatusService } from 'src/app/shared-module/list-edit-mode-status.service';
+import { ResizeObserverService } from 'src/app/shared-module/resize-observer.service';
+import { TypeaheadService } from '../../shared-module/typeahead.service';
 import {
   AllocateService,
   Dataset,
@@ -18,16 +24,17 @@ import {
   SaveEvent,
   isInstanceOfSaveEvent,
 } from 'src/app/shared-module/allocate.service';
-import { Week } from 'src/app/shared-module/week-days/week';
-import { Tag } from 'src/app/shared-module/entry/entry.component';
-import { v4 as uuidv4 } from 'uuid';
-import { Subscription } from 'rxjs';
-import { CsvParserService } from 'src/app/shared-module/csv-parser.service';
+
+import { PageComponent } from 'src/app/shared-module/page/page.component';
+import { DataStore } from 'src/app/utils/StorageManager';
+
 import {
   Project,
   ProjectEditable,
 } from 'src/app/project-list/project-list/project';
-import { PageComponent } from 'src/app/shared-module/page/page.component';
+import { Week } from 'src/app/shared-module/week-days/week';
+import { Tag } from 'src/app/shared-module/entry/entry.component';
+
 import { getNewWeek, getDaysLeft } from '../../shared-module/week-days/week';
 import { getClosestPastMonday, exportProjectListToPDF } from 'src/app/utils';
 
@@ -46,18 +53,22 @@ export class ProjectListComponent
   extends PageComponent
   implements OnInit, OnChanges, OnDestroy
 {
-  projectFilter = new FormControl('All');
+  addressBook!: ContactEntry[];
   allocationDataSubscription!: Subscription;
   deleteRecordSubscription!: Subscription;
-  addressBook!: ContactEntry[];
+  subscription: Subscription = new Subscription();
+  projectFilter = new FormControl('All');
 
   // arr used for storing entries modified by the people side of the app (e.g. by deleting people records - days free up then)
   // records are stored in this array until save / cancel event on the people side
   modifiedEntries: ProjectEditable[] = [];
 
+  @Input() appInOfflineMode!: Boolean;
+
   constructor(
     private fetchService: FetchService,
     private allocateService: AllocateService,
+    private dataStoreService: DataStoreService,
     typeaheadService: TypeaheadService,
     resizeObserverService: ResizeObserverService,
     private csvParserService: CsvParserService,
@@ -67,22 +78,26 @@ export class ProjectListComponent
     super(ngZone, resizeObserverService, typeaheadService);
   }
 
-  ngOnInit(): void {
-    this.allocationDataSubscription = this.allocateService.onDataset.subscribe({
-      next: (newData: Dataset) => {
-        const { dataType, data } = newData;
+  ngOnInit(): void {}
 
-        if (dataType === 'projects') {
-          this.dataSet = this.sortService.applyCurrentSort(data);
-          this.updateFilteredView();
-        }
-      },
-      error: (err) => {
-        this.fetchError = err;
-      },
-    });
+  subscribeToServices() {
+    const allocationDataSubscription = this.allocateService.onDataset.subscribe(
+      {
+        next: (newData: Dataset) => {
+          const { dataType, data } = newData;
 
-    this.deleteRecordSubscription =
+          if (dataType === 'projects') {
+            this.dataSet = this.sortService.applyCurrentSort(data);
+            this.updateFilteredView();
+          }
+        },
+        error: (err) => {
+          this.fetchError = err;
+        },
+      }
+    );
+
+    const deleteRecordSubscription =
       this.allocateService.onDeleteRecord.subscribe({
         next: (data: DeletionEvent | SaveEvent) => {
           // save or discard changes
@@ -161,20 +176,46 @@ export class ProjectListComponent
         },
       });
 
+    this.subscription.add(allocationDataSubscription);
+    this.subscription.add(deleteRecordSubscription);
+
     const updateAddressBook = this._updateAddressBook.bind(this);
 
-    this.fetchService.fetchContactData().subscribe({
-      next: (data: string) => {
-        try {
-          this.csvParserService.parseContacts(data, updateAddressBook);
-        } catch (e: any) {
-          this.fetchError = 'Unable to load contacts';
-        }
+    if (!this.appInOfflineMode) {
+      const fetchSubscription = this.fetchService.fetchContactData().subscribe({
+        next: (data: string) => {
+          try {
+            this.csvParserService.parseContacts(data, updateAddressBook);
+          } catch (e: any) {
+            this.fetchError = 'Unable to load contacts';
+          }
+        },
+        error: () => {
+          this.fetchError = 'Cannot get contact list';
+        },
+      });
+
+      this.subscription.add(fetchSubscription);
+    } else {
+      this.subscribeToStoreServices();
+    }
+  }
+
+  subscribeToStoreServices() {
+    const dataStoreSubscription = this.dataStoreService.storeData$.subscribe({
+      next: (data: DataStore) => {
+        const newWeeklyData = this.dataStoreService.getProjectList(
+          this.referenceDate
+        );
+
+        // this.#onNewWeeklyData(newWeeklyData);
       },
-      error: () => {
-        this.fetchError = 'Cannot get contact list';
+      error: (err) => {
+        this.fetchError = err;
       },
     });
+
+    this.subscription.add(dataStoreSubscription);
   }
 
   _updateAddressBook(addressBook: ContactEntry[]) {
@@ -194,8 +235,9 @@ export class ProjectListComponent
 
   ngOnDestroy(): void {
     this.onPageDestroy();
-    this.allocationDataSubscription.unsubscribe();
-    this.deleteRecordSubscription.unsubscribe();
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
   }
 
   clearFilters(): void {
@@ -339,62 +381,6 @@ export class ProjectListComponent
     this.updateFilteredView();
   }
 
-  async fetchData() {
-    this.fetching = true;
-    this.fetchError = '';
-    this.noData = false;
-
-    this.fetchService.fetchProjectList(this.referenceDate).subscribe({
-      next: (data: Project[]) => {
-        const projects = !data?.length
-          ? []
-          : data.map((entry: any) => {
-              const { availDate, ...otherProps } = entry;
-              return {
-                ...otherProps,
-                availDate: new Date(Date.parse(availDate)),
-              };
-            });
-        this.dataSet = this.sortService
-          .sortData(
-            projects,
-            this.sortService.SORT_COLUMNS.NAME,
-            false,
-            true,
-            false
-          )
-          .map((entry) => ({
-            ...entry,
-            inEditMode: false,
-          }));
-
-        this.updateFilteredView();
-      },
-      error: (e) => {
-        if (e.message === 'No data') {
-          this.noData = true;
-        } else {
-          this.fetchError = e.message;
-        }
-        this.fetching = false;
-        if (this.inEditMode) {
-          this.setInEditMode(false);
-        }
-      },
-      complete: () => {
-        this.fetching = false;
-        if (this.inEditMode) {
-          this.setInEditMode(false);
-        }
-        this.allocateService.registerDataset({
-          dataType: 'projects',
-          data: this.dataSet as ProjectEditable[],
-          weekOf: this.referenceDate,
-        });
-      },
-    });
-  }
-
   setInEditMode(inEditMode: boolean): void {
     this.inEditMode = inEditMode;
 
@@ -413,31 +399,131 @@ export class ProjectListComponent
     }
   }
 
-  async postChanges() {
-    this.fetching = true;
-
-    this.fetchService
-      .saveProjectList(
-        this.referenceDate,
-        (this.dataSet as any[]).map((entry) => {
-          const { inEditMode, ...otherProps } = entry;
-
+  parseProjectDataAndUpdateView(data: Project[]) {
+    const projects = !data?.length
+      ? []
+      : data.map((entry: any) => {
+          const { availDate, ...otherProps } = entry;
           return {
             ...otherProps,
+            availDate: new Date(Date.parse(availDate)),
           };
-        })
+        });
+    this.dataSet = this.sortService
+      .sortData(
+        projects,
+        this.sortService.SORT_COLUMNS.NAME,
+        false,
+        true,
+        false
       )
-      .subscribe({
-        next: () => {
-          this.fetchData();
-        },
-        error: (e) => {
-          this.fetchError = e;
-          this.uploading = false;
+      .map((entry) => ({
+        ...entry,
+        inEditMode: false,
+      }));
+
+    this.updateFilteredView();
+  }
+
+  onFetchCompleted() {
+    this.fetching = false;
+    if (this.inEditMode) {
+      this.setInEditMode(false);
+    }
+    this.allocateService.registerDataset({
+      dataType: 'projects',
+      data: this.dataSet as ProjectEditable[],
+      weekOf: this.referenceDate,
+    });
+  }
+
+  // ******************************
+  // DATA STORE FNs
+  // ******************************
+
+  fetchData() {
+    this.fetching = true;
+    this.fetchError = '';
+    this.noData = false;
+
+    if (!this.appInOfflineMode) {
+      this.#fetchDataFromOnlineStore();
+    } else {
+      this.#fetchDataFromLocalStore();
+    }
+  }
+
+  #fetchDataFromOnlineStore() {
+    this.fetchService.fetchProjectList(this.referenceDate).subscribe({
+      next: (data: Project[]) => {
+        this.parseProjectDataAndUpdateView(data);
+      },
+      error: (e) => {
+        if (e.message === 'No data') {
+          this.noData = true;
+        } else {
+          this.fetchError = e.message;
+        }
+        this.fetching = false;
+        if (this.inEditMode) {
           this.setInEditMode(false);
-        },
-        complete: () => {},
-      });
+        }
+      },
+      complete: () => {
+        this.onFetchCompleted();
+      },
+    });
+  }
+
+  #fetchDataFromLocalStore() {
+    const data: Project[] = this.dataStoreService.getProjectList(
+      this.referenceDate
+    );
+
+    if (data) {
+      this.parseProjectDataAndUpdateView(data);
+    } else {
+      this.noData = true;
+    }
+    this.onFetchCompleted();
+  }
+
+  postChanges() {
+    this.fetching = true;
+    const data: Project[] = (this.dataSet as any[]).map((entry) => {
+      const { inEditMode, ...otherProps } = entry;
+
+      return {
+        ...otherProps,
+      };
+    });
+
+    if (!this.appInOfflineMode) {
+      this.#postChangesToOnlineStore(data);
+    } else {
+      this.#postChangesToLocalStore(data);
+    }
+  }
+
+  #postChangesToOnlineStore(data: Project[]) {
+    this.fetchService.saveProjectList(this.referenceDate, data).subscribe({
+      next: () => {
+        this.fetchData();
+      },
+      error: (e) => {
+        this.fetchError = e;
+        this.uploading = false;
+        this.setInEditMode(false);
+      },
+      complete: () => {},
+    });
+  }
+
+  #postChangesToLocalStore(data: Project[]) {
+    this.dataStoreService.saveChangesToProjectList(this.referenceDate, data);
+
+    // to change (add observable)
+    this.#fetchDataFromLocalStore();
   }
 
   handleFormPending(): void {

@@ -49,9 +49,9 @@ export class PeopleListComponent
   extends PageComponent
   implements OnInit, OnChanges
 {
+  @Input() appInOfflineMode!: Boolean;
   @Input() displayedIn!: 'SUBMIT' | 'ALLOCATE';
   @Input() peopleData!: any;
-  @Input() appInOfflineMode!: Boolean;
 
   boundGetNameTypeahead!: Function;
   pdmArr!: String[];
@@ -154,10 +154,6 @@ export class PeopleListComponent
           this.displayedIn === 'ALLOCATE',
           data
         );
-
-        console.log({
-          newWeeklyData,
-        });
 
         this.#onNewWeeklyData(newWeeklyData);
       },

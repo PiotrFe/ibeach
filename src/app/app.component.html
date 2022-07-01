@@ -111,6 +111,7 @@
   <allocate-section
     *ngIf="pageSection === 'ALLOCATE'"
     [referenceDate]="referenceDate"
+    [appInOfflineMode]="appInOfflineMode"
   ></allocate-section>
   <stats-section *ngIf="pageSection === 'STATS'"></stats-section>
   <select-datastore-page

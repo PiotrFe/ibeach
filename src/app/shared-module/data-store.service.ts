@@ -1,12 +1,13 @@
 import { Subject } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { Person } from 'src/app/people-list/person';
+import { Project } from 'src/app/project-list/project-list/project';
 import { WeeklyData } from 'src/app/shared-module/fetch.service';
 import {
   DataStoreManager,
   StoreManager,
   DataStore,
-} from '../utils/StorageManager';
+} from 'src/app/utils/StorageManager';
 
 @Injectable({
   providedIn: 'root',
@@ -28,6 +29,10 @@ export class DataStoreService {
     return this.dataStoreManager.getEmptyStore();
   }
 
+  getProjectList(week: Date): Project[] {
+    return this.dataStoreManager.getProjectList(week);
+  }
+
   getWeeklyMasterList(
     week: Date,
     submittedOnly: boolean,
@@ -43,6 +48,10 @@ export class DataStoreService {
   saveChangesToPeopleList(weekOf: Date, pdm: string, data: Person[]) {
     this.dataStoreManager.saveChangesToPeopleList(weekOf, pdm, data);
     this.#dataStoreSubject.next(this.dataStoreManager.dataStore as DataStore);
+  }
+
+  saveChangesToProjectList(weekOf: Date, data: Project[]) {
+    this.dataStoreManager.saveChangesToProjectList(weekOf, data);
   }
 
   saveListForLookup(data: any) {
