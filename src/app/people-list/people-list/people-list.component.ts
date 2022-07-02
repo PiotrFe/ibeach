@@ -35,7 +35,7 @@ import {
   SubmissionStatus,
 } from 'src/app/shared-module/page/page.component';
 
-import { DataStore } from 'src/app/utils/StorageManager';
+import { DataStore, WeeklyPeopleList } from 'src/app/utils/StorageManager';
 import { getClosestPastMonday } from 'src/app/utils';
 import { getNewWeek, getDaysLeft } from '../../shared-module/week-days/week';
 import { ProjectEditable } from 'src/app/project-list/project-list/project';
@@ -149,13 +149,31 @@ export class PeopleListComponent
   subscribeToStoreServices() {
     const dataStoreSubscription = this.dataStoreService.storeData$.subscribe({
       next: (data: DataStore) => {
-        const newWeeklyData = this.dataStoreService.getWeeklyMasterList(
-          this.referenceDate,
-          this.displayedIn === 'ALLOCATE',
-          data
-        );
+        const { updatedAtTs: peopleUpdatedAtTs } = data.people;
+        const { updatedAtTs: masterUpdatedAtTs } = data.master;
 
-        this.#onNewWeeklyData(newWeeklyData);
+        if (
+          this.displayedIn === 'SUBMIT' &&
+          masterUpdatedAtTs > this.lastDataUpdateTs
+        ) {
+          const newWeeklyData = this.dataStoreService.getWeeklyMasterList(
+            this.referenceDate,
+            false,
+            data
+          );
+
+          this.#onNewWeeklyData(newWeeklyData);
+          this.lastDataUpdateTs = masterUpdatedAtTs;
+        } else if (
+          this.displayedIn === 'ALLOCATE' &&
+          peopleUpdatedAtTs > this.lastDataUpdateTs
+        ) {
+          const { data } = this.dataStoreService.getPeopleList(
+            this.referenceDate
+          );
+          this.dataSet = this.parsePeopleDataAndUpdateView(data);
+          this.lastDataUpdateTs = peopleUpdatedAtTs;
+        }
       },
       error: (err) => {
         this.fetchError = err;
@@ -445,13 +463,70 @@ export class PeopleListComponent
   }
 
   // *****************
+  // UPDATING VIEW
+  // *****************
+
+  parsePeopleDataAndUpdateView(people: Person[]): PersonEditable[] {
+    const peopleList = !people?.length
+      ? []
+      : this.sortService
+          .sortData(
+            people,
+            this.sortService.SORT_COLUMNS.NAME,
+            false,
+            true,
+            false
+          )
+          .map((person) => ({
+            ...person,
+            inEditMode: false,
+            availDate: new Date(Date.parse(person.availDate)),
+          }));
+
+    return peopleList;
+  }
+
+  #onNewWeeklyData(data: WeeklyData) {
+    this._onWeeklyData(data);
+    this.allocateService.registerDataset({
+      dataType: 'people',
+      data: this.dataSet as PersonEditable[],
+      weekOf: this.referenceDate,
+    });
+  }
+
+  _onWeeklyData(data: WeeklyData) {
+    const { people, statusSummary, lookupTable, config } = data;
+
+    this.dataSet = this.parsePeopleDataAndUpdateView(people);
+
+    // [Comment applying to online mode only]
+    // lookup table only sent on first fetch, where pdm not provided as parameter
+    // if pdm provided as a parameter, he/she cancelled changes and is fetching the old list from server
+
+    if (lookupTable) {
+      this.typeaheadService.storeLookupList(
+        this.typeaheadService.tableTypes.People,
+        lookupTable
+      );
+    }
+
+    if (config) {
+      this.configService.setConfig(config);
+    }
+
+    this.status = statusSummary;
+    this.updateStatusLabel();
+    this.updateFilteredView();
+  }
+
+  // *****************
   // SUBMIT HANDLERS
   // *****************
 
   fetchData(refetching = true) {
     this.fetching = true;
     this.fetchError = '';
-    this.noData = false;
 
     if (!this.appInOfflineMode) {
       this.#fetchFromOnlineStore(refetching);
@@ -470,11 +545,7 @@ export class PeopleListComponent
           this._onWeeklyData(data);
         },
         error: (e) => {
-          if (e.message === 'No data') {
-            this.noData = true;
-          } else {
-            this.fetchError = e.message;
-          }
+          this.fetchError = e.message;
           this.fetching = false;
           if (this.inEditMode) {
             this.setInEditMode(false);
@@ -495,69 +566,45 @@ export class PeopleListComponent
   }
 
   #fetchFromLocalStore() {
-    const submittedOnly = this.displayedIn === 'ALLOCATE';
+    if (this.displayedIn === 'ALLOCATE') {
+      this.#fetchDataForAllocateSection();
+    } else {
+      this.#fetchDataForSubmitSection();
+    }
+  }
+
+  #fetchDataForSubmitSection() {
     const data = this.dataStoreService.getWeeklyMasterList(
       this.referenceDate,
-      submittedOnly
+      false
     );
 
     if (data) {
       this.#onNewWeeklyData(data);
     } else {
-      this.noData = true;
       this.fetchError = 'No data available';
     }
     this.fetching = false;
+
     if (this.inEditMode) {
       this.setInEditMode(false);
     }
   }
 
-  #onNewWeeklyData(data: WeeklyData) {
-    this._onWeeklyData(data);
-    this.allocateService.registerDataset({
-      dataType: 'people',
-      data: this.dataSet as PersonEditable[],
-      weekOf: this.referenceDate,
-    });
-  }
+  #fetchDataForAllocateSection() {
+    const { data, updatedAtTs } = this.dataStoreService.getPeopleList(
+      this.referenceDate
+    );
 
-  _onWeeklyData(data: WeeklyData) {
-    const { people, statusSummary, lookupTable, config } = data;
-
-    this.dataSet = !people?.length
-      ? []
-      : this.sortService
-          .sortData(
-            people,
-            this.sortService.SORT_COLUMNS.NAME,
-            false,
-            true,
-            false
-          )
-          .map((person) => ({
-            ...person,
-            inEditMode: false,
-            availDate: new Date(Date.parse(person.availDate)),
-          }));
-
-    // lookup table only sent on first fetch, where pdm not provided as parameter
-    // if pdm provided as a parameter, he/she cancelled changes and is fetching the old list from server
-
-    if (lookupTable) {
-      this.typeaheadService.storeLookupList(
-        this.typeaheadService.tableTypes.People,
-        lookupTable
-      );
+    if (data) {
+      this.dataSet = this.parsePeopleDataAndUpdateView(data);
+      this.lastDataUpdateTs = updatedAtTs;
     }
+    this.fetching = false;
 
-    if (config) {
-      this.configService.setConfig(config);
+    if (this.inEditMode) {
+      this.setInEditMode(false);
     }
-
-    this.status = statusSummary;
-    this.updateStatusLabel();
-    this.updateFilteredView();
   }
 
   postChanges() {

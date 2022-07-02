@@ -3,6 +3,16 @@ import { Person } from 'src/app/people-list/person';
 import { Project } from 'src/app/project-list/project-list/project';
 import { WeeklyData } from 'src/app/shared-module/fetch.service';
 
+export type WeeklyPeopleList = {
+  data: Person[];
+  updatedAtTs: number;
+};
+
+export type WeeklyProjectList = {
+  data: Project[];
+  updatedAtTs: number;
+};
+
 export interface DataStore {
   master: {
     [key: number]: {
@@ -11,12 +21,15 @@ export interface DataStore {
         isSubmitted: boolean;
       };
     };
+    updatedAtTs: number;
   };
   people: {
     [key: number]: Person[];
+    updatedAtTs: number;
   };
   projects: {
     [key: number]: Project[];
+    updatedAtTs: number;
   };
   lookup: Person[];
   config: Config;
@@ -29,7 +42,8 @@ export interface StoreManager {
   dataStoreFile: File | undefined;
 
   getEmptyStore: () => DataStore;
-  getProjectList: (week: Date) => Project[];
+  getPeopleList: (week: Date) => WeeklyPeopleList;
+  getProjectList: (week: Date) => WeeklyProjectList;
   getWeeklyMasterList: (
     week: Date,
     submittedOnly?: boolean,
@@ -75,19 +89,41 @@ export class DataStoreManager implements StoreManager {
   }
 
   getEmptyStore() {
+    const ts = Date.now();
     return {
-      master: {},
-      people: [],
-      projects: [],
+      master: { updatedAtTs: ts },
+      people: {
+        updatedAtTs: ts,
+      },
+      projects: {
+        updatedAtTs: ts,
+      },
       config: this.#getDefaultConfig(),
       lookup: [],
-      updatedAtTs: Date.now(),
+      updatedAtTs: ts,
     };
   }
 
-  getProjectList(week: Date): Project[] {
+  getPeopleList(week: Date): WeeklyPeopleList {
     const ts = week.getTime();
-    return this.dataStore.projects[ts] || [];
+    const data = this.dataStore.people[ts] || [];
+    const { updatedAtTs } = this.dataStore.people;
+
+    return {
+      data,
+      updatedAtTs,
+    };
+  }
+
+  getProjectList(week: Date): WeeklyProjectList {
+    const ts = week.getTime();
+    const data = this.dataStore.projects[ts] || [];
+    const { updatedAtTs } = this.dataStore.projects;
+
+    return {
+      data,
+      updatedAtTs,
+    };
   }
 
   getWeeklyMasterList(
@@ -154,18 +190,37 @@ export class DataStoreManager implements StoreManager {
 
   saveChangesToPeopleList(weekOf: Date, pdm: string, data: Person[]) {
     const weekTs = weekOf.getTime();
+    const ts = Date.now();
 
-    this.dataStore.master[weekTs][pdm] = {
-      ...this.dataStore!.master[weekTs][pdm],
-      people: data,
-    };
+    const pdmEntry = pdm ? pdm : 'unknown';
+
+    // if pdm is allocator, it means the change was done in the "allocate" section
+    // i.e. people array in store should be updated; otherwise a names pdm
+    // doing changes in master list before submitting
+    if (pdmEntry === 'allocator') {
+      this.dataStore.people[weekTs] = [...data];
+      this.dataStore.people.updatedAtTs = ts;
+    } else {
+      this.dataStore.master[weekTs] = {
+        ...this.dataStore.master[weekTs],
+        [pdmEntry]: {
+          ...this.dataStore.master?.[weekTs]?.[pdmEntry],
+          people: data,
+        },
+      };
+
+      this.dataStore.master.updatedAtTs = ts;
+    }
 
     this.#syncLocalStorage();
   }
 
   saveChangesToProjectList(weekOf: Date, data: Project[]) {
     const weekTs = weekOf.getTime();
+    const ts = Date.now();
     this.dataStore.projects[weekTs] = data;
+    this.dataStore.projects.updatedAtTs = ts;
+    this.#syncLocalStorage();
   }
 
   async setDataStore(file: File) {
@@ -201,6 +256,7 @@ export class DataStoreManager implements StoreManager {
     }
   ) {
     const weekTs = weekOf.getTime();
+    const ts = Date.now();
 
     if (!this.dataStoreFile || this.dataStore === undefined) {
       this.dataStoreError = 'Unable to upload';
@@ -208,10 +264,11 @@ export class DataStoreManager implements StoreManager {
     }
 
     const { week, full } = data;
-    const updatedAtTs = Date.now();
 
     if (!this.dataStore?.master) {
-      this.dataStore.master = {};
+      this.dataStore.master = {
+        updatedAtTs: ts,
+      };
     }
 
     // take pdm list from configuration or - if not available - from the uploaded list
@@ -232,19 +289,21 @@ export class DataStoreManager implements StoreManager {
     }, {});
 
     this.dataStore.master[weekTs] = weeklyData;
-    this.dataStore.updatedAtTs = updatedAtTs;
+    this.dataStore.updatedAtTs = ts;
 
     this.saveListForLookup(full);
   }
 
   submitPeopleList(weekOf: Date, pdm: string, data: Person[]) {
     const weekTs = weekOf.getTime();
+    const ts = Date.now();
 
-    this.dataStore!.master[weekTs][pdm] = {
+    this.dataStore.master[weekTs][pdm] = {
       ...this.dataStore!.master[weekTs][pdm],
       people: data,
       isSubmitted: true,
     };
+    this.dataStore.master.updatedAtTs = ts;
 
     this.#syncLocalStorage();
   }

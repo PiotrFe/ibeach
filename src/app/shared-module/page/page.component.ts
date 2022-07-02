@@ -43,30 +43,25 @@ export class PageComponent implements AfterViewInit {
   ngZone: NgZone;
 
   dataSet: (PersonEditable | ProjectEditable)[] = [];
-  filteredDataset: (PersonEditable | ProjectEditable)[] = this.dataSet;
-  newRows: (PersonEditable | ProjectEditable)[] = [];
-
-  inEditMode: boolean = false;
-  showPastRecordsLabel: boolean = false;
-  filters: Filter[] = [];
-
-  noData: boolean = false;
-  showAvailableOnly: boolean = false;
-
-  saveChangesInProgress: boolean = false;
-
-  uploading: boolean = false;
-  uploaded: boolean = false;
+  entryContainerWidth: number = 4;
   fetching: boolean = false;
   fetchError: string = '';
-
-  uncollapsed: Set<string> = new Set();
-  sortService: SortService = new SortService();
-  typeaheadService!: TypeaheadService;
+  filteredDataset: (PersonEditable | ProjectEditable)[] = this.dataSet;
+  filters: Filter[] = [];
+  inEditMode: boolean = false;
+  lastDataUpdateTs: number = 0;
+  newRows: (PersonEditable | ProjectEditable)[] = [];
+  noData: boolean = false;
   resizeObserverService: ResizeObserverService;
-
-  entryContainerWidth: number = 4;
   resizeSubscription!: any;
+  saveChangesInProgress: boolean = false;
+  sortService: SortService = new SortService();
+  showAvailableOnly: boolean = false;
+  showPastRecordsLabel: boolean = false;
+  typeaheadService!: TypeaheadService;
+  uncollapsed: Set<string> = new Set();
+  uploading: boolean = false;
+  uploaded: boolean = false;
 
   constructor(
     ngZone: NgZone,

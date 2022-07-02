@@ -26,7 +26,7 @@ import {
 } from 'src/app/shared-module/allocate.service';
 
 import { PageComponent } from 'src/app/shared-module/page/page.component';
-import { DataStore } from 'src/app/utils/StorageManager';
+import { DataStore, WeeklyProjectList } from 'src/app/utils/StorageManager';
 
 import {
   Project,
@@ -204,11 +204,15 @@ export class ProjectListComponent
   subscribeToStoreServices() {
     const dataStoreSubscription = this.dataStoreService.storeData$.subscribe({
       next: (data: DataStore) => {
-        const newWeeklyData = this.dataStoreService.getProjectList(
-          this.referenceDate
-        );
+        const ts = this.referenceDate.getTime();
+        const newWeeklyData = data.projects[ts];
+        const { updatedAtTs } = data.projects;
 
-        // this.#onNewWeeklyData(newWeeklyData);
+        if (newWeeklyData && updatedAtTs > this.lastDataUpdateTs) {
+          this.parseProjectDataAndUpdateView(newWeeklyData);
+          this.onFetchCompleted();
+          this.lastDataUpdateTs = updatedAtTs;
+        }
       },
       error: (err) => {
         this.fetchError = err;
@@ -444,7 +448,6 @@ export class ProjectListComponent
   fetchData() {
     this.fetching = true;
     this.fetchError = '';
-    this.noData = false;
 
     if (!this.appInOfflineMode) {
       this.#fetchDataFromOnlineStore();
@@ -459,11 +462,7 @@ export class ProjectListComponent
         this.parseProjectDataAndUpdateView(data);
       },
       error: (e) => {
-        if (e.message === 'No data') {
-          this.noData = true;
-        } else {
-          this.fetchError = e.message;
-        }
+        this.fetchError = e.message;
         this.fetching = false;
         if (this.inEditMode) {
           this.setInEditMode(false);
@@ -476,14 +475,15 @@ export class ProjectListComponent
   }
 
   #fetchDataFromLocalStore() {
-    const data: Project[] = this.dataStoreService.getProjectList(
+    const weeklyList: WeeklyProjectList = this.dataStoreService.getProjectList(
       this.referenceDate
     );
 
+    const { data, updatedAtTs } = weeklyList;
+    this.lastDataUpdateTs = updatedAtTs;
+
     if (data) {
       this.parseProjectDataAndUpdateView(data);
-    } else {
-      this.noData = true;
     }
     this.onFetchCompleted();
   }
@@ -512,7 +512,7 @@ export class ProjectListComponent
       },
       error: (e) => {
         this.fetchError = e;
-        this.uploading = false;
+        this.fetching = true;
         this.setInEditMode(false);
       },
       complete: () => {},
@@ -521,9 +521,8 @@ export class ProjectListComponent
 
   #postChangesToLocalStore(data: Project[]) {
     this.dataStoreService.saveChangesToProjectList(this.referenceDate, data);
-
-    // to change (add observable)
-    this.#fetchDataFromLocalStore();
+    this.setInEditMode(false);
+    this.fetching = false;
   }
 
   handleFormPending(): void {

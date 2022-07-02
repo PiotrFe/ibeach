@@ -4,9 +4,11 @@ import { Person } from 'src/app/people-list/person';
 import { Project } from 'src/app/project-list/project-list/project';
 import { WeeklyData } from 'src/app/shared-module/fetch.service';
 import {
+  DataStore,
   DataStoreManager,
   StoreManager,
-  DataStore,
+  WeeklyPeopleList,
+  WeeklyProjectList,
 } from 'src/app/utils/StorageManager';
 
 @Injectable({
@@ -29,7 +31,11 @@ export class DataStoreService {
     return this.dataStoreManager.getEmptyStore();
   }
 
-  getProjectList(week: Date): Project[] {
+  getPeopleList(week: Date): WeeklyPeopleList {
+    return this.dataStoreManager.getPeopleList(week);
+  }
+
+  getProjectList(week: Date): WeeklyProjectList {
     return this.dataStoreManager.getProjectList(week);
   }
 
@@ -52,6 +58,7 @@ export class DataStoreService {
 
   saveChangesToProjectList(weekOf: Date, data: Project[]) {
     this.dataStoreManager.saveChangesToProjectList(weekOf, data);
+    this.#dataStoreSubject.next(this.dataStoreManager.dataStore as DataStore);
   }
 
   saveListForLookup(data: any) {

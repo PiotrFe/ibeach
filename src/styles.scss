@@ -209,40 +209,44 @@ li {
 
     &--green {
       & > span {
-        background-image: linear-gradient(
-          to right,
-          rgba(25, 135, 84, 0.1),
-          rgba(25, 135, 84, 0.4)
-        );
+        // background-image: linear-gradient(
+        //   to right,
+        //   rgba(25, 135, 84, 0.1),
+        //   rgba(25, 135, 84, 0.4)
+        // );
+        background-color: rgba(25, 135, 84, 0.6);
       }
     }
 
     &--yellow {
       & > span {
-        background-image: linear-gradient(
-          to right,
-          rgba(255, 193, 7, 0.1),
-          rgba(255, 193, 7, 0.4)
-        );
+        // background-image: linear-gradient(
+        //   to right,
+        //   rgba(255, 193, 7, 0.1),
+        //   rgba(255, 193, 7, 0.4)
+        // );
+        background-color: rgba(255, 193, 7, 0.6);
       }
     }
 
     &--orange {
       & > span {
-        background-image: linear-gradient(
-          to right,
-          rgba(253, 125, 20, 0.1),
-          rgba(253, 125, 20, 0.4)
-        );
+        // background-image: linear-gradient(
+        //   to right,
+        //   rgba(253, 125, 20, 0.1),
+        //   rgba(253, 125, 20, 0.4)
+        // );
+        background-color: rgba(253, 125, 20, 0.6);
       }
     }
     &--red {
       & > span {
-        background-image: linear-gradient(
-          to right,
-          rgba(220, 53, 70, 0.1),
-          rgba(220, 53, 70, 0.4)
-        );
+        // background-image: linear-gradient(
+        //   to right,
+        //   rgba(220, 53, 70, 0.1),
+        //   rgba(220, 53, 70, 0.4)
+        // );
+        background-color: rgba(220, 53, 69, 0.6);
       }
     }
   }
@@ -454,7 +458,7 @@ ul {
   height: 100%;
   max-height: 75vh;
   padding: 0 2rem;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 .people-content,
