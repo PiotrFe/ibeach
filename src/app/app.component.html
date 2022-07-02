@@ -99,23 +99,20 @@
 <div class="content-container">
   <people-list
     *ngIf="pageSection === 'SUBMIT'"
-    [appInOfflineMode]="appInOfflineMode"
     [displayedIn]="'SUBMIT'"
     [referenceDate]="referenceDate"
   ></people-list>
   <upload-section
     *ngIf="pageSection === 'UPLOAD'"
-    [appInOfflineMode]="appInOfflineMode"
     [referenceDate]="referenceDate"
   ></upload-section>
   <allocate-section
     *ngIf="pageSection === 'ALLOCATE'"
     [referenceDate]="referenceDate"
-    [appInOfflineMode]="appInOfflineMode"
   ></allocate-section>
   <stats-section *ngIf="pageSection === 'STATS'"></stats-section>
   <select-datastore-page
-    *ngIf="!dataStoreService.hasActiveDataStore"
+    *ngIf="dataStoreService.hasActiveDataStore"
   ></select-datastore-page>
 </div>
 <settings *ngIf="showSettings" (closeEvent)="closeSettings()"></settings>

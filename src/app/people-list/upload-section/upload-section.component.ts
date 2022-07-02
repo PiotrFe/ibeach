@@ -8,6 +8,7 @@ import {
 import { FetchService } from 'src/app/shared-module/fetch.service';
 import { CsvParserService } from 'src/app/shared-module/csv-parser.service';
 import { DataStoreService } from 'src/app/shared-module/data-store.service';
+import { IsOnlineService } from 'src/app/shared-module/is-online.service';
 import { ResizeObserverService } from 'src/app/shared-module/resize-observer.service';
 import { parse } from 'src/app/utils/csv-parser/index';
 import { Person } from '../person';
@@ -20,8 +21,6 @@ import { WeeklyData } from 'src/app/shared-module/fetch.service';
   styleUrls: ['./upload-section.component.scss'],
 })
 export class UploadSectionComponent extends PageComponent implements OnChanges {
-  @Input() appInOfflineMode: Boolean = false;
-
   bsInlineValue: Date = new Date();
   data!: string;
   fileSelected: boolean = false;
@@ -33,9 +32,10 @@ export class UploadSectionComponent extends PageComponent implements OnChanges {
   constructor(
     ngZone: NgZone,
     resizeObserverService: ResizeObserverService,
+    private csvParserService: CsvParserService,
     private dataStoreService: DataStoreService,
     private fetchService: FetchService,
-    private csvParserService: CsvParserService
+    private isOnlineService: IsOnlineService
   ) {
     super(ngZone, resizeObserverService);
   }
@@ -66,7 +66,7 @@ export class UploadSectionComponent extends PageComponent implements OnChanges {
     this.noData = false;
     this.uploaded = false;
 
-    if (!this.appInOfflineMode) {
+    if (this.isOnlineService.isOnline) {
       this._fetchDataFromOnlineStore();
     } else {
       this._fetchDataFromLocalStore();
@@ -165,7 +165,7 @@ export class UploadSectionComponent extends PageComponent implements OnChanges {
   }
 
   uploadData() {
-    if (!this.appInOfflineMode) {
+    if (this.isOnlineService.isOnline) {
       this._storeDataOnline();
     } else {
       this._storeDataLocally();

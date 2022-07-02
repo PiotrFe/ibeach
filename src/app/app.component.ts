@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { DataStoreService } from 'src/app/shared-module/data-store.service';
+import { IsOnlineService } from 'src/app/shared-module/is-online.service';
 
 export const PAGE_SECTIONS = {
   ALLOCATE: 'ALLOCATE',
@@ -16,12 +17,16 @@ export const PAGE_SECTIONS = {
 export class AppComponent {
   title = 'client-dev-app';
 
-  appInOfflineMode: Boolean = true;
   pageSection = PAGE_SECTIONS.ALLOCATE;
   referenceDate: Date = new Date();
   showSettings: boolean = false;
 
-  constructor(public dataStoreService: DataStoreService) {}
+  constructor(
+    public dataStoreService: DataStoreService,
+    private isOnline: IsOnlineService
+  ) {
+    this.isOnline.setIsOnline(false);
+  }
 
   setPageSection(sectionName: keyof typeof PAGE_SECTIONS): void {
     this.pageSection = sectionName;

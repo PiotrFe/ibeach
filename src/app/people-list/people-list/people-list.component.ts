@@ -13,6 +13,7 @@ import { FormControl } from '@angular/forms';
 import { ConfigService } from 'src/app/shared-module/config.service';
 import { DataStoreService } from 'src/app/shared-module/data-store.service';
 import { FetchService } from 'src/app/shared-module/fetch.service';
+import { IsOnlineService } from 'src/app/shared-module/is-online.service';
 import { ListEditModeStatusService } from 'src/app/shared-module/list-edit-mode-status.service';
 import { TypeaheadService } from 'src/app/shared-module/typeahead.service';
 import { ResizeObserverService } from 'src/app/shared-module/resize-observer.service';
@@ -49,7 +50,6 @@ export class PeopleListComponent
   extends PageComponent
   implements OnInit, OnChanges
 {
-  @Input() appInOfflineMode!: Boolean;
   @Input() displayedIn!: 'SUBMIT' | 'ALLOCATE';
   @Input() peopleData!: any;
 
@@ -73,6 +73,7 @@ export class PeopleListComponent
     private configService: ConfigService,
     private dataStoreService: DataStoreService,
     private fetchService: FetchService,
+    private isOnlineService: IsOnlineService,
     private listEditModeStatusService: ListEditModeStatusService,
     ngZone: NgZone,
     resizeObserverService: ResizeObserverService,
@@ -124,6 +125,16 @@ export class PeopleListComponent
           if (dataType === 'people') {
             this.dataSet = this.sortService.applyCurrentSort(data);
             this.updateFilteredView();
+
+            console.log({
+              updatedPeopleData: this.dataSet,
+            });
+
+            // post changes to store in the offline mode
+            // (allocation service does not do it)
+            if (!this.isOnlineService.isOnline) {
+              this.postChanges();
+            }
           }
         },
         error: (err) => {
@@ -164,15 +175,19 @@ export class PeopleListComponent
 
           this.#onNewWeeklyData(newWeeklyData);
           this.lastDataUpdateTs = masterUpdatedAtTs;
+          this.onFetchCompleted();
         } else if (
           this.displayedIn === 'ALLOCATE' &&
           peopleUpdatedAtTs > this.lastDataUpdateTs
         ) {
-          const { data } = this.dataStoreService.getPeopleList(
-            this.referenceDate
-          );
-          this.dataSet = this.parsePeopleDataAndUpdateView(data);
+          const ts = this.referenceDate.getTime();
+          const people = data.people[ts];
+          // console.log({
+          //   people,
+          // });
+          this.dataSet = this.parsePeopleDataAndUpdateView(people);
           this.lastDataUpdateTs = peopleUpdatedAtTs;
+          this.onFetchCompleted();
         }
       },
       error: (err) => {
@@ -528,7 +543,7 @@ export class PeopleListComponent
     this.fetching = true;
     this.fetchError = '';
 
-    if (!this.appInOfflineMode) {
+    if (this.isOnlineService.isOnline) {
       this.#fetchFromOnlineStore(refetching);
     } else {
       this.#fetchFromLocalStore();
@@ -552,15 +567,7 @@ export class PeopleListComponent
           }
         },
         complete: () => {
-          this.fetching = false;
-          if (this.inEditMode) {
-            this.setInEditMode(false);
-          }
-          this.allocateService.registerDataset({
-            dataType: 'people',
-            data: this.dataSet as PersonEditable[],
-            weekOf: this.referenceDate,
-          });
+          this.onFetchCompleted();
         },
       });
   }
@@ -584,11 +591,8 @@ export class PeopleListComponent
     } else {
       this.fetchError = 'No data available';
     }
-    this.fetching = false;
 
-    if (this.inEditMode) {
-      this.setInEditMode(false);
-    }
+    this.onFetchCompleted();
   }
 
   #fetchDataForAllocateSection() {
@@ -600,11 +604,22 @@ export class PeopleListComponent
       this.dataSet = this.parsePeopleDataAndUpdateView(data);
       this.lastDataUpdateTs = updatedAtTs;
     }
+
+    this.onFetchCompleted();
+  }
+
+  onFetchCompleted() {
     this.fetching = false;
 
     if (this.inEditMode) {
       this.setInEditMode(false);
     }
+
+    this.allocateService.registerDataset({
+      dataType: 'people',
+      data: this.dataSet as PersonEditable[],
+      weekOf: this.referenceDate,
+    });
   }
 
   postChanges() {
@@ -626,7 +641,7 @@ export class PeopleListComponent
       };
     }) as Person[];
 
-    if (!this.appInOfflineMode) {
+    if (this.isOnlineService.isOnline) {
       this.#postToOnlineStore(pdmParam, mappedDataset);
     } else {
       this.#postToLocalStore(pdmParam, mappedDataset);
@@ -676,7 +691,7 @@ export class PeopleListComponent
           ...otherProps,
         };
       });
-      if (!this.appInOfflineMode) {
+      if (this.isOnlineService.isOnline) {
         this.#submitToOnlineStore(dataset);
       } else {
         this.#submitToLocalStore(dataset);

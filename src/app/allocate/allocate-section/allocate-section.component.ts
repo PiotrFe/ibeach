@@ -32,7 +32,6 @@ export class AllocateSectionComponent implements OnInit, OnDestroy {
   @ViewChild('dragHandle') dragHandle!: ElementRef;
   @ViewChild('projectSide') projectSide!: ElementRef;
 
-  @Input() appInOfflineMode!: Boolean;
   @Input() referenceDate: Date = new Date();
 
   dragging: boolean = false;

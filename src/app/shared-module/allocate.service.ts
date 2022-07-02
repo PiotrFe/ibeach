@@ -6,8 +6,10 @@ import {
   ProjectEditable,
 } from 'src/app/project-list/project-list/project';
 import { Week, getDaysLeft } from 'src/app/shared-module/week-days/week';
-import { FetchService } from 'src/app/shared-module/fetch.service';
+import { DataStoreService } from 'src/app/shared-module/data-store.service';
 import { DayHighlighterService } from 'src/app/shared-module/day-highlighter.service';
+import { FetchService } from 'src/app/shared-module/fetch.service';
+import { IsOnlineService } from 'src/app/shared-module/is-online.service';
 
 export interface Dataset {
   dataType: 'people' | 'projects';
@@ -76,35 +78,23 @@ interface RegisteredAllocationDragDropEvent extends AllocationDragDropEvent {
   providedIn: 'root',
 })
 export class AllocateService {
-  peopleDataSet!: PersonEditable[];
-  projectDataSet!: ProjectEditable[];
-  registeredDragEvent!: RegisteredAllocationDragDropEvent | null;
   datasetSubject: Subject<Dataset> = new Subject<Dataset>();
   deleteRecordSubject: Subject<DeletionEvent | SaveEvent> = new Subject<
     DeletionEvent | SaveEvent
   >();
+  peopleDataSet!: PersonEditable[];
+  projectDataSet!: ProjectEditable[];
+  registeredDragEvent!: RegisteredAllocationDragDropEvent | null;
   onDataset = this.datasetSubject.asObservable();
   onDeleteRecord = this.deleteRecordSubject.asObservable();
   weekOf!: Date;
 
   constructor(
+    private dataStoreService: DataStoreService,
+    private dayHighlighter: DayHighlighterService,
     private fetchService: FetchService,
-    private dayHighlighter: DayHighlighterService
+    private isOnlineService: IsOnlineService
   ) {}
-
-  registerDataset(newDataset: Dataset): void {
-    const { dataType, data, weekOf } = newDataset;
-
-    if (dataType === 'people') {
-      this.peopleDataSet = data as PersonEditable[];
-    }
-
-    if (dataType === 'projects') {
-      this.projectDataSet = data as ProjectEditable[];
-    }
-
-    this.weekOf = weekOf;
-  }
 
   getDataForDay(
     dataType: 'people' | 'projects',
@@ -168,41 +158,68 @@ export class AllocateService {
     });
   }
 
-  registerSaveEvent(save: boolean, entryType: 'people' | 'projects') {
-    this.deleteRecordSubject.next({ save, issuedBy: entryType });
+  registerDataset(newDataset: Dataset): void {
+    const { dataType, data, weekOf } = newDataset;
+
+    if (dataType === 'people') {
+      this.peopleDataSet = data as PersonEditable[];
+    }
+
+    if (dataType === 'projects') {
+      this.projectDataSet = data as ProjectEditable[];
+    }
+
+    this.weekOf = weekOf;
   }
 
-  registerAllocation(weekOf: Date, entry: AllocationEntry): void {
+  registerAllocation(weekOf: Date, entry: AllocationEntry) {
+    if (this.isOnlineService.isOnline) {
+      this.registerOnlineAllocation(weekOf, entry);
+    } else {
+      this.registerOfflineAllocation(weekOf, entry);
+    }
+  }
+
+  registerOnlineAllocation(weekOf: Date, entry: AllocationEntry): void {
     if (weekOf !== this.weekOf) {
       throw new Error('Date mismatch');
     }
+
+    // If in online mode, use fetch service to send entry to server and allow it to handle allocation
+    // then emit updated data to components
     this.fetchService.saveAllocationEntry(weekOf, entry).subscribe({
       next: ({ peopleData, projectData }) => {
-        this.peopleDataSet = peopleData.map((entry: Person) => ({
-          ...entry,
-          inEditMode: false,
-        }));
-        this.projectDataSet = projectData.map((entry: Project) => ({
-          ...entry,
-          inEditMode: false,
-        }));
-
-        this.datasetSubject.next({
-          dataType: 'people',
-          data: this.peopleDataSet,
-          weekOf: this.weekOf,
-        });
-        this.datasetSubject.next({
-          dataType: 'projects',
-          data: this.projectDataSet,
-          weekOf: this.weekOf,
-        });
+        this.#updateDataset(peopleData, projectData);
+        this.#emitData();
       },
 
       error: (e) => {
         console.log(e);
       },
     });
+  }
+
+  registerOfflineAllocation(weekOf: Date, entry: AllocationEntry) {
+    const { data: peopleData } = this.dataStoreService.getPeopleList(weekOf);
+    const { data: projectData } = this.dataStoreService.getProjectList(weekOf);
+
+    // if in offine mode, update local store withouth emitting to components (store will emit)
+    if (entry.day !== 'match') {
+      this.#allocateSingleDay({
+        peopleData,
+        projectData,
+        newEntry: entry,
+      });
+    } else {
+      this.#allocateFullWeek({
+        peopleData,
+        projectData,
+        newEntry: entry,
+      });
+
+      this.#updateDataset(peopleData, projectData);
+      this.#emitData();
+    }
   }
 
   registerDragEvent(data: AllocationDragDropEvent): void {
@@ -258,6 +275,42 @@ export class AllocateService {
       this._handleAllocate(data);
     }
   }
+
+  registerSaveEvent(save: boolean, entryType: 'people' | 'projects') {
+    this.deleteRecordSubject.next({ save, issuedBy: entryType });
+  }
+
+  // ******************************************
+  // UPDATE DATASET AND EMIT FUNCTIONS
+  // ******************************************
+
+  #emitData() {
+    this.datasetSubject.next({
+      dataType: 'people',
+      data: this.peopleDataSet,
+      weekOf: this.weekOf,
+    });
+    this.datasetSubject.next({
+      dataType: 'projects',
+      data: this.projectDataSet,
+      weekOf: this.weekOf,
+    });
+  }
+
+  #updateDataset(people: Person[], projects: Project[]) {
+    this.peopleDataSet = people.map((entry: Person) => ({
+      ...entry,
+      inEditMode: false,
+    }));
+    this.projectDataSet = projects.map((entry: Project) => ({
+      ...entry,
+      inEditMode: false,
+    }));
+  }
+
+  // ******************************************
+  // ALLOCATION FUNCTIONS
+  // ******************************************
 
   private _handleAllocate(data: AllocationDragDropEvent): void {
     const { day: dayFrom, draggable } = this
@@ -478,4 +531,300 @@ export class AllocateService {
       });
     }
   }
+
+  #allocateSingleDay = ({
+    peopleData,
+    projectData,
+    newEntry,
+  }: {
+    peopleData: Person[];
+    projectData: Project[];
+    newEntry: AllocationEntry;
+  }) => {
+    const { person, project, day, reallocateTo } = newEntry;
+
+    if (reallocateTo?.elemType === 'projects') {
+      this.#reallocatePerson({ peopleData, projectData, newEntry });
+      return;
+    }
+
+    if (reallocateTo?.elemType === 'people') {
+      this.#reallocateProject({ peopleData, projectData, newEntry });
+      return;
+    }
+
+    const personIdx = peopleData.findIndex((entry) => entry.id === person?.id);
+    const projectIdx = projectData.findIndex(
+      (entry) => entry.id === project?.id
+    );
+
+    const personWeek = {
+      ...peopleData[personIdx].week,
+      [day]: !project?.value
+        ? true
+        : {
+            id: project.id,
+            text: project.value,
+          },
+    };
+
+    const projectWeek = {
+      ...projectData[projectIdx].week,
+      [day]: !person?.value
+        ? true
+        : {
+            id: person.id,
+            text: person.value,
+          },
+    };
+
+    peopleData[personIdx] = {
+      ...peopleData[personIdx],
+      week: personWeek,
+      daysLeft: getDaysLeft(personWeek),
+    };
+    projectData[projectIdx] = {
+      ...projectData[projectIdx],
+      week: projectWeek,
+      daysLeft: getDaysLeft(projectWeek),
+    };
+  };
+
+  #allocateFullWeek = ({
+    peopleData,
+    projectData,
+    newEntry,
+  }: {
+    peopleData: Person[];
+    projectData: Project[];
+    newEntry: AllocationEntry;
+  }) => {
+    const { person, project } = newEntry;
+
+    if (!person && !project) {
+      throw new Error('No data supplied');
+    }
+
+    if (!person || !project) {
+      this.#clearWeek({ peopleData, projectData, entry: newEntry });
+      return;
+    }
+
+    const personIdx = peopleData.findIndex((entry) => entry.id === person.id);
+    const projectIdx = projectData.findIndex(
+      (entry) => entry.id === project.id
+    );
+
+    const personEntry = peopleData[personIdx];
+    const projectEntry = projectData[projectIdx];
+
+    for (let weekDay of Object.keys(peopleData[personIdx].week)) {
+      if (
+        personEntry.week[weekDay as keyof Week] === true &&
+        projectEntry.week[weekDay as keyof Week] === true
+      ) {
+        personEntry.week[weekDay as keyof Week] = {
+          id: projectEntry.id,
+          text: projectEntry.client,
+        };
+        projectEntry.week[weekDay as keyof Week] = {
+          id: personEntry.id,
+          text: personEntry.name,
+        };
+      }
+    }
+    personEntry.daysLeft = getDaysLeft(personEntry.week);
+    projectEntry.daysLeft = getDaysLeft(projectEntry.week);
+  };
+
+  #clearWeek = ({
+    peopleData,
+    projectData,
+    entry,
+  }: {
+    peopleData: Person[];
+    projectData: Project[];
+    entry: AllocationEntry;
+  }) => {
+    const { person, project } = entry;
+    const entryID = person ? person.id : project?.id;
+    const primaryDataSet = person ? peopleData : projectData;
+    const seconDaryDataSet = person ? projectData : peopleData;
+    const primaryEntry = (primaryDataSet as any[]).find(
+      (entry) => entry.id === entryID
+    );
+
+    // loop through person's / project's calendar
+    for (let [key, val] of Object.entries(primaryEntry.week)) {
+      // if value is an obj (not boolean), it means there's an allocation entry
+      if (typeof val === 'object') {
+        // change the value of weekday to true
+        primaryEntry.week = {
+          ...primaryEntry.week,
+          [key]: true,
+        };
+
+        // find the index of the other entry (if person primary entry, then project and vice versa)
+        const secondaryEntryIndex = seconDaryDataSet.findIndex(
+          (elem) => elem.id == (val as { id: string; text: string }).id
+        );
+        // change the value of that weekday to boolean true
+        const secondaryEntryWeek = {
+          ...seconDaryDataSet[secondaryEntryIndex].week,
+          [key]: true,
+        };
+        const secondaryEntryDaysLeft = getDaysLeft(secondaryEntryWeek);
+
+        seconDaryDataSet[secondaryEntryIndex] = {
+          ...seconDaryDataSet[secondaryEntryIndex],
+          week: secondaryEntryWeek,
+          daysLeft: secondaryEntryDaysLeft,
+        };
+      }
+    }
+    primaryEntry.daysLeft = getDaysLeft(primaryEntry.week);
+  };
+
+  #reallocatePerson = ({
+    peopleData,
+    projectData,
+    newEntry,
+  }: {
+    peopleData: Person[];
+    projectData: Project[];
+    newEntry: AllocationEntry;
+  }) => {
+    const { person, project, day: dayFrom, reallocateTo } = newEntry;
+
+    if (reallocateTo === undefined) {
+      return;
+    }
+    const { day: dayTo } = reallocateTo;
+
+    const personIdx = peopleData.findIndex((entry) => entry.id === person?.id);
+    const currentProjectIndex = projectData.findIndex(
+      (entry) => entry.id === project?.id
+    );
+    const newProjectIndex = projectData.findIndex(
+      (entry) => entry.id === reallocateTo?.id
+    );
+    const newProject = projectData[newProjectIndex];
+
+    const personWeek = {
+      ...peopleData[personIdx].week,
+      [dayFrom]: true,
+      [dayTo]: !newProject
+        ? true
+        : {
+            id: newProject.id,
+            text: newProject.client,
+          },
+    };
+
+    peopleData[personIdx] = {
+      ...peopleData[personIdx],
+      week: personWeek,
+      daysLeft: getDaysLeft(personWeek),
+    };
+
+    const currentProjectWeek = {
+      ...projectData[currentProjectIndex].week,
+      [dayFrom]: true,
+    };
+
+    projectData[currentProjectIndex] = {
+      ...projectData[currentProjectIndex],
+      week: currentProjectWeek,
+      daysLeft: getDaysLeft(currentProjectWeek),
+    };
+
+    const newProjectWeek = {
+      ...projectData[newProjectIndex].week,
+      [dayTo]: !person?.value
+        ? true
+        : {
+            id: person.id,
+            text: person.value,
+          },
+    };
+
+    projectData[newProjectIndex] = {
+      ...projectData[newProjectIndex],
+      week: newProjectWeek,
+      daysLeft: getDaysLeft(newProjectWeek),
+    };
+  };
+
+  #reallocateProject = ({
+    peopleData,
+    projectData,
+    newEntry,
+  }: {
+    peopleData: Person[];
+    projectData: Project[];
+    newEntry: AllocationEntry;
+  }) => {
+    const { person, project, day: dayFrom, reallocateTo } = newEntry;
+
+    if (reallocateTo === undefined) {
+      return;
+    }
+    const { day: dayTo } = reallocateTo;
+
+    const projectIdx = projectData.findIndex(
+      (entry) => entry.id === project?.id
+    );
+    const currentPersonIndex = peopleData.findIndex(
+      (entry) => entry.id === person?.id
+    );
+    const newPersonIndex = peopleData.findIndex(
+      (entry) => entry.id === reallocateTo?.id
+    );
+
+    const newPerson = peopleData[newPersonIndex];
+
+    const projectWeek = {
+      ...projectData[projectIdx].week,
+      [dayFrom]: true,
+      [dayTo]: !newPerson
+        ? true
+        : {
+            id: newPerson.id,
+            text: newPerson.name,
+          },
+    };
+
+    projectData[projectIdx] = {
+      ...projectData[projectIdx],
+      week: projectWeek,
+      daysLeft: getDaysLeft(projectWeek),
+    };
+
+    const currentPersonWeek = {
+      ...peopleData[currentPersonIndex].week,
+      [dayFrom]: true,
+    };
+
+    peopleData[currentPersonIndex] = {
+      ...peopleData[currentPersonIndex],
+      week: currentPersonWeek,
+      daysLeft: getDaysLeft(currentPersonWeek),
+    };
+
+    const newPersonWeek = {
+      ...peopleData[newPersonIndex].week,
+      [dayTo]: !project?.value
+        ? true
+        : {
+            id: project.id,
+            text: project.value,
+          },
+    };
+
+    peopleData[newPersonIndex] = {
+      ...peopleData[newPersonIndex],
+      week: newPersonWeek,
+      daysLeft: getDaysLeft(newPersonWeek),
+    };
+  };
 }

@@ -14,6 +14,7 @@ import { FormControl } from '@angular/forms';
 import { CsvParserService } from 'src/app/shared-module/csv-parser.service';
 import { DataStoreService } from 'src/app/shared-module/data-store.service';
 import { FetchService } from '../../shared-module/fetch.service';
+import { IsOnlineService } from 'src/app/shared-module/is-online.service';
 import { ListEditModeStatusService } from 'src/app/shared-module/list-edit-mode-status.service';
 import { ResizeObserverService } from 'src/app/shared-module/resize-observer.service';
 import { TypeaheadService } from '../../shared-module/typeahead.service';
@@ -63,12 +64,11 @@ export class ProjectListComponent
   // records are stored in this array until save / cancel event on the people side
   modifiedEntries: ProjectEditable[] = [];
 
-  @Input() appInOfflineMode!: Boolean;
-
   constructor(
     private fetchService: FetchService,
     private allocateService: AllocateService,
     private dataStoreService: DataStoreService,
+    private isOnlineService: IsOnlineService,
     typeaheadService: TypeaheadService,
     resizeObserverService: ResizeObserverService,
     private csvParserService: CsvParserService,
@@ -78,7 +78,9 @@ export class ProjectListComponent
     super(ngZone, resizeObserverService, typeaheadService);
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.subscribeToServices();
+  }
 
   subscribeToServices() {
     const allocationDataSubscription = this.allocateService.onDataset.subscribe(
@@ -89,6 +91,16 @@ export class ProjectListComponent
           if (dataType === 'projects') {
             this.dataSet = this.sortService.applyCurrentSort(data);
             this.updateFilteredView();
+
+            console.log({
+              updatedProjectData: this.dataSet,
+            });
+
+            // post changes to store in the offline mode
+            // (allocation service does not do it)
+            if (!this.isOnlineService.isOnline) {
+              this.postChanges();
+            }
           }
         },
         error: (err) => {
@@ -181,7 +193,7 @@ export class ProjectListComponent
 
     const updateAddressBook = this._updateAddressBook.bind(this);
 
-    if (!this.appInOfflineMode) {
+    if (this.isOnlineService.isOnline) {
       const fetchSubscription = this.fetchService.fetchContactData().subscribe({
         next: (data: string) => {
           try {
@@ -215,6 +227,9 @@ export class ProjectListComponent
         }
       },
       error: (err) => {
+        console.log({
+          err,
+        });
         this.fetchError = err;
       },
     });
@@ -449,7 +464,7 @@ export class ProjectListComponent
     this.fetching = true;
     this.fetchError = '';
 
-    if (!this.appInOfflineMode) {
+    if (this.isOnlineService.isOnline) {
       this.#fetchDataFromOnlineStore();
     } else {
       this.#fetchDataFromLocalStore();
@@ -498,7 +513,7 @@ export class ProjectListComponent
       };
     });
 
-    if (!this.appInOfflineMode) {
+    if (this.isOnlineService.isOnline) {
       this.#postChangesToOnlineStore(data);
     } else {
       this.#postChangesToLocalStore(data);
