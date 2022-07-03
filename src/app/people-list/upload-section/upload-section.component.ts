@@ -63,7 +63,6 @@ export class UploadSectionComponent extends PageComponent implements OnChanges {
   fetchData() {
     this.fetching = true;
     this.fetchError = '';
-    this.noData = false;
     this.uploaded = false;
 
     if (this.isOnlineService.isOnline) {
@@ -82,13 +81,7 @@ export class UploadSectionComponent extends PageComponent implements OnChanges {
           : people.sort(this.sortService.sortByName);
       },
       error: (e) => {
-        console.log({ e });
-        if (e.message === 'No data') {
-          this.noData = true;
-        } else {
-          this.fetchError = e.message;
-        }
-
+        this.fetchError = e.message;
         this.fetching = false;
       },
       complete: () => {
@@ -104,9 +97,7 @@ export class UploadSectionComponent extends PageComponent implements OnChanges {
   }
 
   clearUploadStatus(): void {
-    if (this.fetching) {
-      this.fetchError = '';
-    }
+    this.fetchError = '';
     this.uploaded = false;
     this.fileSelected = false;
   }
@@ -135,8 +126,6 @@ export class UploadSectionComponent extends PageComponent implements OnChanges {
             this.referenceDate,
             this.referenceDateEnd
           );
-          this.noData = false;
-
           const parsed = this.csvParserService.parse(data);
           this.fullData = parsed;
         }
@@ -144,7 +133,6 @@ export class UploadSectionComponent extends PageComponent implements OnChanges {
     };
 
     reader.onerror = () => {
-      console.log(reader.error);
       this.fetchError = String(reader.error?.message);
     };
     event.target.value = '';

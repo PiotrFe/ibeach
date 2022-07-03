@@ -51,7 +51,6 @@ export class PageComponent implements AfterViewInit {
   inEditMode: boolean = false;
   lastDataUpdateTs: number = 0;
   newRows: (PersonEditable | ProjectEditable)[] = [];
-  noData: boolean = false;
   resizeObserverService: ResizeObserverService;
   resizeSubscription!: any;
   saveChangesInProgress: boolean = false;

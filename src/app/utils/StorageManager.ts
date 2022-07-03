@@ -258,10 +258,10 @@ export class DataStoreManager implements StoreManager {
     const weekTs = weekOf.getTime();
     const ts = Date.now();
 
-    if (!this.dataStoreFile || this.dataStore === undefined) {
-      this.dataStoreError = 'Unable to upload';
-      return;
-    }
+    // if (!this.dataStoreFile || this.dataStore === undefined) {
+    //   this.dataStoreError = 'Unable to upload';
+    //   return;
+    // }
 
     const { week, full } = data;
 
@@ -272,9 +272,11 @@ export class DataStoreManager implements StoreManager {
     }
 
     // take pdm list from configuration or - if not available - from the uploaded list
-    const pdmArr = this.dataStore.config.pdms.length
-      ? this.dataStore.config.pdms
-      : Array.from(new Set(full.map(({ pdm }) => pdm)));
+
+    if (!this.dataStore.config.pdms.length) {
+      const pdmArr = Array.from(new Set(full.map(({ pdm }) => pdm as string)));
+      this.dataStore.config.pdms = pdmArr;
+    }
 
     const weeklyData = week.reduce((acc: any, personEntry) => {
       const pdm = personEntry.pdm as string;
@@ -305,6 +307,7 @@ export class DataStoreManager implements StoreManager {
     };
     this.dataStore.master.updatedAtTs = ts;
 
-    this.#syncLocalStorage();
+    // update people section of the store (pdm param === "allocator" to indicate changes are to be done to allocate, not submit, section)
+    this.saveChangesToPeopleList(weekOf, 'allocator', data);
   }
 }

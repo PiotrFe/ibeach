@@ -39,39 +39,44 @@
   </div>
   <div class="toolbar-group toolbar-group--center flex flex-ver-ctr"></div>
   <div class="toolbar-group toolbar-group--right flex flex-ver-ctr">
-    <button
-      type="button"
-      class="btn btn-menu mr-20"
-      [disabled]="inEditMode"
-      (click)="downloadProjectList()"
-    >
-      <i class="bi bi-download download-project-icon"></i>
-    </button>
-
-    <div
-      class="form-check form-switch"
-      tooltip="Show available only"
-      placement="bottom"
-      [adaptivePosition]="false"
-      [delay]="700"
-    >
-      <input
-        class="form-check-input"
-        type="checkbox"
-        role="switch"
-        id="flexSwitchCheckChecked"
-        [checked]="showAvailableOnly"
-        (click)="toggleShowAvailableOnly()"
-      />
+    <div class="toolbar-right-item">
+      <button
+        type="button"
+        class="btn btn-menu mr-20"
+        [disabled]="inEditMode"
+        (click)="downloadProjectList()"
+      >
+        <i class="bi bi-download download-project-icon"></i>
+      </button>
     </div>
-    <i
-      [ngClass]="getClearFilterBtnClass()"
-      tooltip="Clear filters"
-      placement="bottom"
-      [adaptivePosition]="false"
-      [delay]="700"
-      (click)="clearFilters()"
-    ></i>
+    <div class="toolbar-right-item">
+      <div
+        class="form-check form-switch"
+        tooltip="Show available only"
+        placement="bottom"
+        [adaptivePosition]="false"
+        [delay]="700"
+      >
+        <input
+          class="form-check-input"
+          type="checkbox"
+          role="switch"
+          id="flexSwitchCheckChecked"
+          [checked]="showAvailableOnly"
+          (click)="toggleShowAvailableOnly()"
+        />
+      </div>
+    </div>
+    <div class="toolbar-right-item">
+      <i
+        [ngClass]="getClearFilterBtnClass()"
+        tooltip="Clear filters"
+        placement="bottom"
+        [adaptivePosition]="false"
+        [delay]="700"
+        (click)="clearFilters()"
+      ></i>
+    </div>
   </div>
 </nav>
 <ul class="people" #page id="page-projects">

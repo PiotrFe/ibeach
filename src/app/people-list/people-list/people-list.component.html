@@ -55,7 +55,11 @@
     >
   </div>
   <div class="toolbar-group toolbar-group--center flex flex-ver-ctr"></div>
-  <div class="toolbar-group toolbar-group--right flex flex-ver-ctr">
+  <div
+    class="toolbar-group toolbar-group--right toolbar-group--right--wide flex flex-ver-ctr"
+    [class.toolbar-group--right--wide]="displayedIn === 'ALLOCATE'"
+    [class.toolbar-group--right--v-wide]="displayedIn === 'SUBMIT'"
+  >
     <span *ngIf="statusLabel === 'pending'" class="badge bg-warning text-dark"
       >Pending</span
     >
@@ -63,6 +67,7 @@
       >Submitted</span
     >
     <span *ngIf="statusLabel === 'ready'" class="badge bg-success">Ready</span>
+    <div class="toolbar-right-item"></div>
     <select
       *ngIf="displayedIn === 'SUBMIT'"
       class="form-select mr-10 mw-12 ml-12"
@@ -74,45 +79,51 @@
         {{ pdm }}
       </option>
     </select>
-    <select
-      *ngIf="displayedIn === 'ALLOCATE'"
-      class="form-select mr-10 mw-12 ml-12"
-      (change)="updateSkillFilter($event)"
-      [formControl]="pdmFilter"
-    >
-      <option value="All" selected>All</option>
-      <option value="EM" selected>EM</option>
-      <option value="SRAS" selected>SRAS</option>
-      <option value="ASC" selected>ASC</option>
-      <option value="FELL" selected>FELL</option>
-      <option value="BA" selected>BA</option>
-      <option value="INT" selected>INT</option>
-    </select>
-    <div
-      class="form-check form-switch"
-      tooltip="Show available only"
-      placement="bottom"
-      [adaptivePosition]="false"
-      [delay]="700"
-      triggers="hover"
-    >
-      <input
-        class="form-check-input"
-        type="checkbox"
-        role="switch"
-        id="flexSwitchCheckChecked"
-        [checked]="showAvailableOnly"
-        (click)="toggleShowAvailableOnly()"
-      />
+    <div class="toolbar-right-item">
+      <select
+        *ngIf="displayedIn === 'ALLOCATE'"
+        class="form-select mr-10 mw-12 ml-12"
+        (change)="updateSkillFilter($event)"
+        [formControl]="pdmFilter"
+      >
+        <option value="All" selected>All</option>
+        <option value="EM" selected>EM</option>
+        <option value="SRAS" selected>SRAS</option>
+        <option value="ASC" selected>ASC</option>
+        <option value="FELL" selected>FELL</option>
+        <option value="BA" selected>BA</option>
+        <option value="INT" selected>INT</option>
+      </select>
     </div>
-    <i
-      [ngClass]="getClearFilterBtnClass()"
-      tooltip="Clear filters"
-      placement="bottom"
-      [adaptivePosition]="false"
-      [delay]="700"
-      (click)="clearFilters()"
-    ></i>
+    <div class="toolbar-right-item">
+      <div
+        class="form-check form-switch"
+        tooltip="Show available only"
+        placement="bottom"
+        [adaptivePosition]="false"
+        [delay]="700"
+        triggers="hover"
+      >
+        <input
+          class="form-check-input"
+          type="checkbox"
+          role="switch"
+          id="flexSwitchCheckChecked"
+          [checked]="showAvailableOnly"
+          (click)="toggleShowAvailableOnly()"
+        />
+      </div>
+    </div>
+    <div class="toolbar-right-item">
+      <i
+        [ngClass]="getClearFilterBtnClass()"
+        tooltip="Clear filters"
+        placement="bottom"
+        [adaptivePosition]="false"
+        [delay]="700"
+        (click)="clearFilters()"
+      ></i>
+    </div>
   </div>
 </nav>
 

@@ -442,8 +442,24 @@ ul {
   }
 
   &--right {
-    justify-content: flex-end;
+    width: 170px;
+    justify-content: center;
+    margin-right: 15px;
+
+    &--wide {
+      width: 220px;
+    }
+
+    &--v-wide {
+      width: 280px;
+    }
   }
+}
+
+.toolbar-right-item {
+  margin-left: 10px;
+  display: flex;
+  justify-content: center;
 }
 
 .content-container {

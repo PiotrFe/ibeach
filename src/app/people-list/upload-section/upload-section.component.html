@@ -1,7 +1,10 @@
 <nav class="main-toolbar">
   <div class="toolbar-group toolbar-group--left flex flex-ver-ctr">
     <button
-      *ngIf="showUploadModal || (fileSelected && !uploading && !uploaded)"
+      *ngIf="
+        (showUploadModal || (fileSelected && !uploading && !uploaded)) &&
+        !fetchError
+      "
       type="button"
       class="btn btn-primary mr-20"
       (click)="onSubmit()"
@@ -51,10 +54,7 @@
     <div *ngIf="fetchError && !uploaded" class="alert alert-danger">
       {{ fetchError }}
     </div>
-    <div
-      *ngIf="(noData || !previewData.length) && !uploaded"
-      class="alert alert-primary"
-    >
+    <div *ngIf="!previewData.length && !uploaded" class="alert alert-primary">
       No data to display
     </div>
     <div *ngIf="uploaded" class="alert alert-success">
