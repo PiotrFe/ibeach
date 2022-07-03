@@ -258,15 +258,14 @@ export class ProjectEntryFormComponent
 
   isFieldValid(field: string) {
     return (
-      !this.projectForm.get(field)!.valid &&
-      this.projectForm.get(field)!.touched
+      !this.projectForm.get(field)!.valid && this.projectForm.get(field)!.dirty
     );
   }
 
   validateFormFields() {
     Object.keys(this.projectForm.controls).forEach((field) => {
       const control = this.projectForm.get(field);
-      control?.markAsTouched({ onlySelf: true });
+      control?.markAsDirty({ onlySelf: true });
     });
   }
 

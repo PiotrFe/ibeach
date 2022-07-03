@@ -216,10 +216,10 @@ export class AllocateService {
         projectData,
         newEntry: entry,
       });
-
-      this.#updateDataset(peopleData, projectData);
-      this.#emitData();
     }
+
+    this.#updateDataset(peopleData, projectData);
+    this.#emitData();
   }
 
   registerDragEvent(data: AllocationDragDropEvent): void {

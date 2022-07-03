@@ -14,3 +14,4 @@ export { removeExtraSpacesFromStr } from './removeExtraSpacesFromStr';
 export { getClosestPastMonday } from './getClosestPastMonday';
 export { decodeWhitespaces, encodeWhitespaces } from './handleWhitespaces'; // addWhitespaces,
 export { exportProjectListToPDF } from './exportProjectListToPDF';
+export { forbiddenValueValidator } from './forbiddenValueValidator';

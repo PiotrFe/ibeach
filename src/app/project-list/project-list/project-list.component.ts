@@ -92,10 +92,6 @@ export class ProjectListComponent
             this.dataSet = this.sortService.applyCurrentSort(data);
             this.updateFilteredView();
 
-            console.log({
-              updatedProjectData: this.dataSet,
-            });
-
             // post changes to store in the offline mode
             // (allocation service does not do it)
             if (!this.isOnlineService.isOnline) {

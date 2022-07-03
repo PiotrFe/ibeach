@@ -126,10 +126,6 @@ export class PeopleListComponent
             this.dataSet = this.sortService.applyCurrentSort(data);
             this.updateFilteredView();
 
-            console.log({
-              updatedPeopleData: this.dataSet,
-            });
-
             // post changes to store in the offline mode
             // (allocation service does not do it)
             if (!this.isOnlineService.isOnline) {
@@ -731,9 +727,7 @@ export class PeopleListComponent
   }
 
   handleFormPending(): void {
-    setTimeout(() => {
-      this.saveChangesInProgress = false;
-    });
+    this.saveChangesInProgress = false;
   }
 
   onChangeSaved(): void {

@@ -47,7 +47,7 @@
 >
   <input
     class="form-control section section-name data-entry-input input--name mr-12 mw-6"
-    [class.is-invalid]="isFieldValid('name')"
+    [class.is-invalid]="isFieldInvalid('name')"
     type="text"
     placeholder="Name"
     formControlName="name"
@@ -59,7 +59,7 @@
 
   <select
     class="form-control section section-skill data-entry-input mr-12 mw-3"
-    [class.is-invalid]="isFieldValid('skill')"
+    [class.is-invalid]="isFieldInvalid('skill')"
     formControlName="skill"
   >
     <option value="skill" selected hidden>Skill</option>
@@ -74,7 +74,7 @@
     *ngIf="displayedIn !== 'ALLOCATE'"
     [ngClass]="getFieldClasses('availDate')"
     [dateVal]="personForm.get('availDate')!.value"
-    [showError]="isFieldValid('availDate')"
+    [showError]="isFieldInvalid('availDate')"
     [isSmall]="true"
     (dateChangeEvent)="onDateChange($event)"
   ></calendar>

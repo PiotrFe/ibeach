@@ -19,11 +19,12 @@ import { TypeaheadService } from '../../shared-module/typeahead.service';
 import { ConfigService, Config } from 'src/app/shared-module/config.service';
 import { Person } from '../person';
 import {
+  forbiddenValueValidator,
   getWeekDayDate,
   getNewAvailDate,
   getCalendarFromDate,
   removeExtraSpacesFromStr,
-} from '../../utils/';
+} from 'src/app/utils';
 
 import {
   Week,
@@ -176,7 +177,10 @@ export class PersonEntryFormComponent
 
   personForm = new FormGroup({
     name: new FormControl('', [Validators.required, Validators.minLength(3)]),
-    skill: new FormControl('', [Validators.required]),
+    skill: new FormControl('', [
+      Validators.required,
+      forbiddenValueValidator(/skill/i),
+    ]),
     availDate: new FormControl(getWeekDayDate(1, 'next'), [
       Validators.required,
     ]),
@@ -198,16 +202,16 @@ export class PersonEntryFormComponent
     }
   }
 
-  isFieldValid(field: string) {
+  isFieldInvalid(field: string) {
     return (
-      !this.personForm.get(field)!.valid && this.personForm.get(field)!.touched
+      !this.personForm.get(field)!.valid && this.personForm.get(field)!.dirty
     );
   }
 
   validateFormFields() {
     Object.keys(this.personForm.controls).forEach((field) => {
       const control = this.personForm.get(field);
-      control?.markAsTouched({ onlySelf: true });
+      control?.markAsDirty({ onlySelf: true });
     });
   }
 
@@ -222,6 +226,7 @@ export class PersonEntryFormComponent
   onSubmit(): void {
     if (!this.personForm.valid) {
       this.validateFormFields();
+      this.formPendingEvent.emit();
       return;
     }
 
