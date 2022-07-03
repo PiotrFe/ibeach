@@ -20,12 +20,14 @@ export interface Dataset {
 export interface DropdownEntry {
   id: string;
   value: string;
+  skill?: string;
 }
 
 export interface AllocationEntry {
   person?: {
     id: string;
     value: string | null;
+    skill: string | undefined;
   };
   project?: {
     id: string;
@@ -119,6 +121,7 @@ export class AllocateService {
       .map((person) => ({
         id: person.id,
         value: person.name,
+        skill: person.skill,
       }));
   }
 
@@ -352,6 +355,7 @@ export class AllocateService {
       this.registerAllocation(this.weekOf, {
         person: {
           id: personEntry!.id,
+          skill: (personEntry as PersonEditable)!.skill,
           value: (personEntry as PersonEditable)!.name,
         },
         project: {
@@ -388,10 +392,12 @@ export class AllocateService {
           ? {
               id: calendarEntry.id,
               value: calendarEntry.text,
+              skill: calendarEntry.skill,
             }
           : {
               id: draggable.id,
               value: (draggable as PersonEditable).name,
+              skill: (draggable as PersonEditable).skill,
             };
 
       const project =
@@ -508,6 +514,7 @@ export class AllocateService {
       this.registerAllocation(this.weekOf, {
         person: {
           id: personEntry.id,
+          skill: (personEntry as PersonEditable).skill,
           value: null,
         },
         project: {
@@ -519,7 +526,11 @@ export class AllocateService {
     } else if (personEntry || projectEntry) {
       this.registerAllocation(this.weekOf, {
         ...(personEntry && {
-          person: { id: personEntry.id, value: null },
+          person: {
+            id: personEntry.id,
+            skill: (personEntry as PersonEditable).skill,
+            value: null,
+          },
         }),
         ...(projectEntry && {
           project: {
@@ -575,6 +586,7 @@ export class AllocateService {
         : {
             id: person.id,
             text: person.value,
+            skill: person.skill,
           },
     };
 
@@ -630,6 +642,7 @@ export class AllocateService {
         projectEntry.week[weekDay as keyof Week] = {
           id: personEntry.id,
           text: personEntry.name,
+          skill: personEntry.skill,
         };
       }
     }
@@ -745,6 +758,7 @@ export class AllocateService {
         : {
             id: person.id,
             text: person.value,
+            skill: person.skill,
           },
     };
 
@@ -791,6 +805,7 @@ export class AllocateService {
         : {
             id: newPerson.id,
             text: newPerson.name,
+            skill: newPerson.skill,
           },
     };
 

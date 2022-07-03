@@ -22,7 +22,7 @@
           entry.type === "avail" || entry.type === "away"
             ? (entry.value.text | titlecase)
             : displayedIn === "projects"
-            ? (entry.value.text | firstInitial)
+            ? (entry.value.text | firstInitial | titlecase)
             : (entry.value.text | projectName)
         }}</label
       >

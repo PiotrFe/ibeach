@@ -75,11 +75,12 @@ export class ProjectEntryComponent extends EntryComponent implements OnInit {
   }
 
   onAllocation(event: any): void {
-    const { id, value, day } = event;
+    const { id, value, skill, day } = event;
     const allocationEntry: AllocationEntry = {
       person: {
         id,
         value,
+        skill,
       },
       project: {
         id: this.project.id,

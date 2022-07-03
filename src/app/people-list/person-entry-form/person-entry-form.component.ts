@@ -24,6 +24,7 @@ import {
   getNewAvailDate,
   getCalendarFromDate,
   removeExtraSpacesFromStr,
+  stringToTitleCase,
 } from 'src/app/utils';
 
 import {
@@ -235,7 +236,7 @@ export class PersonEntryFormComponent
     if (this.entryData) {
       this.formEditEvent.emit({
         id: this.fmno || this.id,
-        name: removeExtraSpacesFromStr(name),
+        name: stringToTitleCase(removeExtraSpacesFromStr(name)),
         skill,
         comments: removeExtraSpacesFromStr(comments),
         availDate,
@@ -246,7 +247,7 @@ export class PersonEntryFormComponent
     } else {
       this.formSubmitEvent.emit({
         id: this.fmno || this.id,
-        name: removeExtraSpacesFromStr(name),
+        name: stringToTitleCase(removeExtraSpacesFromStr(name)),
         skill,
         comments: removeExtraSpacesFromStr(comments),
         availDate,

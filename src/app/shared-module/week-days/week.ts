@@ -1,9 +1,11 @@
+type WeekEntry = boolean | { id: string; text: string; skill?: string };
+
 export interface Week {
-  mon: boolean | { id: string; text: string };
-  tue: boolean | { id: string; text: string };
-  wed: boolean | { id: string; text: string };
-  thu: boolean | { id: string; text: string };
-  fri: boolean | { id: string; text: string };
+  mon: WeekEntry;
+  tue: WeekEntry;
+  wed: WeekEntry;
+  thu: WeekEntry;
+  fri: WeekEntry;
 }
 
 const newWeek: Week = {

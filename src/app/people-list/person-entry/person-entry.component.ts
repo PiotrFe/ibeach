@@ -5,6 +5,7 @@ import {
   AllocateService,
   AllocationEntry,
 } from 'src/app/shared-module/allocate.service';
+import { getSkillGroupColor } from 'src/app/utils';
 import { DragAndDropService } from 'src/app/shared-module/drag-and-drop.service';
 import { Week } from 'src/app/shared-module/week-days/week';
 
@@ -46,6 +47,7 @@ export class PersonEntryComponent extends PersonEntry {
       person: {
         id: this.person.id,
         value: this.person.name,
+        skill: this.person.skill,
       },
       day,
     };
@@ -71,7 +73,7 @@ export class PersonEntryComponent extends PersonEntry {
     }
 
     if (fieldName === 'skill') {
-      otherClass += ` section-skill--${getSkillGroup(this.person.skill)}`;
+      otherClass += ` section-skill--${getSkillGroupColor(this.person.skill)}`;
     }
 
     if (fieldName === 'comments' && this.entryContainerWidth < 4) {
@@ -85,19 +87,3 @@ export class PersonEntryComponent extends PersonEntry {
     return `${baseClass}${sortedClass}${otherClass}`;
   }
 }
-
-const getSkillGroup = (skill: string): string => {
-  if (['EM', 'PSSM', 'PE', 'EDS'].includes(skill)) {
-    return 'green';
-  }
-  if (['ASC', 'PSSA', 'SRAS', 'SPDS'].includes(skill)) {
-    return 'yellow';
-  }
-  if (['BA', 'FELL', 'FDS', 'SFDS', 'PSSR'].includes(skill)) {
-    return 'orange';
-  }
-  if (['INT', 'SA', 'ECAI'].includes(skill)) {
-    return 'red';
-  }
-  return '';
-};

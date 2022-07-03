@@ -15,3 +15,5 @@ export { getClosestPastMonday } from './getClosestPastMonday';
 export { decodeWhitespaces, encodeWhitespaces } from './handleWhitespaces'; // addWhitespaces,
 export { exportProjectListToPDF } from './exportProjectListToPDF';
 export { forbiddenValueValidator } from './forbiddenValueValidator';
+export { stringToTitleCase } from './stringToTitleCase';
+export { getSkillGroupColor } from './getSkillGroupColor';

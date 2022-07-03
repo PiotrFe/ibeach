@@ -8,7 +8,6 @@ import {
   ViewChild,
   ElementRef,
 } from '@angular/core';
-
 import { FormControl } from '@angular/forms';
 import { Week, getNewWeek } from './week';
 import {
@@ -17,6 +16,7 @@ import {
 } from 'src/app/shared-module/allocate.service';
 
 import { DragAndDropService } from '../drag-and-drop.service';
+import { getSkillGroupColor } from 'src/app/utils';
 
 const weekStrArr = ['mon', 'tue', 'wed', 'thu', 'fri'];
 
@@ -26,6 +26,7 @@ interface CalendarEntry {
   value: {
     id: string | null;
     text: string;
+    skill?: string;
   };
 }
 
@@ -45,6 +46,7 @@ export class WeekDaysComponent implements OnInit {
     id: string;
     value: string;
     day: string;
+    skill?: string;
   }>();
   @ViewChild('dropdown') dropdown!: ElementRef;
 
@@ -105,6 +107,9 @@ export class WeekDaysComponent implements OnInit {
         id: dropDowndownEntry.id,
         value: dropDowndownEntry.value,
         day: this.showDropdownAtDay as string,
+        ...(dropDowndownEntry?.skill && {
+          skill: dropDowndownEntry.skill,
+        }),
       });
 
       this.showDropdownAtDay = null;
@@ -174,7 +179,13 @@ export class WeekDaysComponent implements OnInit {
         : classes;
     }
 
-    let classes = `btn-allocated cal-entry cal-entry--${item.day} flex flex-hor-ctr flex-ver-ctr`;
+    let btnColor = ' ';
+    if (this.displayedIn === 'projects' && item.value.skill) {
+      const skillColor = getSkillGroupColor(item.value.skill);
+      btnColor = ` btn-allocated--${skillColor} `;
+    }
+
+    let classes = `btn-allocated${btnColor}cal-entry cal-entry--${item.day} flex flex-hor-ctr flex-ver-ctr`;
 
     return !this.inEditMode
       ? `${classes} draggable draggable-${activeDragAndDropFor}`

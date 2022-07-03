@@ -727,7 +727,9 @@ export class PeopleListComponent
   }
 
   handleFormPending(): void {
-    this.saveChangesInProgress = false;
+    setTimeout(() => {
+      this.saveChangesInProgress = false;
+    }, 0);
   }
 
   onChangeSaved(): void {
