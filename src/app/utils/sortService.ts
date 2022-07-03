@@ -305,6 +305,13 @@ export class SortService {
       this.updateSortCriteria(colName);
     }
 
+    console.log({
+      freshStart,
+      showHighlight,
+      colName,
+      updateCriteria,
+    });
+
     if (!freshStart && updateCriteria) {
       this.updateSortCriteria(colName);
     }

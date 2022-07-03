@@ -178,10 +178,8 @@ export class PeopleListComponent
         ) {
           const ts = this.referenceDate.getTime();
           const people = data.people[ts];
-          // console.log({
-          //   people,
-          // });
-          this.dataSet = this.parsePeopleDataAndUpdateView(people);
+          this.dataSet = this.parseAndSortPeopleData(people);
+          this.updateFilteredView();
           this.lastDataUpdateTs = peopleUpdatedAtTs;
           this.onFetchCompleted();
         }
@@ -477,22 +475,14 @@ export class PeopleListComponent
   // UPDATING VIEW
   // *****************
 
-  parsePeopleDataAndUpdateView(people: Person[]): PersonEditable[] {
+  parseAndSortPeopleData(people: Person[]): PersonEditable[] {
     const peopleList = !people?.length
       ? []
-      : this.sortService
-          .sortData(
-            people,
-            this.sortService.SORT_COLUMNS.NAME,
-            false,
-            true,
-            false
-          )
-          .map((person) => ({
-            ...person,
-            inEditMode: false,
-            availDate: new Date(Date.parse(person.availDate)),
-          }));
+      : this.sortService.applyCurrentSort(people).map((person) => ({
+          ...person,
+          inEditMode: false,
+          availDate: new Date(Date.parse(person.availDate)),
+        }));
 
     return peopleList;
   }
@@ -509,7 +499,7 @@ export class PeopleListComponent
   _onWeeklyData(data: WeeklyData) {
     const { people, statusSummary, lookupTable, config } = data;
 
-    this.dataSet = this.parsePeopleDataAndUpdateView(people);
+    this.dataSet = this.parseAndSortPeopleData(people);
 
     // [Comment applying to online mode only]
     // lookup table only sent on first fetch, where pdm not provided as parameter
@@ -547,25 +537,25 @@ export class PeopleListComponent
   }
 
   #fetchFromOnlineStore(refetching = true) {
-    const submittedOnly = this.displayedIn === 'ALLOCATE';
-    const skipLookupList = refetching;
-    this.fetchService
-      .fetchWeeklyList(this.referenceDate, skipLookupList, submittedOnly)
-      .subscribe({
-        next: (data: WeeklyData) => {
-          this._onWeeklyData(data);
-        },
-        error: (e) => {
-          this.fetchError = e.message;
-          this.fetching = false;
-          if (this.inEditMode) {
-            this.setInEditMode(false);
-          }
-        },
-        complete: () => {
-          this.onFetchCompleted();
-        },
-      });
+    // const submittedOnly = this.displayedIn === 'ALLOCATE';
+    // const skipLookupList = refetching;
+    // this.fetchService
+    //   .fetchWeeklyList(this.referenceDate, skipLookupList, submittedOnly)
+    //   .subscribe({
+    //     next: (data: WeeklyData) => {
+    //       this._onWeeklyData(data);
+    //     },
+    //     error: (e) => {
+    //       this.fetchError = e.message;
+    //       this.fetching = false;
+    //       if (this.inEditMode) {
+    //         this.setInEditMode(false);
+    //       }
+    //     },
+    //     complete: () => {
+    //       this.onFetchCompleted();
+    //     },
+    //   });
   }
 
   #fetchFromLocalStore() {
@@ -597,8 +587,9 @@ export class PeopleListComponent
     );
 
     if (data) {
-      this.dataSet = this.parsePeopleDataAndUpdateView(data);
+      this.dataSet = this.parseAndSortPeopleData(data);
       this.lastDataUpdateTs = updatedAtTs;
+      this.updateFilteredView();
     }
 
     this.onFetchCompleted();

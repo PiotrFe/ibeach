@@ -112,6 +112,8 @@ export class UploadSectionComponent extends PageComponent implements OnChanges {
     reader.onload = () => {
       this.data = reader.result as string;
 
+      console.log({ result: reader.result });
+
       parse(
         this.data,
         { encoding: 'utf8', columns: true, relaxColumnCount: true },

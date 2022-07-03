@@ -188,7 +188,12 @@ export class DataStoreManager implements StoreManager {
     this.#syncLocalStorage();
   }
 
-  saveChangesToPeopleList(weekOf: Date, pdm: string, data: Person[]) {
+  saveChangesToPeopleList(
+    weekOf: Date,
+    pdm: string,
+    data: Person[],
+    append: boolean = false
+  ) {
     const weekTs = weekOf.getTime();
     const ts = Date.now();
 
@@ -198,7 +203,9 @@ export class DataStoreManager implements StoreManager {
     // i.e. people array in store should be updated; otherwise a names pdm
     // doing changes in master list before submitting
     if (pdmEntry === 'allocator') {
-      this.dataStore.people[weekTs] = [...data];
+      this.dataStore.people[weekTs] = append
+        ? [...(this.dataStore.people[weekTs] || []), ...data]
+        : [...data];
       this.dataStore.people.updatedAtTs = ts;
     } else {
       this.dataStore.master[weekTs] = {
@@ -308,6 +315,6 @@ export class DataStoreManager implements StoreManager {
     this.dataStore.master.updatedAtTs = ts;
 
     // update people section of the store (pdm param === "allocator" to indicate changes are to be done to allocate, not submit, section)
-    this.saveChangesToPeopleList(weekOf, 'allocator', data);
+    this.saveChangesToPeopleList(weekOf, 'allocator', data, true);
   }
 }

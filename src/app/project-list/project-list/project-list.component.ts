@@ -217,9 +217,10 @@ export class ProjectListComponent
         const { updatedAtTs } = data.projects;
 
         if (newWeeklyData && updatedAtTs > this.lastDataUpdateTs) {
-          this.parseProjectDataAndUpdateView(newWeeklyData);
-          this.onFetchCompleted();
+          this.dataSet = this.parseAndSortProjectData(newWeeklyData);
+          this.updateFilteredView();
           this.lastDataUpdateTs = updatedAtTs;
+          this.onFetchCompleted();
         }
       },
       error: (err) => {
@@ -414,30 +415,18 @@ export class ProjectListComponent
     }
   }
 
-  parseProjectDataAndUpdateView(data: Project[]) {
-    const projects = !data?.length
+  parseAndSortProjectData(projects: Project[]) {
+    const projectList = !projects?.length
       ? []
-      : data.map((entry: any) => {
-          const { availDate, ...otherProps } = entry;
+      : this.sortService.applyCurrentSort(projects).map((project) => {
           return {
-            ...otherProps,
-            availDate: new Date(Date.parse(availDate)),
+            ...project,
+            inEditMode: false,
+            availDate: new Date(Date.parse(project.availDate)),
           };
         });
-    this.dataSet = this.sortService
-      .sortData(
-        projects,
-        this.sortService.SORT_COLUMNS.NAME,
-        false,
-        true,
-        false
-      )
-      .map((entry) => ({
-        ...entry,
-        inEditMode: false,
-      }));
 
-    this.updateFilteredView();
+    return projectList;
   }
 
   onFetchCompleted() {
@@ -468,21 +457,21 @@ export class ProjectListComponent
   }
 
   #fetchDataFromOnlineStore() {
-    this.fetchService.fetchProjectList(this.referenceDate).subscribe({
-      next: (data: Project[]) => {
-        this.parseProjectDataAndUpdateView(data);
-      },
-      error: (e) => {
-        this.fetchError = e.message;
-        this.fetching = false;
-        if (this.inEditMode) {
-          this.setInEditMode(false);
-        }
-      },
-      complete: () => {
-        this.onFetchCompleted();
-      },
-    });
+    // this.fetchService.fetchProjectList(this.referenceDate).subscribe({
+    //   next: (data: Project[]) => {
+    //     this.parseAndSortProjectData(data);
+    //   },
+    //   error: (e) => {
+    //     this.fetchError = e.message;
+    //     this.fetching = false;
+    //     if (this.inEditMode) {
+    //       this.setInEditMode(false);
+    //     }
+    //   },
+    //   complete: () => {
+    //     this.onFetchCompleted();
+    //   },
+    // });
   }
 
   #fetchDataFromLocalStore() {
@@ -491,11 +480,13 @@ export class ProjectListComponent
     );
 
     const { data, updatedAtTs } = weeklyList;
-    this.lastDataUpdateTs = updatedAtTs;
 
     if (data) {
-      this.parseProjectDataAndUpdateView(data);
+      this.dataSet = this.parseAndSortProjectData(data);
+      this.lastDataUpdateTs = updatedAtTs;
+      this.updateFilteredView();
     }
+
     this.onFetchCompleted();
   }
 
