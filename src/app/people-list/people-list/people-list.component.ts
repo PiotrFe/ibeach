@@ -322,7 +322,7 @@ export class PeopleListComponent
     const skill = event.target.value;
 
     if (skill === 'All') {
-      this.filters = [];
+      this.filters = this.filters.filter(({ field }) => field === 'days'); // leave only days filter (if in array at all)
     } else {
       this.updateFilter('skill', skill);
     }
