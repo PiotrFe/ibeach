@@ -53,6 +53,7 @@ export interface StoreManager {
   dataStoreFile: File | undefined;
 
   getConfig: () => Config;
+  getContactList: () => ContactEntry[];
   getEmptyStore: () => DataStore;
   getPeopleList: (week: Date) => WeeklyPeopleList;
   getProjectList: (week: Date) => WeeklyProjectList;
@@ -100,6 +101,10 @@ export class DataStoreManager implements StoreManager {
 
   #syncLocalStorage() {
     window.localStorage.setItem('iBeach', JSON.stringify(this.dataStore));
+  }
+
+  getContactList(): ContactEntry[] {
+    return this.dataStore.contacts;
   }
 
   getConfig(): Config {

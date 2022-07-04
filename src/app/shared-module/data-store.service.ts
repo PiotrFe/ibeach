@@ -34,6 +34,10 @@ export class DataStoreService {
     return this.dataStoreManager.getConfig();
   }
 
+  getContactList(): ContactEntry[] {
+    return this.dataStoreManager.getContactList();
+  }
+
   getEmptyStore(): DataStore {
     return this.dataStoreManager.getEmptyStore();
   }

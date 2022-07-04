@@ -286,6 +286,10 @@ export const generateEmail = (
     (val) => typeof val !== 'boolean'
   );
 
+  console.log({
+    addressBook,
+  });
+
   const email = allocationDone
     ? emailBuilder
         .withTo(

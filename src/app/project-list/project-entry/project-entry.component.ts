@@ -1,21 +1,20 @@
-import { Component, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { TypeaheadService } from 'src/app/shared-module/typeahead.service';
-import { DragAndDropService } from 'src/app/shared-module/drag-and-drop.service';
-import {
-  ConfigService,
-  Config,
-  EmailTemplate,
-} from 'src/app/shared-module/config.service';
-import { EntryComponent } from 'src/app/shared-module/entry/entry.component';
-import { Project, ProjectEditable } from '../project-list/project';
-import { Week } from 'src/app/shared-module/week-days/week';
-import { generateEmail } from 'src/app/shared-module/email';
 import {
   AllocateService,
   AllocationEntry,
 } from 'src/app/shared-module/allocate.service';
-import { ContactEntry } from 'src/app/utils/StorageManager';
+import {
+  ConfigService,
+  EmailTemplate,
+} from 'src/app/shared-module/config.service';
+import { DataStoreService } from 'src/app/shared-module/data-store.service';
+import { DragAndDropService } from 'src/app/shared-module/drag-and-drop.service';
+import { EntryComponent } from 'src/app/shared-module/entry/entry.component';
+import { generateEmail } from 'src/app/shared-module/email';
+import { Project, ProjectEditable } from '../project-list/project';
+import { TypeaheadService } from 'src/app/shared-module/typeahead.service';
+import { Week } from 'src/app/shared-module/week-days/week';
 
 @Component({
   selector: 'project-entry',
@@ -27,11 +26,11 @@ export class ProjectEntryComponent extends EntryComponent implements OnInit {
   subscription: Subscription = new Subscription();
   emailTemplate!: EmailTemplate;
 
-  @Input() addressBook: ContactEntry[] = [];
   @ViewChild('entryContainer') entryContainer!: ElementRef;
 
   constructor(
     private allocateService: AllocateService,
+    private dataStoreService: DataStoreService,
     private dragAndDrop: DragAndDropService,
     typeaheadService: TypeaheadService,
     private config: ConfigService
@@ -112,7 +111,7 @@ export class ProjectEntryComponent extends EntryComponent implements OnInit {
     generateEmail(
       this.entryData as ProjectEditable,
       this.entryContainer,
-      this.addressBook,
+      this.dataStoreService.getContactList(),
       this.config.getEmailTemplate()
     );
   }

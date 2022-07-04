@@ -48,7 +48,6 @@ export class ProjectListComponent
   extends PageComponent
   implements OnInit, OnChanges, OnDestroy
 {
-  addressBook!: ContactEntry[];
   allocationDataSubscription!: Subscription;
   deleteRecordSubscription!: Subscription;
   subscription: Subscription = new Subscription();
@@ -181,13 +180,14 @@ export class ProjectListComponent
     this.subscription.add(allocationDataSubscription);
     this.subscription.add(deleteRecordSubscription);
 
-    const updateAddressBook = this._updateAddressBook.bind(this);
-
     if (this.isOnlineService.isOnline) {
       const fetchSubscription = this.fetchService.fetchContactData().subscribe({
         next: (data: string) => {
           try {
-            this.csvParserService.parseContacts(data, updateAddressBook);
+            this.csvParserService.parseContacts(
+              data,
+              this.dataStoreService.saveContactList
+            );
           } catch (e: any) {
             this.fetchError = 'Unable to load contacts';
           }
@@ -226,10 +226,6 @@ export class ProjectListComponent
     });
 
     this.subscription.add(dataStoreSubscription);
-  }
-
-  _updateAddressBook(addressBook: ContactEntry[]) {
-    this.addressBook = addressBook;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
