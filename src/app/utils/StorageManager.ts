@@ -7,6 +7,12 @@ import { Person } from 'src/app/people-list/person';
 import { Project } from 'src/app/project-list/project-list/project';
 import { WeeklyData } from 'src/app/shared-module/fetch.service';
 
+export type ContactEntry = {
+  first: string;
+  last: string;
+  email: string;
+};
+
 export type WeeklyPeopleList = {
   data: Person[];
   updatedAtTs: number;
@@ -38,6 +44,7 @@ export interface DataStore {
   lookup: Person[];
   config: Config;
   updatedAtTs: number;
+  contacts: ContactEntry[];
 }
 
 export interface StoreManager {
@@ -57,6 +64,7 @@ export interface StoreManager {
   saveChangesToConfig: (c: ConfigChange[]) => Config;
   saveChangesToPeopleList: (weekOf: Date, pdm: string, data: Person[]) => void;
   saveChangesToProjectList: (weekOf: Date, data: Project[]) => void;
+  saveContactList: (list: ContactEntry[]) => void;
   saveListForLookup: (data: any) => void;
   setDataStore: (s: File | DataStore) => void;
   storeMasterList: (week: Date, data: any) => void;
@@ -110,6 +118,7 @@ export class DataStoreManager implements StoreManager {
       },
       config: this.#getDefaultConfig(),
       lookup: [],
+      contacts: [],
       updatedAtTs: ts,
     };
   }
@@ -278,6 +287,11 @@ export class DataStoreManager implements StoreManager {
       console.log(e);
       this.dataStoreError = 'Unable to read file. Try again';
     }
+  }
+
+  saveContactList(list: ContactEntry[]) {
+    this.dataStore.contacts = list;
+    this.#syncLocalStorage();
   }
 
   saveListForLookup(data: any) {

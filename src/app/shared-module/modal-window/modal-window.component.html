@@ -12,10 +12,20 @@
   </div>
   <div class="modal-body">{{ text }}</div>
   <div class="modal-footer">
-    <button type="button" class="btn btn-primary" (click)="close(true)">
+    <button
+      *ngIf="btnConfirmText"
+      type="button"
+      class="btn btn-primary"
+      (click)="close(true)"
+    >
       {{ btnConfirmText }}
     </button>
-    <button type="button" class="btn btn-secondary" (click)="close(false)">
+    <button
+      *ngIf="btnCloseText"
+      type="button"
+      class="btn btn-secondary"
+      (click)="close(false)"
+    >
       {{ btnCloseText }}
     </button>
   </div>
@@ -25,6 +35,7 @@
   <div class="modal-body text-center">
     <p>{{ text }}</p>
     <button
+      *ngIf="btnConfirmText"
       type="button"
       class="btn btn-sm btn-primary mr-10"
       (click)="close(true)"
@@ -32,6 +43,7 @@
       {{ btnConfirmText }}
     </button>
     <button
+      *ngIf="btnCloseText"
       type="button"
       class="btn btn-sm btn-secondary"
       (click)="close(false)"
@@ -58,10 +70,20 @@
       <ng-content select="[settings]"></ng-content>
     </div>
     <div class="modal-footer settings-buttons">
-      <button type="button" class="btn btn-primary mr-10" (click)="close(true)">
+      <button
+        *ngIf="btnConfirmText"
+        type="button"
+        class="btn btn-primary mr-10"
+        (click)="close(true)"
+      >
         {{ btnConfirmText }}
       </button>
-      <button type="button" class="btn btn-secondary" (click)="close(false)">
+      <button
+        *ngIf="btnCloseText"
+        type="button"
+        class="btn btn-secondary"
+        (click)="close(false)"
+      >
         {{ btnCloseText }}
       </button>
     </div>

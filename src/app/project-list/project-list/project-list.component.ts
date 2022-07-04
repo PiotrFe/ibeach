@@ -10,7 +10,7 @@ import {
   OnDestroy,
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
-
+import { ContactEntry } from 'src/app/utils/StorageManager';
 import { CsvParserService } from 'src/app/shared-module/csv-parser.service';
 import { DataStoreService } from 'src/app/shared-module/data-store.service';
 import { FetchService } from '../../shared-module/fetch.service';
@@ -38,12 +38,6 @@ import { Tag } from 'src/app/shared-module/entry/entry.component';
 
 import { getNewWeek, getDaysLeft } from '../../shared-module/week-days/week';
 import { getClosestPastMonday, exportProjectListToPDF } from 'src/app/utils';
-
-export interface ContactEntry {
-  first: string;
-  last: string;
-  email: string;
-}
 
 @Component({
   selector: 'project-list',

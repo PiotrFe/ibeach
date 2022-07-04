@@ -602,8 +602,8 @@ ul {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  height: 50px;
-  max-height: 50px;
+  height: 60px;
+  max-height: 60px;
   margin-bottom: 10px;
 
   &--lg {
@@ -621,7 +621,7 @@ ul {
   flex-grow: 1;
   font-size: 0.8rem;
   overflow-y: auto;
-  margin-right: 10px;
+  margin: 10px 25px;
 }
 
 .settings-icon {
@@ -637,6 +637,13 @@ ul {
 }
 .input-window-content {
   height: 85%;
+}
+
+.contact-list-upload-msg {
+  position: absolute;
+  right: 20px;
+  transform: translate(0px, 50%);
+  font-size: 10px !important;
 }
 
 // ****************

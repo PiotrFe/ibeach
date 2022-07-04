@@ -2,6 +2,7 @@ import { Subject } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { Config, ConfigChange } from 'src/app/shared-module/config.service';
 import {
+  ContactEntry,
   DataStore,
   DataStoreManager,
   StoreManager,
@@ -55,6 +56,10 @@ export class DataStoreService {
       submittedOnly,
       customStore
     );
+  }
+
+  saveContactList(list: ContactEntry[]) {
+    this.dataStoreManager.saveContactList(list);
   }
 
   saveChangesToConfig(configChanges: ConfigChange[]) {

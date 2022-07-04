@@ -12,7 +12,7 @@ import {
   getCalendarFromData,
 } from '../utils';
 
-import { ContactEntry } from 'src/app/project-list/project-list/project-list.component';
+import { ContactEntry } from 'src/app/utils/StorageManager';
 
 @Injectable({
   providedIn: 'root',

@@ -6,6 +6,9 @@ import {
   EventEmitter,
 } from '@angular/core';
 
+import { ContactEntry } from 'src/app/utils/StorageManager';
+import { CsvParserService } from 'src/app/shared-module/csv-parser.service';
+import { DataStoreService } from 'src/app/shared-module/data-store.service';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import {
@@ -27,6 +30,10 @@ export class SettingsComponent implements OnInit, OnDestroy {
   @Output() closeEvent = new EventEmitter();
 
   configChanges: ConfigChange[] = [];
+  contactUploadStatus: { success: boolean; msg: string } = {
+    success: false,
+    msg: '',
+  };
   email!: EmailConfig;
   emailForm = new FormGroup({
     subject: new FormControl(''),
@@ -40,7 +47,11 @@ export class SettingsComponent implements OnInit, OnDestroy {
   showInputModal: boolean = false;
   subscription: Subscription = new Subscription();
 
-  constructor(private configService: ConfigService) {}
+  constructor(
+    private configService: ConfigService,
+    private csvParserService: CsvParserService,
+    private dataStoreService: DataStoreService
+  ) {}
 
   ngOnInit(): void {
     const configSubscr = this.configService.onConfig.subscribe({
@@ -55,6 +66,42 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
+  }
+
+  clearContactListUploadStatus() {
+    this.contactUploadStatus = {
+      success: false,
+      msg: '',
+    };
+  }
+
+  closeInputModal(submitted: any, inputType: string): void {
+    let configChange: ConfigChange | null = null;
+
+    if (inputType === 'pdms' && this.inputContent.dirty && submitted) {
+      configChange = {
+        field: this.inputModalType!,
+        value: this._parseInputValue(this.inputContent.value),
+      };
+    }
+
+    if (inputType === 'email' && this.emailForm.dirty && submitted) {
+      configChange = {
+        field: this.inputModalType!,
+        value: this.emailForm.value,
+      };
+    }
+
+    this.showInputModal = false;
+    this.inputContent.setValue('');
+    this.inputModalTitle = '';
+    this.inputModalType = null;
+
+    if (!configChange) {
+      return;
+    }
+    this.configChanges.push(configChange);
+    this._updateLocalView(configChange);
   }
 
   closeSettings(submit: any): void {
@@ -89,33 +136,43 @@ export class SettingsComponent implements OnInit, OnDestroy {
     this.showInputModal = true;
   }
 
-  closeInputModal(submitted: any, inputType: string): void {
-    let configChange: ConfigChange | null = null;
+  async handleUpdateContactList(e: any) {
+    const file = e?.target?.files?.[0];
 
-    if (inputType === 'pdms' && this.inputContent.dirty && submitted) {
-      configChange = {
-        field: this.inputModalType!,
-        value: this._parseInputValue(this.inputContent.value),
-      };
-    }
-
-    if (inputType === 'email' && this.emailForm.dirty && submitted) {
-      configChange = {
-        field: this.inputModalType!,
-        value: this.emailForm.value,
-      };
-    }
-
-    this.showInputModal = false;
-    this.inputContent.setValue('');
-    this.inputModalTitle = '';
-    this.inputModalType = null;
-
-    if (!configChange) {
+    if (!file) {
       return;
     }
-    this.configChanges.push(configChange);
-    this._updateLocalView(configChange);
+
+    try {
+      const str = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsText(file);
+
+        reader.onload = function () {
+          resolve(reader.result);
+        };
+
+        reader.onerror = function () {
+          reject(reader.error);
+        };
+      });
+
+      const cb = (data: ContactEntry[]) => {
+        this.dataStoreService.saveContactList(data);
+      };
+
+      this.csvParserService.parseContacts(str, cb);
+      this.contactUploadStatus = {
+        success: true,
+        msg: 'List uploaded!',
+      };
+    } catch (e) {
+      this.contactUploadStatus = {
+        success: false,
+        msg: 'Something went wrong.',
+      };
+      console.log(e);
+    }
   }
 
   restoreEmailToDefault(): void {

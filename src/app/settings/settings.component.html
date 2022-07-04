@@ -1,7 +1,6 @@
 <modal-window
   modalType="SETTINGS"
-  btnConfirmText="Save"
-  btnCloseText="Cancel"
+  btnCloseText="Done"
   [canSubmit]="true"
   [hideOnBackdropClick]="!showInputModal"
   (closeEvent)="closeSettings($event)"
@@ -32,7 +31,37 @@
           Edit template
         </button>
       </div>
-
+      <div class="settings-icon"></div>
+    </div>
+    <div class="settings-row">
+      <label class="form-label settings-label">Contacts</label>
+      <div class="settings-content">
+        <label
+          for="upload-contact-list"
+          class="btn btn-dark btn-sm"
+          (click)="clearContactListUploadStatus()"
+        >
+          <i class="bi bi-upload clickable mr-5"></i>
+          Upload contact list
+        </label>
+        <input
+          type="file"
+          id="upload-contact-list"
+          accept=".csv,.txt"
+          hidden
+          (change)="handleUpdateContactList($event)"
+        />
+        <span
+          *ngIf="contactUploadStatus.success && contactUploadStatus.msg"
+          class="badge bg-success contact-list-upload-msg"
+          >{{ contactUploadStatus.msg }}</span
+        >
+        <span
+          *ngIf="!contactUploadStatus.success && contactUploadStatus.msg"
+          class="badge bg-danger contact-list-upload-msg"
+          >{{ contactUploadStatus.msg }}</span
+        >
+      </div>
       <div class="settings-icon"></div>
     </div>
   </div>

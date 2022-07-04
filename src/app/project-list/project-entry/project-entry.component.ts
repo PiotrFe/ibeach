@@ -15,7 +15,7 @@ import {
   AllocateService,
   AllocationEntry,
 } from 'src/app/shared-module/allocate.service';
-import { ContactEntry } from 'src/app/project-list/project-list/project-list.component';
+import { ContactEntry } from 'src/app/utils/StorageManager';
 
 @Component({
   selector: 'project-entry',

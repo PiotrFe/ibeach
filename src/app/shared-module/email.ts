@@ -1,7 +1,7 @@
 import { ElementRef } from '@angular/core';
 import { ProjectEditable } from 'src/app/project-list/project-list/project';
 import { Week } from 'src/app/shared-module/week-days/week';
-import { ContactEntry } from 'src/app/project-list/project-list/project-list.component';
+import { ContactEntry } from 'src/app/utils/StorageManager';
 import { remove as removeDiacritics } from 'diacritics';
 import { compareTwoStrings } from 'string-similarity';
 import { encodeWhitespaces } from 'src/app/utils';

@@ -122,9 +122,13 @@ export class UploadSectionComponent extends PageComponent implements OnChanges {
             this.referenceDate,
             this.referenceDateEnd
           );
-          this.previewData = parsedPreview.filter(({ pdm }) =>
-            this.configService.getPDMs().includes((pdm as string).toLowerCase())
-          );
+          this.previewData = !this.configService.getPDMs().length
+            ? parsedPreview
+            : parsedPreview.filter(({ pdm }) =>
+                this.configService
+                  .getPDMs()
+                  .includes((pdm as string).toLowerCase())
+              );
           const parsedFull = this.csvParserService.parse(data);
           this.fullData = parsedFull;
         }
