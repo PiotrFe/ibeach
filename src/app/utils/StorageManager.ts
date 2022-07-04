@@ -1,4 +1,8 @@
-import { Config } from 'src/app/shared-module/config.service';
+import {
+  Config,
+  ConfigChange,
+  EmailTemplate,
+} from 'src/app/shared-module/config.service';
 import { Person } from 'src/app/people-list/person';
 import { Project } from 'src/app/project-list/project-list/project';
 import { WeeklyData } from 'src/app/shared-module/fetch.service';
@@ -41,6 +45,7 @@ export interface StoreManager {
   dataStoreError: string | undefined;
   dataStoreFile: File | undefined;
 
+  getConfig: () => Config;
   getEmptyStore: () => DataStore;
   getPeopleList: (week: Date) => WeeklyPeopleList;
   getProjectList: (week: Date) => WeeklyProjectList;
@@ -49,10 +54,11 @@ export interface StoreManager {
     submittedOnly?: boolean,
     customStore?: DataStore
   ) => WeeklyData;
+  saveChangesToConfig: (c: ConfigChange[]) => Config;
   saveChangesToPeopleList: (weekOf: Date, pdm: string, data: Person[]) => void;
   saveChangesToProjectList: (weekOf: Date, data: Project[]) => void;
   saveListForLookup: (data: any) => void;
-  setDataStore: (f: File) => void;
+  setDataStore: (s: File | DataStore) => void;
   storeMasterList: (week: Date, data: any) => void;
   submitPeopleList: (weekOf: Date, pdm: string, data: Person[]) => void;
 }
@@ -86,6 +92,10 @@ export class DataStoreManager implements StoreManager {
 
   #syncLocalStorage() {
     window.localStorage.setItem('iBeach', JSON.stringify(this.dataStore));
+  }
+
+  getConfig(): Config {
+    return this.dataStore.config || this.#getDefaultConfig();
   }
 
   getEmptyStore() {
@@ -177,15 +187,37 @@ export class DataStoreManager implements StoreManager {
     };
   }
 
-  saveListForLookup(data: any) {
-    const updateTs = Date.now();
-    if (this.dataStore === undefined) {
-      this.dataStore = this.getEmptyStore();
-    }
-    this.dataStore.lookup = data;
-    this.dataStore.updatedAtTs = updateTs;
+  async readStoreDataFromFile(file: File): Promise<DataStore> {
+    return new Promise<DataStore>((resolve, reject) => {
+      const fileReader = new FileReader();
+      fileReader.readAsText(file);
 
-    this.#syncLocalStorage();
+      fileReader.onload = function () {
+        const resultJSON = JSON.parse(fileReader.result as string);
+        resolve(resultJSON as DataStore);
+      };
+      fileReader.onerror = function () {
+        console.log(fileReader.error);
+        reject();
+      };
+    });
+  }
+
+  saveChangesToConfig(configChanges: ConfigChange[]) {
+    for (let change of configChanges) {
+      const { field, value } = change;
+
+      if (field === 'pdms') {
+        const pdmArr =
+          typeof value === 'string' ? value.split(', ') : (value as string[]);
+        this.dataStore.config.pdms = pdmArr;
+      }
+
+      if (field === 'email') {
+        this.dataStore.config.email.current = value as EmailTemplate;
+      }
+    }
+    return this.dataStore.config;
   }
 
   saveChangesToPeopleList(
@@ -230,29 +262,33 @@ export class DataStoreManager implements StoreManager {
     this.#syncLocalStorage();
   }
 
-  async setDataStore(file: File) {
-    this.dataStoreFile = file;
+  async setDataStore(store: File | DataStore) {
+    let storeJSON: DataStore;
 
     try {
-      const storeDataJSON = await new Promise<DataStore>((resolve, reject) => {
-        const fileReader = new FileReader();
-        fileReader.readAsText(file);
-
-        fileReader.onload = function () {
-          const resultJSON = JSON.parse(fileReader.result as string);
-          resolve(resultJSON as DataStore);
-        };
-        fileReader.onerror = function () {
-          console.log(fileReader.error);
-          reject();
-        };
-      });
-      this.dataStore = storeDataJSON;
+      if (isFile(store)) {
+        this.dataStoreFile = store;
+        storeJSON = await this.readStoreDataFromFile(store);
+      } else {
+        storeJSON = store;
+      }
+      this.dataStore = storeJSON;
       this.#syncLocalStorage();
     } catch (e) {
       console.log(e);
       this.dataStoreError = 'Unable to read file. Try again';
     }
+  }
+
+  saveListForLookup(data: any) {
+    const updateTs = Date.now();
+    if (this.dataStore === undefined) {
+      this.dataStore = this.getEmptyStore();
+    }
+    this.dataStore.lookup = data;
+    this.dataStore.updatedAtTs = updateTs;
+
+    this.#syncLocalStorage();
   }
 
   storeMasterList(
@@ -285,17 +321,23 @@ export class DataStoreManager implements StoreManager {
       this.dataStore.config.pdms = pdmArr;
     }
 
-    const weeklyData = week.reduce((acc: any, personEntry) => {
-      const pdm = personEntry.pdm as string;
-      return {
-        ...acc,
-        [pdm]: {
-          ...acc[pdm],
-          isSubmitted: false,
-          people: [...(acc[pdm]?.people || []), personEntry],
-        },
-      };
-    }, {});
+    const weeklyData = week
+      .filter(({ pdm }) =>
+        this.dataStore.config.pdms
+          .map((pdm) => pdm.toLowerCase())
+          .includes((pdm as string).toLowerCase())
+      )
+      .reduce((acc: any, personEntry) => {
+        const pdm = personEntry.pdm as string;
+        return {
+          ...acc,
+          [pdm]: {
+            ...acc[pdm],
+            isSubmitted: false,
+            people: [...(acc[pdm]?.people || []), personEntry],
+          },
+        };
+      }, {});
 
     this.dataStore.master[weekTs] = weeklyData;
     this.dataStore.updatedAtTs = ts;
@@ -317,4 +359,8 @@ export class DataStoreManager implements StoreManager {
     // update people section of the store (pdm param === "allocator" to indicate changes are to be done to allocate, not submit, section)
     this.saveChangesToPeopleList(weekOf, 'allocator', data, true);
   }
+}
+
+function isFile(param: File | DataStore): param is File {
+  return (param as File).size !== undefined;
 }

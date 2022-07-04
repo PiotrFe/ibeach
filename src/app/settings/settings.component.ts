@@ -26,27 +26,25 @@ import { decodeWhitespaces, encodeWhitespaces } from 'src/app/utils';
 export class SettingsComponent implements OnInit, OnDestroy {
   @Output() closeEvent = new EventEmitter();
 
-  subscription: Subscription = new Subscription();
-  pdmArr: string[] = [];
+  configChanges: ConfigChange[] = [];
   email!: EmailConfig;
-  showInputModal: boolean = false;
-  inputModalTitle: string = '';
-  inputModalType!: null | 'pdms' | 'email';
-  inputContent = new FormControl('');
   emailForm = new FormGroup({
     subject: new FormControl(''),
     content: new FormControl(''),
     contentNoAllocation: new FormControl(''),
   });
-
-  configChanges: ConfigChange[] = [];
+  inputContent = new FormControl('');
+  inputModalTitle: string = '';
+  inputModalType!: null | 'pdms' | 'email';
+  pdmArr: string[] = [];
+  showInputModal: boolean = false;
+  subscription: Subscription = new Subscription();
 
   constructor(private configService: ConfigService) {}
 
   ngOnInit(): void {
     const configSubscr = this.configService.onConfig.subscribe({
       next: (config: Config) => {
-        // TODO: add a check to prevent unnecessary updates
         const { pdms, email } = config;
         this.pdmArr = pdms;
         this.email = email;
@@ -104,10 +102,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
     if (inputType === 'email' && this.emailForm.dirty && submitted) {
       configChange = {
         field: this.inputModalType!,
-        value: {
-          default: this.email.default,
-          current: this.emailForm.value,
-        },
+        value: this.emailForm.value,
       };
     }
 
@@ -143,13 +138,15 @@ export class SettingsComponent implements OnInit, OnDestroy {
     }
 
     if (field === 'email') {
-      this.email.current = (value as EmailConfig).current as EmailTemplate;
+      this.email.current = value as EmailTemplate;
     }
   }
 
   _parseInputValue(value: string): string | string[] {
     if (this.inputModalType === 'pdms') {
-      return this.inputContent.value.split('\n');
+      return (this.inputContent.value.split('\n') as string[])
+        .filter((entry) => entry.length)
+        .map((entry) => entry.trim());
     }
     return value;
   }

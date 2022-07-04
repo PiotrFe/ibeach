@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { DataStoreService } from 'src/app/shared-module/data-store.service';
 import { IsOnlineService } from 'src/app/shared-module/is-online.service';
+import { DataStore } from 'src/app/utils/StorageManager';
 
 export const PAGE_SECTIONS = {
   ALLOCATE: 'ALLOCATE',
@@ -14,7 +15,7 @@ export const PAGE_SECTIONS = {
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'client-dev-app';
 
   pageSection = PAGE_SECTIONS.ALLOCATE;
@@ -26,6 +27,21 @@ export class AppComponent {
     private isOnline: IsOnlineService
   ) {
     this.isOnline.setIsOnline(false);
+  }
+
+  ngOnInit(): void {
+    const storeStr = window.localStorage.getItem('iBeach');
+
+    if (!storeStr) {
+      return;
+    }
+
+    try {
+      const storeJSON = JSON.parse(storeStr);
+      this.dataStoreService.setDataStore(storeJSON as DataStore);
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   setPageSection(sectionName: keyof typeof PAGE_SECTIONS): void {

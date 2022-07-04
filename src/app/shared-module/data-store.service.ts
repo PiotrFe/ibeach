@@ -1,8 +1,6 @@
 import { Subject } from 'rxjs';
 import { Injectable } from '@angular/core';
-import { Person } from 'src/app/people-list/person';
-import { Project } from 'src/app/project-list/project-list/project';
-import { WeeklyData } from 'src/app/shared-module/fetch.service';
+import { Config, ConfigChange } from 'src/app/shared-module/config.service';
 import {
   DataStore,
   DataStoreManager,
@@ -10,6 +8,10 @@ import {
   WeeklyPeopleList,
   WeeklyProjectList,
 } from 'src/app/utils/StorageManager';
+
+import { Person } from 'src/app/people-list/person';
+import { Project } from 'src/app/project-list/project-list/project';
+import { WeeklyData } from 'src/app/shared-module/fetch.service';
 
 @Injectable({
   providedIn: 'root',
@@ -25,6 +27,10 @@ export class DataStoreService {
 
   get hasActiveDataStore(): boolean {
     return Boolean(this.dataStoreManager.dataStoreFile);
+  }
+
+  getConfig(): Config {
+    return this.dataStoreManager.getConfig();
   }
 
   getEmptyStore(): DataStore {
@@ -51,6 +57,10 @@ export class DataStoreService {
     );
   }
 
+  saveChangesToConfig(configChanges: ConfigChange[]) {
+    return this.dataStoreManager.saveChangesToConfig(configChanges);
+  }
+
   saveChangesToPeopleList(weekOf: Date, pdm: string, data: Person[]) {
     this.dataStoreManager.saveChangesToPeopleList(weekOf, pdm, data);
     this.#dataStoreSubject.next(this.dataStoreManager.dataStore as DataStore);
@@ -66,8 +76,8 @@ export class DataStoreService {
     this.#dataStoreSubject.next(this.dataStoreManager.dataStore as DataStore);
   }
 
-  setDataStore(file: File) {
-    this.dataStoreManager.setDataStore(file);
+  setDataStore(store: File | DataStore) {
+    this.dataStoreManager.setDataStore(store);
   }
 
   storeMasterList(weekOf: Date, data: any) {

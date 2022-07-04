@@ -45,21 +45,6 @@ export class ProjectEntryComponent extends EntryComponent implements OnInit {
       ...entry,
       inEditMode: false,
     };
-
-    const configSubscription = this.config.onConfig.subscribe({
-      next: (config: Config) => {
-        const { email } = config;
-        if (
-          email &&
-          (email?.current?.content !== this.emailTemplate?.content ||
-            email?.current?.subject !== this.emailTemplate?.subject)
-        ) {
-          this.emailTemplate = email.current;
-        }
-      },
-    });
-
-    this.subscription.add(configSubscription);
   }
 
   handleEdit(): void {
@@ -128,7 +113,7 @@ export class ProjectEntryComponent extends EntryComponent implements OnInit {
       this.entryData as ProjectEditable,
       this.entryContainer,
       this.addressBook,
-      this.emailTemplate
+      this.config.getEmailTemplate()
     );
   }
 }

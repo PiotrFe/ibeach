@@ -59,6 +59,9 @@ export class PersonEntryComponent extends PersonEntry {
   }
 
   handleDragStart(event: any) {
+    if (this.displayedIn !== 'ALLOCATE') {
+      return;
+    }
     this.dragAndDrop.onDragStart(event, this.id, 'match', 'people');
     return false;
   }
@@ -68,7 +71,11 @@ export class PersonEntryComponent extends PersonEntry {
     const sortedClass = fieldName === this.sortField ? ' sorted' : '';
     let otherClass = fieldName === 'pdm' ? ' flex-ctr-hor' : '';
 
-    if (!this.inEditMode && fieldName === 'name') {
+    if (
+      !this.inEditMode &&
+      fieldName === 'name' &&
+      this.displayedIn === 'ALLOCATE'
+    ) {
       otherClass += ` draggable draggable-people`;
     }
 

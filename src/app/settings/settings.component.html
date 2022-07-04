@@ -7,29 +7,23 @@
   (closeEvent)="closeSettings($event)"
 >
   <div class="container" id="settings-list" settings>
-    <div class="row align-items-center settings-row settings-row--lg">
-      <div class="col-2 settings-col">
-        <label class="settings-label bld">PDMs</label>
+    <div class="settings-row">
+      <label class="form-label settings-label" for="settings-pdm-list"
+        >PDMs</label
+      >
+      <div class="settings-content">
+        {{ pdmArr.join(", ") }}
       </div>
-      <div class="col-8 settings-col">
-        <div class="settings-content">
-          {{ pdmArr.join(", ") }}
-        </div>
-      </div>
-      <div class="col-2 settings-col">
-        <div class="settings-icon">
-          <i
-            class="bi bi-pencil clickable"
-            (click)="displayInputModal('pdm')"
-          ></i>
-        </div>
+      <div class="settings-icon">
+        <i
+          class="bi bi-pencil clickable"
+          (click)="displayInputModal('pdm')"
+        ></i>
       </div>
     </div>
-    <div class="row align-items-center settings-row">
-      <div class="col-2 settings-col">
-        <label class="settings-label bld">Email</label>
-      </div>
-      <div class="col-8 settings-col">
+    <div class="settings-row">
+      <label class="form-label settings-label">Email</label>
+      <div class="settings-content">
         <button
           class="btn btn-dark btn-sm"
           (click)="displayInputModal('email')"
@@ -38,9 +32,8 @@
           Edit template
         </button>
       </div>
-      <div class="col-2 settings-col">
-        <div class="settings-icon"></div>
-      </div>
+
+      <div class="settings-icon"></div>
     </div>
   </div>
 </modal-window>

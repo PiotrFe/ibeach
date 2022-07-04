@@ -350,7 +350,7 @@ export class PeopleListComponent
       return;
     }
     if (this.status && (clearedFilters || this.pdmFilter.value === 'All')) {
-      if (!this.status.pending) {
+      if (!this.status.pending.length) {
         this.statusLabel = 'ready';
       } else {
         this.statusLabel = 'pending';
@@ -497,7 +497,7 @@ export class PeopleListComponent
   }
 
   _onWeeklyData(data: WeeklyData) {
-    const { people, statusSummary, lookupTable, config } = data;
+    const { people, statusSummary, lookupTable } = data;
 
     this.dataSet = this.parseAndSortPeopleData(people);
 
@@ -510,10 +510,6 @@ export class PeopleListComponent
         this.typeaheadService.tableTypes.People,
         lookupTable
       );
-    }
-
-    if (config) {
-      this.configService.setConfig(config);
     }
 
     this.status = statusSummary;

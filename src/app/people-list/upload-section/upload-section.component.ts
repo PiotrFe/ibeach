@@ -1,13 +1,8 @@
-import {
-  Component,
-  NgZone,
-  OnChanges,
-  SimpleChanges,
-  Input,
-} from '@angular/core';
-import { FetchService } from 'src/app/shared-module/fetch.service';
+import { Component, NgZone, OnChanges, SimpleChanges } from '@angular/core';
+import { ConfigService } from 'src/app/shared-module/config.service';
 import { CsvParserService } from 'src/app/shared-module/csv-parser.service';
 import { DataStoreService } from 'src/app/shared-module/data-store.service';
+import { FetchService } from 'src/app/shared-module/fetch.service';
 import { IsOnlineService } from 'src/app/shared-module/is-online.service';
 import { ResizeObserverService } from 'src/app/shared-module/resize-observer.service';
 import { parse } from 'src/app/utils/csv-parser/index';
@@ -32,6 +27,7 @@ export class UploadSectionComponent extends PageComponent implements OnChanges {
   constructor(
     ngZone: NgZone,
     resizeObserverService: ResizeObserverService,
+    private configService: ConfigService,
     private csvParserService: CsvParserService,
     private dataStoreService: DataStoreService,
     private fetchService: FetchService,
@@ -112,8 +108,6 @@ export class UploadSectionComponent extends PageComponent implements OnChanges {
     reader.onload = () => {
       this.data = reader.result as string;
 
-      console.log({ result: reader.result });
-
       parse(
         this.data,
         { encoding: 'utf8', columns: true, relaxColumnCount: true },
@@ -123,13 +117,16 @@ export class UploadSectionComponent extends PageComponent implements OnChanges {
             this.fetchError = String(err);
           }
           this.fileSelected = true;
-          this.previewData = this.csvParserService.parse(
+          const parsedPreview = this.csvParserService.parse(
             data,
             this.referenceDate,
             this.referenceDateEnd
           );
-          const parsed = this.csvParserService.parse(data);
-          this.fullData = parsed;
+          this.previewData = parsedPreview.filter(({ pdm }) =>
+            this.configService.getPDMs().includes((pdm as string).toLowerCase())
+          );
+          const parsedFull = this.csvParserService.parse(data);
+          this.fullData = parsedFull;
         }
       );
     };

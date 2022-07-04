@@ -76,17 +76,16 @@ export class DragAndDropService {
     draggableElem.style.display = 'flex';
     draggableElem.style.justifyContent = 'center';
     draggableElem.style.alignItems = 'center';
-    draggableElem.style.padding = '0px';
+    draggableElem.style.padding = '5px';
     draggableElem.style.margin = '0px';
-    draggableElem.style.backgroundColor = 'rgba(25, 135, 84, 1)';
-
+    // draggableElem.style.backgroundColor = 'rgba(25, 135, 84, 1)';
+    draggableElem.style.backgroundColor = 'var(--bs-gray-700)';
     draggableElem.innerText = getInitials(draggableElem.innerText);
 
     draggableElem.classList.add('phase-in');
     draggableElem.classList.remove('droppable');
 
     if (day === 'match') {
-      draggableElem.style.backgroundColor = 'var(--bs-gray-700)';
       draggableElem.style.fontWeight = 'bold';
       draggableElem.style.justifyContent = 'center';
       draggableElem.style.color = '#fff';
@@ -228,5 +227,7 @@ const getInitials = (text: string | null): string => {
     lastChar = arr[arr.length - 4][0];
   }
 
-  return `${arr[0][0].toUpperCase()} ${lastChar.toUpperCase()}`;
+  const initials = `${arr[0][0].toUpperCase()}${lastChar.toUpperCase()}`.trim();
+
+  return initials;
 };
