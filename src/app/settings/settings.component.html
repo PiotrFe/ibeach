@@ -42,7 +42,7 @@
           (click)="clearContactListUploadStatus()"
         >
           <i class="bi bi-upload clickable mr-5"></i>
-          Upload contact list
+          Import contact list
         </label>
         <input
           type="file"
@@ -60,6 +60,37 @@
           *ngIf="!contactUploadStatus.success && contactUploadStatus.msg"
           class="badge bg-danger contact-list-upload-msg"
           >{{ contactUploadStatus.msg }}</span
+        >
+      </div>
+      <div class="settings-icon"></div>
+    </div>
+    <div class="settings-row">
+      <label class="form-label settings-label">iBeach data</label>
+      <div class="settings-content">
+        <label
+          for="import-app-data"
+          class="btn btn-primary btn-sm"
+          (click)="clearAppDataImportStatus()"
+        >
+          <i class="bi bi-upload clickable mr-5"></i>
+          Import iBeach data
+        </label>
+        <input
+          type="file"
+          id="import-app-data"
+          accept=".csv,.txt,.json"
+          hidden
+          (change)="handleImportAppData($event)"
+        />
+        <span
+          *ngIf="appDataImportStatus.success && appDataImportStatus.msg"
+          class="badge bg-success contact-list-upload-msg"
+          >{{ appDataImportStatus.msg }}</span
+        >
+        <span
+          *ngIf="!appDataImportStatus.success && appDataImportStatus.msg"
+          class="badge bg-danger contact-list-upload-msg"
+          >{{ appDataImportStatus.msg }}</span
         >
       </div>
       <div class="settings-icon"></div>

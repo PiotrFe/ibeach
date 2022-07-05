@@ -24,10 +24,34 @@ export class DataStoreService {
 
   constructor() {
     this.dataStoreManager = new DataStoreManager();
+    this.init();
+  }
+
+  init() {
+    window.addEventListener('beforeunload', (e) => {
+      e.preventDefault();
+      console.log(this.areChangesPending);
+      if (this.areChangesPending) {
+        return (e.returnValue = 'Are you sure you want to exit?');
+      }
+
+      return null;
+    });
   }
 
   get hasActiveDataStore(): boolean {
     return Boolean(this.dataStoreManager.dataStoreFile);
+  }
+
+  get areChangesPending(): boolean {
+    return (
+      this.dataStoreManager.dataStore.updatedAtTs >
+      this.dataStoreManager.dataStoreFileUpdateTs
+    );
+  }
+
+  exportDataStore() {
+    this.dataStoreManager.exportDataStore();
   }
 
   getConfig(): Config {
@@ -59,6 +83,20 @@ export class DataStoreService {
       week,
       submittedOnly,
       customStore
+    );
+  }
+
+  importDataStore(store: DataStore) {
+    this.dataStoreManager.importDataStore(store);
+    this.#dataStoreSubject.next(this.dataStoreManager.dataStore as DataStore);
+  }
+
+  isDataStore(obj: DataStore | any): obj is DataStore {
+    return (
+      (obj as DataStore).master !== undefined &&
+      (obj as DataStore).config !== undefined &&
+      (obj as DataStore).people !== undefined &&
+      (obj as DataStore).projects !== undefined
     );
   }
 

@@ -6,6 +6,7 @@ import {
 import { Person } from 'src/app/people-list/person';
 import { Project } from 'src/app/project-list/project-list/project';
 import { WeeklyData } from 'src/app/shared-module/fetch.service';
+import { link } from 'fs';
 
 export type ContactEntry = {
   first: string;
@@ -51,7 +52,9 @@ export interface StoreManager {
   dataStore: DataStore;
   dataStoreError: string | undefined;
   dataStoreFile: File | undefined;
+  dataStoreFileUpdateTs: number;
 
+  exportDataStore: () => void;
   getConfig: () => Config;
   getContactList: () => ContactEntry[];
   getEmptyStore: () => DataStore;
@@ -62,6 +65,7 @@ export interface StoreManager {
     submittedOnly?: boolean,
     customStore?: DataStore
   ) => WeeklyData;
+  importDataStore: (s: DataStore) => void;
   saveChangesToConfig: (c: ConfigChange[]) => Config;
   saveChangesToPeopleList: (weekOf: Date, pdm: string, data: Person[]) => void;
   saveChangesToProjectList: (weekOf: Date, data: Project[]) => void;
@@ -76,6 +80,7 @@ export class DataStoreManager implements StoreManager {
   dataStoreFile: File | undefined = undefined;
   dataStore!: DataStore;
   dataStoreError: string | undefined = undefined;
+  dataStoreFileUpdateTs: number = 0;
 
   constructor() {
     this.dataStore = this.getEmptyStore();
@@ -99,32 +104,53 @@ export class DataStoreManager implements StoreManager {
     };
   }
 
-  #syncLocalStorage() {
-    window.localStorage.setItem('iBeach', JSON.stringify(this.dataStore));
+  // **************************
+  // IMPORT / EXPORT
+  // **************************
+
+  exportDataStore() {
+    const a = document.createElement('a');
+    a.download = this.dataStoreFile?.name || 'iBeach data.txt';
+    const blob = new Blob([JSON.stringify(this.dataStore)], {
+      type: 'text/plain',
+    });
+    a.href = URL.createObjectURL(blob);
+    a.click();
+    URL.revokeObjectURL(a.href);
+    this.dataStoreFileUpdateTs = this.dataStore.updatedAtTs;
+  }
+
+  importDataStore(store: DataStore) {
+    this.dataStore = store;
+    this.dataStoreFileUpdateTs = store.updatedAtTs;
+  }
+
+  // **************************
+  // GETTERS
+  // **************************
+
+  getConfig(): Config {
+    return this.dataStore.config || this.#getDefaultConfig();
   }
 
   getContactList(): ContactEntry[] {
     return this.dataStore.contacts;
   }
 
-  getConfig(): Config {
-    return this.dataStore.config || this.#getDefaultConfig();
-  }
-
   getEmptyStore() {
-    const ts = Date.now();
+    // const ts = Date.now();
     return {
-      master: { updatedAtTs: ts },
+      master: { updatedAtTs: 0 },
       people: {
-        updatedAtTs: ts,
+        updatedAtTs: 0,
       },
       projects: {
-        updatedAtTs: ts,
+        updatedAtTs: 0,
       },
       config: this.#getDefaultConfig(),
       lookup: [],
       contacts: [],
-      updatedAtTs: ts,
+      updatedAtTs: 0,
     };
   }
 
@@ -217,6 +243,10 @@ export class DataStoreManager implements StoreManager {
     });
   }
 
+  // **************************
+  // SETTERS
+  // **************************
+
   saveChangesToConfig(configChanges: ConfigChange[]) {
     for (let change of configChanges) {
       const { field, value } = change;
@@ -231,6 +261,7 @@ export class DataStoreManager implements StoreManager {
         this.dataStore.config.email.current = value as EmailTemplate;
       }
     }
+    this.dataStore.updatedAtTs = Date.now();
     return this.dataStore.config;
   }
 
@@ -264,7 +295,7 @@ export class DataStoreManager implements StoreManager {
 
       this.dataStore.master.updatedAtTs = ts;
     }
-
+    this.dataStore.updatedAtTs = Date.now();
     this.#syncLocalStorage();
   }
 
@@ -273,6 +304,7 @@ export class DataStoreManager implements StoreManager {
     const ts = Date.now();
     this.dataStore.projects[weekTs] = data;
     this.dataStore.projects.updatedAtTs = ts;
+    this.dataStore.updatedAtTs = Date.now();
     this.#syncLocalStorage();
   }
 
@@ -283,6 +315,7 @@ export class DataStoreManager implements StoreManager {
       if (isFile(store)) {
         this.dataStoreFile = store;
         storeJSON = await this.readStoreDataFromFile(store);
+        this.dataStoreFileUpdateTs = storeJSON.updatedAtTs;
       } else {
         storeJSON = store;
       }
@@ -296,17 +329,16 @@ export class DataStoreManager implements StoreManager {
 
   saveContactList(list: ContactEntry[]) {
     this.dataStore.contacts = list;
+    this.dataStore.updatedAtTs = Date.now();
     this.#syncLocalStorage();
   }
 
   saveListForLookup(data: any) {
-    const updateTs = Date.now();
     if (this.dataStore === undefined) {
       this.dataStore = this.getEmptyStore();
     }
     this.dataStore.lookup = data;
-    this.dataStore.updatedAtTs = updateTs;
-
+    this.dataStore.updatedAtTs = Date.now();
     this.#syncLocalStorage();
   }
 
@@ -319,12 +351,6 @@ export class DataStoreManager implements StoreManager {
   ) {
     const weekTs = weekOf.getTime();
     const ts = Date.now();
-
-    // if (!this.dataStoreFile || this.dataStore === undefined) {
-    //   this.dataStoreError = 'Unable to upload';
-    //   return;
-    // }
-
     const { week, full } = data;
 
     if (!this.dataStore?.master) {
@@ -377,6 +403,10 @@ export class DataStoreManager implements StoreManager {
 
     // update people section of the store (pdm param === "allocator" to indicate changes are to be done to allocate, not submit, section)
     this.saveChangesToPeopleList(weekOf, 'allocator', data, true);
+  }
+
+  #syncLocalStorage() {
+    // window.localStorage.setItem('iBeach', JSON.stringify(this.dataStore));
   }
 }
 

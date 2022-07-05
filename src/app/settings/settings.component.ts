@@ -29,11 +29,16 @@ import { decodeWhitespaces, encodeWhitespaces } from 'src/app/utils';
 export class SettingsComponent implements OnInit, OnDestroy {
   @Output() closeEvent = new EventEmitter();
 
-  configChanges: ConfigChange[] = [];
+  appDataImportStatus: { success: boolean; msg: string } = {
+    success: false,
+    msg: '',
+  };
   contactUploadStatus: { success: boolean; msg: string } = {
     success: false,
     msg: '',
   };
+
+  configChanges: ConfigChange[] = [];
   email!: EmailConfig;
   emailForm = new FormGroup({
     subject: new FormControl(''),
@@ -70,6 +75,13 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
   clearContactListUploadStatus() {
     this.contactUploadStatus = {
+      success: false,
+      msg: '',
+    };
+  }
+
+  clearAppDataImportStatus() {
+    this.appDataImportStatus = {
       success: false,
       msg: '',
     };
@@ -168,6 +180,46 @@ export class SettingsComponent implements OnInit, OnDestroy {
       };
     } catch (e) {
       this.contactUploadStatus = {
+        success: false,
+        msg: 'Something went wrong.',
+      };
+      console.log(e);
+    }
+  }
+
+  async handleImportAppData(e: any) {
+    const file = e?.target?.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    try {
+      const str = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsText(file);
+
+        reader.onload = function () {
+          resolve(reader.result as string);
+        };
+
+        reader.onerror = function () {
+          reject(reader.error);
+        };
+      });
+
+      const json = JSON.parse(str);
+
+      if (this.dataStoreService.isDataStore(json)) {
+        this.dataStoreService.importDataStore(json);
+      }
+
+      this.appDataImportStatus = {
+        success: true,
+        msg: 'Data imported!',
+      };
+    } catch (e) {
+      this.appDataImportStatus = {
         success: false,
         msg: 'Something went wrong.',
       };

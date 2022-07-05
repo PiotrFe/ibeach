@@ -44,8 +44,8 @@ export class AppComponent implements OnInit {
     }
   }
 
-  setPageSection(sectionName: keyof typeof PAGE_SECTIONS): void {
-    this.pageSection = sectionName;
+  closeSettings() {
+    this.showSettings = false;
   }
 
   handleDateChange(date: Date) {
@@ -54,11 +54,15 @@ export class AppComponent implements OnInit {
     this.referenceDate = newDate;
   }
 
-  toggleShowSettings() {
-    this.showSettings = !this.showSettings;
+  saveChanges() {
+    this.dataStoreService.exportDataStore();
   }
 
-  closeSettings() {
-    this.showSettings = false;
+  setPageSection(sectionName: keyof typeof PAGE_SECTIONS): void {
+    this.pageSection = sectionName;
+  }
+
+  toggleShowSettings() {
+    this.showSettings = !this.showSettings;
   }
 }

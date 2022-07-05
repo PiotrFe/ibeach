@@ -201,7 +201,7 @@ li {
     & > span {
       height: 30px;
       width: 90%;
-      min-width: max(2rem, 90%);
+      max-width: 60px;
       border-radius: 5px;
       display: flex;
       justify-content: center;
@@ -529,6 +529,26 @@ ul {
 
 .bi-trash {
   color: var(--bs-red);
+}
+
+.save-changes-btn {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  border-radius: 60px !important;
+  bottom: 20px;
+  right: 15px;
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  &--inactive {
+    opacity: 0.6;
+    &:hover {
+      cursor: auto;
+    }
+  }
 }
 
 // ****************

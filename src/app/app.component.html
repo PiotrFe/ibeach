@@ -21,6 +21,23 @@
 
     <div class="navbar-expand">
       <ul class="navbar-nav">
+        <li
+          *ngIf="
+            pageSection === 'ALLOCATE' ||
+            pageSection === 'SUBMIT' ||
+            pageSection === 'UPLOAD'
+          "
+          class="nav-item mr-30"
+        >
+          <button
+            class="btn btn-primary"
+            type="button"
+            [disabled]="!dataStoreService.areChangesPending"
+            (click)="saveChanges()"
+          >
+            Save work
+          </button>
+        </li>
         <div class="toolbar-group toolbar-group--center flex flex-ver-ctr">
           <calendar
             *ngIf="pageSection !== 'STATS'"
