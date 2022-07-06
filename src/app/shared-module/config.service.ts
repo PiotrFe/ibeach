@@ -1,8 +1,9 @@
-import { Injectable, OnInit } from '@angular/core';
-import { ReplaySubject, Observable } from 'rxjs';
+import { Injectable } from '@angular/core';
+import { ReplaySubject, Observable, Subscription } from 'rxjs';
 import { defaultEmailTemplate } from 'src/app/utils/defaultEmailTemplates';
 import { FetchService } from 'src/app/shared-module/fetch.service';
 import { DataStoreService } from 'src/app/shared-module/data-store.service';
+import { DataStore } from 'src/app/utils/StorageManager';
 import { IsOnlineService } from 'src/app/shared-module/is-online.service';
 
 export interface EmailTemplate {
@@ -33,6 +34,7 @@ export class ConfigService {
   _config!: Config;
   _configSubject: ReplaySubject<Config> = new ReplaySubject<Config>();
   onConfig: Observable<Config> = this._configSubject.asObservable();
+  subscription!: Subscription;
 
   constructor(
     private fetch: FetchService,
@@ -50,6 +52,11 @@ export class ConfigService {
         config.email.default = defaultEmailTemplate;
       }
       this.setConfig(config);
+      this.subscription = this.dataStoreService.storeData$.subscribe({
+        next: (data: DataStore) => {
+          this.setConfig(data.config);
+        },
+      });
     }
   }
 
@@ -62,8 +69,9 @@ export class ConfigService {
   }
 
   setConfig(config: Config) {
-    this._config = config;
-    this._configSubject.next(config);
+    const pdms = [...config.pdms].sort();
+    this._config = { ...config, pdms };
+    this._configSubject.next(this._config);
   }
 
   updateConfig(changes: ConfigChange[]) {

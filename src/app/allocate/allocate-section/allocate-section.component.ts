@@ -52,10 +52,12 @@ export class AllocateSectionComponent implements OnInit, OnDestroy {
     });
 
     this.subsciption.add(ddSubscription);
+    window.addEventListener('resize', this.onWindowResize);
   }
 
   ngOnDestroy(): void {
     this.subsciption.unsubscribe();
+    window.removeEventListener('resize', this.onWindowResize);
   }
 
   onDragHandleClick(e: any) {
@@ -89,4 +91,28 @@ export class AllocateSectionComponent implements OnInit, OnDestroy {
     document.addEventListener('pointermove', onPointerMove);
     document.addEventListener('pointerup', onPointerUp);
   }
+
+  onWindowResize = () => {
+    const currentWidth = window.innerWidth;
+    const peopleSide = this.peopleSide.nativeElement;
+    const projectSide = this.projectSide.nativeElement;
+
+    const peopleStyle = window.getComputedStyle(peopleSide);
+    const projectStyle = window.getComputedStyle(projectSide);
+    const originalPeopleWidth = parseFloat(
+      peopleStyle.getPropertyValue('width')
+    );
+    const originalProjectWidth = parseFloat(
+      projectStyle.getPropertyValue('width')
+    );
+    const originalTotalWidth = originalPeopleWidth + originalProjectWidth;
+    const peopleWidthPercent = originalPeopleWidth / originalTotalWidth;
+    const projectWidthPercent = originalProjectWidth / originalTotalWidth;
+    peopleSide.style.width = `${Math.round(
+      currentWidth * peopleWidthPercent
+    )}px`;
+    projectSide.style.width = `${Math.round(
+      currentWidth * projectWidthPercent
+    )}px`;
+  };
 }
