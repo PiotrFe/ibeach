@@ -83,6 +83,7 @@ li {
   letter-spacing: 2px;
   font-size: inherit;
   height: 40px;
+  font-size: 20px;
 }
 
 .app-logo {
@@ -1370,5 +1371,20 @@ ul {
   }
   &-20 {
     max-width: 20rem;
+  }
+}
+
+@media screen and (min-height: 850px) {
+  .content-container {
+    height: 92vh;
+  }
+
+  .people {
+    max-height: 85vh;
+  }
+
+  .people-content,
+  .project-content {
+    max-height: 80vh;
   }
 }

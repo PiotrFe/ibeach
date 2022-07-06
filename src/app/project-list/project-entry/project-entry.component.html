@@ -97,7 +97,7 @@
     [ngClass]="getFieldClasses('leadership')"
   >
     <ng-container span *ngFor="let leader of $any(entryData).leadership">
-      {{ leader | firstInitial }}
+      {{ leader.name | firstInitial }}
     </ng-container>
   </div>
   <span
