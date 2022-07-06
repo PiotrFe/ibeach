@@ -23,6 +23,9 @@
         [class.is-invalid]="isFieldInvalid('password')"
       />
     </div>
+    <div *ngIf="loginError.length" class="invalid-feedback">
+      {{ loginError }}
+    </div>
     <div class="login-btns">
       <button type="submit" class="btn btn-primary btn-app-login">Login</button>
     </div>

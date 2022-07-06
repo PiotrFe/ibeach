@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { AuthService } from 'src/app/auth/auth.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-login-page',
@@ -9,14 +11,21 @@ import { AuthService } from 'src/app/auth/auth.service';
   styleUrls: ['./login-page.component.scss'],
 })
 export class LoginPageComponent implements OnInit {
+  loginError: string = '';
   loginForm = new FormGroup({
     name: new FormControl('', [Validators.required]),
     password: new FormControl('', [Validators.required]),
   });
 
+  subscription!: Subscription;
+
   constructor(private authService: AuthService, private router: Router) {}
 
   ngOnInit(): void {}
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+  }
 
   isFieldInvalid(field: string) {
     return (
@@ -35,10 +44,20 @@ export class LoginPageComponent implements OnInit {
     const name = this.loginForm.get('name')?.value;
     const password = this.loginForm.get('password')?.value;
 
-    this.authService.login(name, password).subscribe({
-      next: (loggedIn) => {
-        if (loggedIn) {
+    this.subscription = this.authService.login(name, password).subscribe({
+      next: ({ name, authorized }: { name: string; authorized: boolean }) => {
+        if (authorized) {
           this.router.navigate(['/']);
+        }
+      },
+      error: (e: HttpErrorResponse) => {
+        console.log({
+          e,
+        });
+        if (e.status === 401) {
+          this.loginError = 'Wrong password';
+        } else {
+          this.loginError = 'Something went wrong. Please try again';
         }
       },
     });

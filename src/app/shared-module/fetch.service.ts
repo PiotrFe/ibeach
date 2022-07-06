@@ -32,9 +32,20 @@ export class FetchService {
       );
     }
 
-    return throwError(
-      () => new Error('Something went wrong. Please try again')
-    );
+    return throwError(() => error);
+
+    // return throwError(
+    //   () => new Error('Something went wrong. Please try again')
+    // );
+  }
+
+  login(name: string, password: string): Observable<any> {
+    return this.http
+      .post<any>('http://localhost:4000/auth', {
+        name,
+        password,
+      })
+      .pipe(catchError(this.handleError));
   }
 
   storeMasterList(weekOf: Date, data: any): Observable<unknown> {
