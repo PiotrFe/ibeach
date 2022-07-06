@@ -1,0 +1,30 @@
+<div class="container login-page-container">
+  <div class="login-app-logo">
+    <app-logo></app-logo>
+  </div>
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
+    <div class="mb-3">
+      <label for="name-input" class="form-label">Name</label>
+      <input
+        type="text"
+        id="name-input"
+        formControlName="name"
+        class="form-control"
+        [class.is-invalid]="isFieldInvalid('name')"
+      />
+    </div>
+    <div class="mb-3">
+      <label for="pwd-input" class="form-label">Password</label>
+      <input
+        type="password"
+        id="pwd-input"
+        formControlName="password"
+        class="form-control"
+        [class.is-invalid]="isFieldInvalid('password')"
+      />
+    </div>
+    <div class="login-btns">
+      <button type="submit" class="btn btn-primary btn-app-login">Login</button>
+    </div>
+  </form>
+</div>

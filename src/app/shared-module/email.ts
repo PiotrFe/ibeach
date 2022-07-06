@@ -1,5 +1,8 @@
 import { ElementRef } from '@angular/core';
-import { ProjectEditable } from 'src/app/project-list/project-list/project';
+import {
+  ProjectEditable,
+  LeadershipEntry,
+} from 'src/app/project-list/project-list/project';
 import { Week } from 'src/app/shared-module/week-days/week';
 import { ContactEntry } from 'src/app/utils/StorageManager';
 import { remove as removeDiacritics } from 'diacritics';
@@ -59,7 +62,7 @@ class EmailBuilder {
     const noDuplArr = Array.from(new Set(contacts));
 
     this._to = noDuplArr
-      .map((person) => getEmail(person, this.addressBook))
+      .map((entry) => getEmail(entry, this.addressBook))
       .reduce((acc, item, idx, arr) => {
         if (idx < arr.length - 1) {
           return `${acc}${item};`;
@@ -85,9 +88,9 @@ class EmailBuilder {
     return this;
   }
 
-  withCC(names: string[]) {
+  withCC(entries: string[]) {
     const ccList = Array.from(
-      new Set(names.map((name) => getEmail(name, this.addressBook)))
+      new Set(entries.map((entry) => getEmail(entry, this.addressBook)))
     );
 
     this._cc = ccList.reduce((acc, item, idx, arr) => {
@@ -98,7 +101,7 @@ class EmailBuilder {
       return `${acc}${item}`;
     }, '');
 
-    this._leadershipString = names
+    this._leadershipString = entries
       .map((entry) => entry.split(' ')[0])
       .reduce((acc, item, idx, arr): string => {
         if (idx < arr.length - 2) {
@@ -251,7 +254,7 @@ const getEmail = (name: string, addressBook: ContactEntry[]): string => {
   }
 
   if (!addressBook) {
-    return `${name.replace(' ', '_')}@email___not___found.com`;
+    return `${name.replace(' ', '_')}@EMAIL___NOT___FOUND.com`;
   }
 
   const nameCleared = removeDiacritics(name).toLowerCase();
@@ -271,7 +274,7 @@ const getEmail = (name: string, addressBook: ContactEntry[]): string => {
 
   return entry
     ? entry.email
-    : `${name.replace(' ', '_')}@email___not___found.com`;
+    : `${name.replace(' ', '_')}@EMAIL___NOT___FOUND.com`;
 };
 
 export const generateEmail = (
@@ -288,12 +291,19 @@ export const generateEmail = (
 
   const email = allocationDone
     ? emailBuilder
-        .withTo(
-          Object.values(project.week)
+        .withTo([
+          ...Object.values(project.week)
             .filter((val) => typeof val !== 'boolean')
-            .map((val) => val.text)
+            .map((val) => val.text),
+          ...project.leadership
+            .filter((entry) => entry.mainContact)
+            .map((entry) => entry.name),
+        ])
+        .withCC(
+          project.leadership
+            .filter((entry) => !entry.mainContact)
+            .map((entry) => entry.name)
         )
-        .withCC(project.leadership)
         .withClient(project.client)
         .withProjectType(project.type)
         .withDays(project.week)
@@ -301,7 +311,16 @@ export const generateEmail = (
         .withBody(emailTemplate, true)
         .build()
     : emailBuilder
-        .withTo(project.leadership)
+        .withTo(
+          project.leadership
+            .filter((entry) => entry.mainContact)
+            .map((entry) => entry.name)
+        )
+        .withCC(
+          project.leadership
+            .filter((entry) => !entry.mainContact)
+            .map((entry) => entry.name)
+        )
         .withClient(project.client)
         .withProjectType(project.type)
         .withSubject(emailTemplate?.subject)

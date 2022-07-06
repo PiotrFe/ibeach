@@ -108,6 +108,7 @@ export class ProjectEntryComponent extends EntryComponent implements OnInit {
   }
 
   handleGenerateEmail() {
+    this.dataStoreService.monitorNavigation = false;
     generateEmail(
       this.entryData as ProjectEditable,
       this.entryContainer,

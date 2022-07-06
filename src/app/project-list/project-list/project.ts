@@ -4,6 +4,11 @@ import { TypeaheadService } from 'src/app/shared-module/typeahead.service';
 import { Week } from 'src/app/shared-module/week-days/week';
 import { Tag } from 'src/app/shared-module/entry/entry.component';
 
+export type LeadershipEntry = {
+  name: string;
+  mainContact: boolean;
+};
+
 export interface Project {
   id: string;
   client: string;
@@ -11,7 +16,7 @@ export interface Project {
   availDate?: Date;
   week: Week;
   daysLeft: number;
-  leadership: string[];
+  leadership: LeadershipEntry[];
   comments?: string;
   tags: Tag[];
 }

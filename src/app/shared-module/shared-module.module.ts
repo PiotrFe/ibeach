@@ -16,6 +16,7 @@ import { FirstInitialPipe } from './first-initial.pipe';
 import { ProjectNamePipe } from './project-name.pipe';
 import { Max25charsPipe } from './max25chars.pipe';
 import { ArrayToListPipe } from './array-to-list.pipe';
+import { AppLogoComponent } from './app-logo/app-logo.component';
 
 @NgModule({
   declarations: [
@@ -31,6 +32,7 @@ import { ArrayToListPipe } from './array-to-list.pipe';
     ProjectNamePipe,
     Max25charsPipe,
     ArrayToListPipe,
+    AppLogoComponent,
   ],
   imports: [
     CommonModule,
@@ -53,6 +55,7 @@ import { ArrayToListPipe } from './array-to-list.pipe';
     EntryComponent,
     Max25charsPipe,
     ArrayToListPipe,
+    AppLogoComponent,
   ],
   providers: [BsModalRef],
 })

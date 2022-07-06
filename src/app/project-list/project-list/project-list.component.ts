@@ -30,6 +30,7 @@ import { PageComponent } from 'src/app/shared-module/page/page.component';
 import { DataStore, WeeklyProjectList } from 'src/app/utils/StorageManager';
 
 import {
+  LeadershipEntry,
   Project,
   ProjectEditable,
 } from 'src/app/project-list/project-list/project';
@@ -310,7 +311,17 @@ export class ProjectListComponent
         comments,
         availDate,
         daysLeft: getDaysLeft(week),
-        leadership,
+        leadership: leadership.map<LeadershipEntry>((str) =>
+          str.match(/\*/i)
+            ? {
+                name: str,
+                mainContact: true,
+              }
+            : {
+                name: str,
+                mainContact: false,
+              }
+        ),
         week,
         tags,
         inEditMode: false,
@@ -356,7 +367,17 @@ export class ProjectListComponent
       inEditMode: false,
       daysLeft: getDaysLeft(week),
       tags,
-      leadership,
+      leadership: leadership.map<LeadershipEntry>((str) =>
+        str.match(/\*/i)
+          ? {
+              name: str,
+              mainContact: true,
+            }
+          : {
+              name: str,
+              mainContact: false,
+            }
+      ),
     };
 
     const entryIndex: number = existing

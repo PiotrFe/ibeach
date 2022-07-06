@@ -1,0 +1,25 @@
+.login-page-container {
+  max-width: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-top: 15vh;
+}
+
+.login-app-logo {
+  font-size: 30px;
+  height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn-app-login {
+  width: 100px;
+}
+
+.login-btns {
+  display: flex;
+  justify-content: center;
+  margin-top: 40px;
+}

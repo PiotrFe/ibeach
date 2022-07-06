@@ -20,6 +20,7 @@ import { WeeklyData } from 'src/app/shared-module/fetch.service';
 export class DataStoreService {
   dataStoreManager!: StoreManager;
   #dataStoreSubject: Subject<DataStore> = new Subject<DataStore>();
+  monitorNavigation: boolean = true;
   storeData$ = this.#dataStoreSubject.asObservable();
 
   constructor() {
@@ -30,10 +31,12 @@ export class DataStoreService {
   init() {
     window.addEventListener('beforeunload', (e) => {
       e.preventDefault();
-      console.log(this.areChangesPending);
-      if (this.areChangesPending) {
+      if (this.monitorNavigation && this.areChangesPending) {
         return (e.returnValue = 'Are you sure you want to exit?');
       }
+      // monitoring navigation gets suspended when the user clicks on the link to generate email;
+      // beforeunload should be ignored in such cases, but set right back to true after the listener has run
+      this.monitorNavigation = true;
 
       return null;
     });

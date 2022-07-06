@@ -1,22 +1,7 @@
-<link
-  href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css"
-  rel="stylesheet"
-  crossorigin="anonymous"
-  integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We"
-/>
-<link
-  rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css"
-/>
-<link
-  rel="stylesheet"
-  href="https://unpkg.com/ngx-bootstrap/datepicker/bs-datepicker.css"
-/>
-
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
   <div class="container-fluid">
-    <div class="navbar-brand app-logo" href="#">
-      <i>i</i>Beach <img class="app-logo-icon" src="../assets/beach-icon.png" />
+    <div class="navbar-brand" href="#">
+      <app-logo></app-logo>
     </div>
 
     <div class="navbar-expand">
@@ -128,8 +113,5 @@
     [referenceDate]="referenceDate"
   ></allocate-section>
   <stats-section *ngIf="pageSection === 'STATS'"></stats-section>
-  <select-datastore-page
-    *ngIf="dataStoreService.hasActiveDataStore"
-  ></select-datastore-page>
 </div>
 <settings *ngIf="showSettings" (closeEvent)="closeSettings()"></settings>

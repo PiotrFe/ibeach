@@ -13,7 +13,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { EntryComponent } from 'src/app/shared-module/entry/entry.component';
 import { TypeaheadService } from 'src/app/shared-module/typeahead.service';
 
-import { Project } from '../project-list/project';
+import { LeadershipEntry, Project } from '../project-list/project';
 import { Tag } from 'src/app/shared-module/entry/entry.component';
 import {
   getWeekDayDate,
@@ -85,18 +85,20 @@ export class ProjectEntryFormComponent
         availDate: availDate || this.referenceDate,
         leadership: !leadership.length
           ? ''
-          : leadership.reduce(
+          : leadership.reduce<string>(
               (
                 acc: string,
-                elem: string,
+                elem: LeadershipEntry,
                 idx: number,
-                arr: string[]
-              ): string => {
+                arr: LeadershipEntry[]
+              ) => {
+                let str = `${acc} ${elem.name}`;
+
                 if (idx < arr.length - 1) {
-                  return `${acc} ${elem}, `;
+                  return `${str}, `;
                 }
 
-                return `${acc} ${elem}`;
+                return `${str}`;
               },
               ''
             ),

@@ -38,7 +38,6 @@ export class SettingsComponent implements OnInit, OnDestroy {
     msg: '',
   };
 
-  configChanges: ConfigChange[] = [];
   email!: EmailConfig;
   emailForm = new FormGroup({
     subject: new FormControl(''),
@@ -112,17 +111,8 @@ export class SettingsComponent implements OnInit, OnDestroy {
     if (!configChange) {
       return;
     }
-    this.configChanges.push(configChange);
-    this._updateLocalView(configChange);
-  }
 
-  closeSettings(submit: any): void {
-    if (submit && this.configChanges.length) {
-      this.configService.updateConfig(this.configChanges);
-      this.configChanges = [];
-    }
-
-    this.closeEvent.emit();
+    this.configService.updateConfig([configChange]);
   }
 
   displayInputModal(showType: string): void {

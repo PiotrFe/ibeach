@@ -4,7 +4,10 @@ import {
   EmailTemplate,
 } from 'src/app/shared-module/config.service';
 import { Person } from 'src/app/people-list/person';
-import { Project } from 'src/app/project-list/project-list/project';
+import {
+  Project,
+  LeadershipEntry,
+} from 'src/app/project-list/project-list/project';
 import { WeeklyData } from 'src/app/shared-module/fetch.service';
 import { link } from 'fs';
 

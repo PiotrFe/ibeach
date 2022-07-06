@@ -81,13 +81,11 @@ li {
 .app-logo {
   display: flex;
   letter-spacing: 2px;
-  & > i {
-    margin-right: 1.3px;
-  }
+  font-size: inherit;
 }
 
 .app-logo-icon {
-  height: 30px;
+  height: 100%;
   margin-left: 5px;
 }
 
