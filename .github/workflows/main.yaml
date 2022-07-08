@@ -10,7 +10,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [10.x, 12.x]
+        node-version: [12.x]
 
     steps:
       - uses: actions/checkout@v2
@@ -35,10 +35,34 @@ jobs:
 
       - name: Install Dependencies
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-        run: npm ci
+        run: |
+          npm ci
 
       - name: Build
-        run: npm run build -- --prod
+        run: |
+          npm run build -- --prod
 
       - name: Lint
-        run: npm run lint
+        run: |
+          npm run lint
+
+      - name: Conventional Changelog Action
+        id: changelog
+        uses: TriPSs/conventional-changelog-action@v3
+        with:
+          github-token: $
+          output-file: "false"
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        if: ${{ steps.changelog.outputs.skipped == 'false' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB_ACTION }}
+        with:
+          tag_name: ${{ steps.changelog.outputs.tag }}
+          release_name: ${{ steps.changelog.outputs.tag }}
+          body: ${{ steps.changelog.outputs.clean_changelog }}
+
+      - name: Deploy
+        run: |
+          npm run deploy
