@@ -7,7 +7,7 @@ import { AllocationEntry } from 'src/app/shared-module/allocate.service';
 import { Config, ConfigChange } from 'src/app/shared-module/config.service';
 import { StatsEntry } from 'src/app/stats/stats-entry/stats-entry.component';
 
-export const baseUrl = 'https://piotrfe.github.io/ibeach';
+export const baseUrl = 'https://ibeach-api.herokuapp.com';
 // export const baseUrl = 'http://localhost:3000';
 
 export interface WeeklyData {
