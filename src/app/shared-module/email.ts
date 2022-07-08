@@ -68,19 +68,21 @@ class EmailBuilder {
         return `${acc}${item}`;
       }, '');
 
-    this._firstNameString = noDuplArr.reduce((acc, item, idx, arr): string => {
-      const fName = item.split(' ')[0];
+    this._firstNameString = noDuplArr
+      .filter((name) => !name.includes('*'))
+      .reduce((acc, item, idx, arr): string => {
+        const fName = item.split(' ')[0];
 
-      if (idx < arr.length - 2) {
-        return `${acc}${fName}, `;
-      }
+        if (idx < arr.length - 2) {
+          return `${acc}${fName}, `;
+        }
 
-      if (idx === arr.length - 2) {
-        return `${acc}${fName} and `;
-      }
+        if (idx === arr.length - 2) {
+          return `${acc}${fName} and `;
+        }
 
-      return `${acc}${fName}`;
-    }, '');
+        return `${acc}${fName}`;
+      }, '');
 
     return this;
   }
@@ -184,7 +186,7 @@ class EmailBuilder {
   withBody(emailBody: EmailTemplate | undefined, withAllocation: boolean) {
     const generateBody = () => {
       if (withAllocation) {
-        const body = emailBody!.content
+        let body = emailBody!.content
           .replace(/\[FIRST\]/g, `${this._firstNameString}`)
           .replace(/\[CST\]/g, `${this._leadershipString}`)
           .replace(/\[TYPE\]/g, `${this._projectType}`)
@@ -198,6 +200,18 @@ class EmailBuilder {
             `${this._calString ? `${this._calString}` : ''}` // fallback replace if a user removes spaces under settings
           );
 
+        console.log({
+          calStr: this._calString,
+          body,
+        });
+
+        if (this._calString) {
+          console.log({
+            calString: this._calString,
+            body,
+          });
+          body = body.replace('Monday to Friday', 'as per below');
+        }
         this._body = encodeWhitespaces(body);
       } else {
         const body = emailBody!.contentNoAllocation

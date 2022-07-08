@@ -69,6 +69,10 @@ export class DataStoreService {
     return this.dataStoreManager.getEmptyStore();
   }
 
+  getLookupTable(): Person[] {
+    return this.dataStoreManager.dataStore.lookup;
+  }
+
   getPeopleList(week: Date): WeeklyPeopleList {
     return this.dataStoreManager.getPeopleList(week);
   }

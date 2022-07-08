@@ -181,6 +181,7 @@ export class PeopleListComponent
           this.dataSet = this.parseAndSortPeopleData(people);
           this.updateFilteredView();
           this.lastDataUpdateTs = peopleUpdatedAtTs;
+          this.updateLookupTable();
           this.onFetchCompleted();
         }
       },
@@ -404,6 +405,13 @@ export class PeopleListComponent
     this.updateFilteredView();
   }
 
+  updateLookupTable() {
+    this.typeaheadService.storeLookupList(
+      this.typeaheadService.tableTypes.People,
+      this.dataStoreService.getLookupTable()
+    );
+  }
+
   updatePersonDetails(objParam: {
     id: string;
     name: string;
@@ -494,23 +502,17 @@ export class PeopleListComponent
       data: this.dataSet as PersonEditable[],
       weekOf: this.referenceDate,
     });
+    this.updateLookupTable();
   }
 
   _onWeeklyData(data: WeeklyData) {
-    const { people, statusSummary, lookupTable } = data;
+    const { people, statusSummary } = data;
 
     this.dataSet = this.parseAndSortPeopleData(people);
 
     // [Comment applying to online mode only]
     // lookup table only sent on first fetch, where pdm not provided as parameter
     // if pdm provided as a parameter, he/she cancelled changes and is fetching the old list from server
-
-    if (lookupTable) {
-      this.typeaheadService.storeLookupList(
-        this.typeaheadService.tableTypes.People,
-        lookupTable
-      );
-    }
 
     this.status = statusSummary;
     this.updateStatusLabel();
