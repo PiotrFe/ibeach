@@ -10,6 +10,7 @@ enum TableTypes {
 enum Fields {
   Name,
   Tag,
+  Stats,
 }
 
 @Injectable({
@@ -21,6 +22,10 @@ export class TypeaheadService {
 
   tableTypes = TableTypes;
   fields = Fields;
+
+  constructor() {
+    this._tagList = getAvailableTags();
+  }
 
   storeLookupList(type: TableTypes, list: any): void {
     if (type === TableTypes.People) {
@@ -42,6 +47,11 @@ export class TypeaheadService {
     if (field === Fields.Tag) {
       return this._getTagTypeahead(dataSet);
     }
+
+    if (field === Fields.Stats) {
+      return this._getStatsTypeahead(dataSet);
+    }
+
     return [];
   }
 
@@ -89,8 +99,8 @@ export class TypeaheadService {
     return this._tagList.map((tag) => tag.value);
   }
 
-  constructor() {
-    this._tagList = getAvailableTags();
+  _getStatsTypeahead(data: any): string[] {
+    return [];
   }
 }
 

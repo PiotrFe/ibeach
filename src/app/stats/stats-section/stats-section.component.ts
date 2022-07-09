@@ -7,49 +7,25 @@ import {
   ElementRef,
   ViewChild,
 } from '@angular/core';
-import { fromEvent, Observable, Subscription, debounceTime, pipe } from 'rxjs';
+import {
+  fromEvent,
+  Observable,
+  Subscription,
+  debounceTime,
+  pipe,
+  startWith,
+  distinctUntilChanged,
+  switchMap,
+  map,
+  tap,
+} from 'rxjs';
 import { DataStoreService } from 'src/app/shared-module/data-store.service';
 import { FetchService } from 'src/app/shared-module/fetch.service';
 import { Filter } from 'src/app/shared-module/page/page.component';
 import { IsOnlineService } from 'src/app/shared-module/is-online.service';
 import { StatsEntry } from 'src/app/stats/stats-entry/stats-entry.component';
 import { SortService } from 'src/app/utils/sortService';
-
-const testData = [
-  {
-    client: 'Abba',
-    days: {
-      asked: 10,
-      got: 6,
-    },
-    tags: ['ls', 'org'],
-    leadership: [],
-  },
-  {
-    client: 'Chinese',
-    days: {
-      asked: 100,
-      got: 5,
-    },
-    tags: [],
-  },
-  {
-    client: 'Bolonese',
-    days: {
-      asked: 100,
-      got: 5,
-    },
-    tags: [],
-  },
-  {
-    client: 'Dalmatene',
-    days: {
-      asked: 20,
-      got: 20,
-    },
-    tags: [],
-  },
-];
+import { TypeaheadService } from 'src/app/shared-module/typeahead.service';
 
 @Component({
   selector: 'stats-section',
@@ -57,7 +33,7 @@ const testData = [
   styleUrls: ['./stats-section.component.scss'],
 })
 export class StatsSectionComponent implements OnInit, OnDestroy, AfterViewInit {
-  @ViewChild('searchBar') searchBar!: ElementRef;
+  @ViewChild('searchInput') searchInput!: ElementRef;
   dateRange!: [Date, Date];
   entries: StatsEntry[] = [];
   fetchError!: string;
@@ -68,51 +44,42 @@ export class StatsSectionComponent implements OnInit, OnDestroy, AfterViewInit {
   showCSTHeader: boolean = false;
   sortService: SortService = new SortService();
   splitByCST: boolean = false;
+  typeaheadList: any[] = [];
 
   constructor(
     private dataStoreService: DataStoreService,
     private fetchService: FetchService,
-    private isOnlineService: IsOnlineService
+    private isOnlineService: IsOnlineService,
+    private typeaheadService: TypeaheadService
   ) {}
 
-  ngOnInit(): void {
-    this.entries = this.sortService.applyCurrentSort(testData);
-  }
+  ngOnInit(): void {}
 
   ngAfterViewInit(): void {
-    this.searchSubscription = fromEvent<InputEvent>(
-      this.searchBar.nativeElement,
+    this.searchSubscription = fromEvent<any>(
+      this.searchInput.nativeElement,
       'input'
     )
-      .pipe(debounceTime(600))
-      .subscribe({
-        next: (e: InputEvent) => {
-          const { value } = e.target as HTMLInputElement;
-          console.log(value);
-        },
-      });
+      .pipe(
+        tap(() => (this.typeaheadList = [])),
+        map((e) => e.target.value),
+        startWith(''),
+        debounceTime(500),
+        distinctUntilChanged()
+      )
+      .pipe(
+        switchMap((text) =>
+          this.typeaheadService.getTypeahead(
+            this.typeaheadService.fields.Stats,
+            text
+          )
+        )
+      )
+      .subscribe();
   }
 
   ngOnDestroy(): void {
     this.searchSubscription.unsubscribe();
-  }
-
-  handleSort(colName: string) {
-    this.entries = this.sortService.sortData(this.entries, colName);
-    this.updateFilteredView();
-  }
-
-  onDateRangeChange(event: any): void {
-    this.dateRange = event as [Date, Date];
-  }
-
-  onSubmit(): void {
-    this.fetching = true;
-    if (this.isOnlineService.isOnline) {
-      this.#fetchFromOnlineStore();
-    } else {
-      this.#fetchFromOfflineStore();
-    }
   }
 
   #fetchFromOnlineStore() {
@@ -155,10 +122,6 @@ export class StatsSectionComponent implements OnInit, OnDestroy, AfterViewInit {
     this.fetching = false;
   }
 
-  updateFilteredView(): void {
-    this.filteredEntries = this.getFilteredView(this.entries);
-  }
-
   getFilteredView(data: any[]): any[] {
     if (!this.filters.length) {
       return data;
@@ -186,7 +149,29 @@ export class StatsSectionComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
+  handleSort(colName: string) {
+    this.entries = this.sortService.sortData(this.entries, colName);
+    this.updateFilteredView();
+  }
+
+  onDateRangeChange(event: any): void {
+    this.dateRange = event as [Date, Date];
+  }
+
+  onSubmit(): void {
+    this.fetching = true;
+    if (this.isOnlineService.isOnline) {
+      this.#fetchFromOnlineStore();
+    } else {
+      this.#fetchFromOfflineStore();
+    }
+  }
+
   updateCSTView(e: any): void {
     this.splitByCST = e.target.checked;
+  }
+
+  updateFilteredView(): void {
+    this.filteredEntries = this.getFilteredView(this.entries);
   }
 }
