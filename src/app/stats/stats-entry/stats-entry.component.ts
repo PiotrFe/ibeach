@@ -20,7 +20,16 @@ export class StatsEntryComponent implements OnInit {
   @Input() entry!: StatsEntry;
   @Input() sortField!: string;
 
+  ratioColor!: number;
+
   constructor() {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    if (!this.entry) {
+      return;
+    }
+    this.ratioColor = Math.floor(
+      (this.entry.days.got / this.entry.days.asked) * 10
+    );
+  }
 }

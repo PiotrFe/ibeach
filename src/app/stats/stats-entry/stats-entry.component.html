@@ -29,7 +29,9 @@
       class="section stats-entry--figures"
       [class.sorted]="sortField === 'ratio'"
     >
-      {{ (entry?.days)!.got / (entry?.days)!.asked | percent }}
+      <span [ngClass]="'allocation-ratio allocation-ratio--' + ratioColor">
+        {{ (entry?.days)!.got / (entry?.days)!.asked | percent }}
+      </span>
     </div>
   </div>
   <div class="stats-entry--chart section section-chart">

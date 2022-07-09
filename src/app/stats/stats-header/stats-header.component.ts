@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { HeaderComponent } from 'src/app/shared-module/header/header.component';
 
 @Component({
@@ -7,5 +7,6 @@ import { HeaderComponent } from 'src/app/shared-module/header/header.component';
   styleUrls: ['./stats-header.component.scss'],
 })
 export class StatsHeaderComponent extends HeaderComponent implements OnInit {
+  @Input() withTeam: boolean = false;
   ngOnInit(): void {}
 }

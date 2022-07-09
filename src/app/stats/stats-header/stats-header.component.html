@@ -10,6 +10,9 @@
     ></i>
     <i *ngIf="getSort('name', -1)" class="bi bi-sort-up fs-085 ptop-3 ml-2"></i>
   </div>
+  <div *ngIf="withTeam" class="section section-cst header-entry mr-12 pl-3">
+    Leadership
+  </div>
   <div class="section section-allocation header-entry mr-12 pl-3 clickable">
     <div class="stats-entry--figures" (click)="handleClick('got')">
       Got

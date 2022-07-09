@@ -193,6 +193,11 @@ li {
     font-weight: 700;
   }
 
+  &-cst {
+    width: 15%;
+    min-width: max(5.5rem, 15%);
+  }
+
   &-skill,
   &-type {
     width: 7%;
@@ -238,7 +243,7 @@ li {
         //   rgba(255, 193, 7, 0.1),
         //   rgba(255, 193, 7, 0.4)
         // );
-        background-color: rgba(255, 193, 7, 0.8);
+        background-color: rgba(255, 193, 7, 0.6);
       }
     }
 
@@ -337,7 +342,7 @@ li {
     max-width: 20rem;
     display: flex;
     height: 100%;
-    justify-content: center;
+    justify-content: space-around;
     align-items: center;
   }
 
@@ -356,11 +361,69 @@ li {
     font-size: 1.1rem;
   }
 
+  &--cst {
+    width: 15%;
+    min-width: max(5.5rem, 15%);
+  }
+
   &--figures {
     display: flex;
     width: 100%;
     justify-content: center;
     align-items: center;
+    width: 60px;
+  }
+}
+
+.allocation-ratio {
+  padding: 5px;
+  width: 50px;
+
+  text-align: center;
+  border-radius: 5px;
+
+  &--10 {
+    background-color: rgba(13, 110, 253, 1);
+  }
+
+  &--9 {
+    background-color: rgba(13, 110, 253, 0.93);
+  }
+
+  &--8 {
+    background-color: rgba(13, 110, 253, 0.85);
+  }
+
+  &--7 {
+    background-color: rgba(13, 110, 253, 0.78);
+  }
+
+  &--6 {
+    background-color: rgba(13, 110, 253, 0.65);
+  }
+
+  &--5 {
+    background-color: rgba(13, 110, 253, 0.58);
+  }
+
+  &--4 {
+    background-color: rgba(13, 110, 253, 0.45);
+  }
+
+  &--3 {
+    background-color: rgba(13, 110, 253, 0.38);
+  }
+
+  &--2 {
+    background-color: rgba(13, 110, 253, 0.25);
+  }
+
+  &--1 {
+    background-color: rgba(13, 110, 253, 0.18);
+  }
+
+  &--0 {
+    background-color: rgba(13, 110, 253, 0.15);
   }
 }
 
@@ -709,9 +772,10 @@ ul {
 }
 
 .btn-primary--light {
-  background-color: rgba(13, 110, 253, 0.75) !important;
-  border-color: rgba(13, 110, 253, 0.75) !important;
+  background-color: rgba(0, 55, 55, 0.55) !important;
+  border-color: rgba(0, 55, 55, 0.55) !important;
   font-size: 0.88rem !important;
+  border: none;
 
   &-printable {
     background-color: var(--bs-gray-400) !important;

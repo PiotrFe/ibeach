@@ -1,10 +1,11 @@
-import { Subject } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { Config, ConfigChange } from 'src/app/shared-module/config.service';
 import {
   ContactEntry,
   DataStore,
   DataStoreManager,
+  getEmptyStore,
   StoreManager,
   WeeklyPeopleList,
   WeeklyProjectList,
@@ -20,7 +21,8 @@ import { WeeklyData } from 'src/app/shared-module/fetch.service';
 })
 export class DataStoreService {
   dataStoreManager!: StoreManager;
-  #dataStoreSubject: Subject<DataStore> = new Subject<DataStore>();
+  #dataStoreSubject: BehaviorSubject<DataStore> =
+    new BehaviorSubject<DataStore>(getEmptyStore());
   monitorNavigation: boolean = true;
   storeData$ = this.#dataStoreSubject.asObservable();
 

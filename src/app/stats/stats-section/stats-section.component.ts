@@ -23,7 +23,7 @@ const testData = [
       got: 6,
     },
     tags: ['ls', 'org'],
-    leadership: ['andreas patz'],
+    leadership: [],
   },
   {
     client: 'Chinese',
@@ -65,9 +65,9 @@ export class StatsSectionComponent implements OnInit, OnDestroy, AfterViewInit {
   filters: Filter[] = [];
   filteredEntries: StatsEntry[] = this.entries;
   searchSubscription!: Subscription;
+  showCSTHeader: boolean = false;
   sortService: SortService = new SortService();
   splitByCST: boolean = false;
-  withTags: boolean = false;
 
   constructor(
     private dataStoreService: DataStoreService,
@@ -116,28 +116,27 @@ export class StatsSectionComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   #fetchFromOnlineStore() {
-    this.fetchService
-      .fetchHistory(this.dateRange, this.splitByCST, this.withTags)
-      .subscribe({
-        next: (data) => {
-          const entries = Object.entries(data).map(([client, data]) => {
-            const { days } = data;
-            return {
-              client,
-              days,
-            } as StatsEntry;
-          });
+    this.fetchService.fetchHistory(this.dateRange, this.splitByCST).subscribe({
+      next: (data) => {
+        const entries = Object.entries(data).map(([client, data]) => {
+          const { days } = data;
+          return {
+            client,
+            days,
+          } as StatsEntry;
+        });
 
-          this.entries = this.sortService.applyCurrentSort(entries);
-        },
-        error: (err) => {
-          this.fetchError = err;
-          this.fetching = false;
-        },
-        complete: () => {
-          this.fetching = false;
-        },
-      });
+        this.entries = this.sortService.applyCurrentSort(entries);
+        this.showCSTHeader = this.splitByCST;
+      },
+      error: (err) => {
+        this.fetchError = err;
+        this.fetching = false;
+      },
+      complete: () => {
+        this.fetching = false;
+      },
+    });
   }
 
   #fetchFromOfflineStore() {
@@ -152,6 +151,7 @@ export class StatsSectionComponent implements OnInit, OnDestroy, AfterViewInit {
     );
 
     this.entries = this.sortService.applyCurrentSort(data);
+    this.showCSTHeader = this.splitByCST;
     this.fetching = false;
   }
 
@@ -188,9 +188,5 @@ export class StatsSectionComponent implements OnInit, OnDestroy, AfterViewInit {
 
   updateCSTView(e: any): void {
     this.splitByCST = e.target.checked;
-  }
-
-  updateTags(e: any): void {
-    this.withTags = e.target.checked;
   }
 }

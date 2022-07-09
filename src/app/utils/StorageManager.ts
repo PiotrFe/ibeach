@@ -52,6 +52,36 @@ export interface DataStore {
   contacts: ContactEntry[];
 }
 
+const getDefaultConfig = () => ({
+  pdms: [],
+  email: {
+    current: {
+      subject: '',
+      content: '',
+      contentNoAllocation: '',
+    },
+    default: {
+      subject: '',
+      content: '',
+      contentNoAllocation: '',
+    },
+  },
+});
+
+export const getEmptyStore = () => ({
+  master: { updatedAtTs: 0 },
+  people: {
+    updatedAtTs: 0,
+  },
+  projects: {
+    updatedAtTs: 0,
+  },
+  config: getDefaultConfig(),
+  lookup: [],
+  contacts: [],
+  updatedAtTs: 0,
+});
+
 export interface StoreManager {
   dataStore: DataStore;
   dataStoreError: string | undefined;
@@ -97,21 +127,7 @@ export class DataStoreManager implements StoreManager {
   }
 
   #getDefaultConfig(): Config {
-    return {
-      pdms: [],
-      email: {
-        current: {
-          subject: '',
-          content: '',
-          contentNoAllocation: '',
-        },
-        default: {
-          subject: '',
-          content: '',
-          contentNoAllocation: '',
-        },
-      },
-    };
+    return getDefaultConfig();
   }
 
   // **************************
@@ -209,10 +225,6 @@ export class DataStoreManager implements StoreManager {
           ? []
           : client.split('--')[1].split(NAME_BREAK);
 
-        console.log({
-          client,
-          leadership,
-        });
         return {
           client: clientName,
           days: {
@@ -235,20 +247,7 @@ export class DataStoreManager implements StoreManager {
   }
 
   getEmptyStore() {
-    // const ts = Date.now();
-    return {
-      master: { updatedAtTs: 0 },
-      people: {
-        updatedAtTs: 0,
-      },
-      projects: {
-        updatedAtTs: 0,
-      },
-      config: this.#getDefaultConfig(),
-      lookup: [],
-      contacts: [],
-      updatedAtTs: 0,
-    };
+    return getEmptyStore();
   }
 
   getPeopleList(week: Date): WeeklyPeopleList {
