@@ -1,6 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Tag } from 'src/app/shared-module/entry/entry.component';
-import { LeadershipEntry } from 'src/app/project-list/project-list/project';
 
 export interface StatsEntry {
   client: string;
@@ -8,8 +7,8 @@ export interface StatsEntry {
     asked: number;
     got: number;
   };
+  leadership: string[];
   tags?: Tag[];
-  leadership?: LeadershipEntry[];
 }
 
 @Component({

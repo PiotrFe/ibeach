@@ -15,7 +15,11 @@
     class="form-control no-select"
     [class.data-entry-input]="isSmall"
     bsDatepicker
-    [bsConfig]="{ isAnimated: true, dateInputFormat: 'DD-MMM-YYYY' }"
+    [bsConfig]="{
+      isAnimated: true,
+      dateInputFormat: 'DD-MMM-YYYY',
+      containerClass: 'theme-default'
+    }"
     [formControl]="displayDate"
     [isDisabled]="disabled"
     [class.is-invalid]="showError"
@@ -34,7 +38,8 @@
     ([ngModel])="(bsRangeValue)"
     [bsConfig]="{
       isAnimated: true,
-      rangeInputFormat: 'DD-MMM-YY'
+      rangeInputFormat: 'DD-MMM-YY',
+      containerClass: 'theme-default'
     }"
     (bsValueChange)="onRangeChange($event)"
   />

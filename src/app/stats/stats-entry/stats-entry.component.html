@@ -4,6 +4,14 @@
     [class.sorted]="sortField === 'name'"
     >{{ entry?.client }}</span
   >
+  <div
+    *ngIf="entry?.leadership?.length"
+    class="stats-entry--cst section section-cst"
+  >
+    <ng-container span *ngFor="let leader of $any(entry).leadership">
+      {{ leader | firstInitial }}
+    </ng-container>
+  </div>
   <div class="stats-entry--allocation section section-allocation">
     <div
       class="section stats-entry--figures"

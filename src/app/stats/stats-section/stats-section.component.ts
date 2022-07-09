@@ -23,12 +23,7 @@ const testData = [
       got: 6,
     },
     tags: ['ls', 'org'],
-    leadership: [
-      {
-        name: 'andreas patz',
-        mainContact: true,
-      },
-    ],
+    leadership: ['andreas patz'],
   },
   {
     client: 'Chinese',
@@ -71,7 +66,7 @@ export class StatsSectionComponent implements OnInit, OnDestroy, AfterViewInit {
   filteredEntries: StatsEntry[] = this.entries;
   searchSubscription!: Subscription;
   sortService: SortService = new SortService();
-  withCSTView: boolean = false;
+  splitByCST: boolean = false;
   withTags: boolean = false;
 
   constructor(
@@ -122,7 +117,7 @@ export class StatsSectionComponent implements OnInit, OnDestroy, AfterViewInit {
 
   #fetchFromOnlineStore() {
     this.fetchService
-      .fetchHistory(this.dateRange, this.withCSTView, this.withTags)
+      .fetchHistory(this.dateRange, this.splitByCST, this.withTags)
       .subscribe({
         next: (data) => {
           const entries = Object.entries(data).map(([client, data]) => {
@@ -152,7 +147,8 @@ export class StatsSectionComponent implements OnInit, OnDestroy, AfterViewInit {
 
     const data = this.dataStoreService.getAllocationHistory(
       this.dateRange[0],
-      this.dateRange[1]
+      this.dateRange[1],
+      this.splitByCST
     );
 
     this.entries = this.sortService.applyCurrentSort(data);
@@ -191,7 +187,7 @@ export class StatsSectionComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   updateCSTView(e: any): void {
-    this.withCSTView = e.target.checked;
+    this.splitByCST = e.target.checked;
   }
 
   updateTags(e: any): void {

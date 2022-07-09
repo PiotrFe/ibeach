@@ -145,6 +145,7 @@ export class DataStoreManager implements StoreManager {
     splitByCST: boolean = false,
     splitByTags: boolean = false
   ): StatsEntry[] {
+    const NAME_BREAK = '[nbr]';
     const fromTS = from.getTime();
     const toTS = to.getTime();
     const { updatedAtTs, ...projectEntries } = this.dataStore.projects;
@@ -161,7 +162,7 @@ export class DataStoreManager implements StoreManager {
       })
       .flatMap(([key, projectArr]) => projectArr)
       .reduce((acc: any, project) => {
-        const { client, week, daysLeft } = project as Project;
+        const { client, week, daysLeft, leadership } = project as Project;
 
         const daysAllocated = Object.values(week).reduce((acc: number, val) => {
           if (typeof val !== 'boolean') {
@@ -171,23 +172,55 @@ export class DataStoreManager implements StoreManager {
           return acc;
         }, 0);
 
+        const clientKey = !splitByCST
+          ? client
+          : `${client}--${leadership
+              .filter((entry) => entry.mainContact)
+              .sort((a, b) => {
+                const nameA = a.name.toUpperCase();
+                const nameB = b.name.toUpperCase();
+
+                if (nameA < nameB) {
+                  return -1;
+                }
+                if (nameA > nameB) {
+                  return 1;
+                }
+
+                return 0;
+              })
+              .map((entry) => entry.name.replace('*', ''))
+              .join(NAME_BREAK)}`;
+
         return {
           ...acc,
-          [client]: {
-            ...(acc[client] || {}),
-            asked: acc[client]?.asked || 0 + daysAllocated + daysLeft,
-            got: acc[client]?.got || 0 + daysAllocated,
+          [clientKey]: {
+            ...(acc[clientKey] || {}),
+            asked: (acc[clientKey]?.asked || 0) + daysAllocated + daysLeft,
+            got: (acc[clientKey]?.got || 0) + daysAllocated,
           },
         };
       }, {});
 
     const statsEntryArr: StatsEntry[] = Object.entries(projectMap).map(
-      ([client, entry]) => ({
-        client,
-        days: {
-          ...entry,
-        },
-      })
+      ([client, entry]) => {
+        const clientName = !splitByCST ? client : client.split('--')[0];
+        const leadership = !splitByCST
+          ? []
+          : client.split('--')[1].split(NAME_BREAK);
+
+        console.log({
+          client,
+          leadership,
+        });
+        return {
+          client: clientName,
+          days: {
+            ...entry,
+          },
+          leadership,
+        };
+      }
     );
 
     return statsEntryArr;
