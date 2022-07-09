@@ -12,6 +12,7 @@ import {
 
 import { Person } from 'src/app/people-list/person';
 import { Project } from 'src/app/project-list/project-list/project';
+import { StatsEntry } from 'src/app/stats/stats-entry/stats-entry.component';
 import { WeeklyData } from 'src/app/shared-module/fetch.service';
 
 @Injectable({
@@ -55,6 +56,20 @@ export class DataStoreService {
 
   exportDataStore() {
     this.dataStoreManager.exportDataStore();
+  }
+
+  getAllocationHistory(
+    from: Date,
+    to: Date,
+    splitByCST: boolean = false,
+    splitByTags: boolean = false
+  ): StatsEntry[] {
+    return this.dataStoreManager.getAllocationHistory(
+      from,
+      to,
+      splitByCST,
+      splitByTags
+    );
   }
 
   getConfig(): Config {

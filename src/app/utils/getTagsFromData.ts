@@ -150,7 +150,7 @@ const ind = {
   ],
   ins: ['multi-line', 'casualty', 'insurance'],
   pe: ['private equity'],
-  pmp: [
+  ls: [
     'pharma',
     'desease',
     'drugs',

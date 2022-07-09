@@ -200,16 +200,7 @@ class EmailBuilder {
             `${this._calString ? `${this._calString}` : ''}` // fallback replace if a user removes spaces under settings
           );
 
-        console.log({
-          calStr: this._calString,
-          body,
-        });
-
         if (this._calString) {
-          console.log({
-            calString: this._calString,
-            body,
-          });
           body = body.replace('Monday to Friday', 'as per below');
         }
         this._body = encodeWhitespaces(body);

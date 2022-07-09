@@ -1,4 +1,7 @@
 export const getSkillGroupColor = (skill: string): string => {
+  if (['AP', 'EAP'].includes(skill)) {
+    return 'blue';
+  }
   if (['EM', 'PSSM', 'PE', 'EDS'].includes(skill)) {
     return 'green';
   }

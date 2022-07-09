@@ -7,11 +7,13 @@ import {
   ElementRef,
   ViewChild,
 } from '@angular/core';
+import { fromEvent, Observable, Subscription, debounceTime, pipe } from 'rxjs';
+import { DataStoreService } from 'src/app/shared-module/data-store.service';
 import { FetchService } from 'src/app/shared-module/fetch.service';
+import { Filter } from 'src/app/shared-module/page/page.component';
+import { IsOnlineService } from 'src/app/shared-module/is-online.service';
 import { StatsEntry } from 'src/app/stats/stats-entry/stats-entry.component';
 import { SortService } from 'src/app/utils/sortService';
-import { Filter } from 'src/app/shared-module/page/page.component';
-import { fromEvent, Observable, Subscription, debounceTime, pipe } from 'rxjs';
 
 const testData = [
   {
@@ -20,7 +22,13 @@ const testData = [
       asked: 10,
       got: 6,
     },
-    tags: [],
+    tags: ['ls', 'org'],
+    leadership: [
+      {
+        name: 'andreas patz',
+        mainContact: true,
+      },
+    ],
   },
   {
     client: 'Chinese',
@@ -55,29 +63,25 @@ const testData = [
 })
 export class StatsSectionComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('searchBar') searchBar!: ElementRef;
-  entries: StatsEntry[] = [];
-  filteredEntries: StatsEntry[] = this.entries;
   dateRange!: [Date, Date];
-  sortService: SortService = new SortService();
+  entries: StatsEntry[] = [];
   fetchError!: string;
-  filters: Filter[] = [];
   fetching: boolean = false;
+  filters: Filter[] = [];
+  filteredEntries: StatsEntry[] = this.entries;
   searchSubscription!: Subscription;
+  sortService: SortService = new SortService();
   withCSTView: boolean = false;
   withTags: boolean = false;
 
-  constructor(ngZone: NgZone, private fetchService: FetchService) {}
+  constructor(
+    private dataStoreService: DataStoreService,
+    private fetchService: FetchService,
+    private isOnlineService: IsOnlineService
+  ) {}
 
   ngOnInit(): void {
     this.entries = this.sortService.applyCurrentSort(testData);
-  }
-
-  updateCSTView(e: any): void {
-    this.withCSTView = e.target.checked;
-  }
-
-  updateTags(e: any): void {
-    this.withTags = e.target.checked;
   }
 
   ngAfterViewInit(): void {
@@ -97,8 +101,26 @@ export class StatsSectionComponent implements OnInit, OnDestroy, AfterViewInit {
   ngOnDestroy(): void {
     this.searchSubscription.unsubscribe();
   }
+
+  handleSort(colName: string) {
+    this.entries = this.sortService.sortData(this.entries, colName);
+    this.updateFilteredView();
+  }
+
+  onDateRangeChange(event: any): void {
+    this.dateRange = event as [Date, Date];
+  }
+
   onSubmit(): void {
     this.fetching = true;
+    if (this.isOnlineService.isOnline) {
+      this.#fetchFromOnlineStore();
+    } else {
+      this.#fetchFromOfflineStore();
+    }
+  }
+
+  #fetchFromOnlineStore() {
     this.fetchService
       .fetchHistory(this.dateRange, this.withCSTView, this.withTags)
       .subscribe({
@@ -112,10 +134,10 @@ export class StatsSectionComponent implements OnInit, OnDestroy, AfterViewInit {
           });
 
           this.entries = this.sortService.applyCurrentSort(entries);
-          console.log(this.entries);
         },
         error: (err) => {
           this.fetchError = err;
+          this.fetching = false;
         },
         complete: () => {
           this.fetching = false;
@@ -123,8 +145,18 @@ export class StatsSectionComponent implements OnInit, OnDestroy, AfterViewInit {
       });
   }
 
-  onDateRangeChange(event: any): void {
-    this.dateRange = event as [Date, Date];
+  #fetchFromOfflineStore() {
+    if (!this.dateRange) {
+      return;
+    }
+
+    const data = this.dataStoreService.getAllocationHistory(
+      this.dateRange[0],
+      this.dateRange[1]
+    );
+
+    this.entries = this.sortService.applyCurrentSort(data);
+    this.fetching = false;
   }
 
   updateFilteredView(): void {
@@ -158,8 +190,11 @@ export class StatsSectionComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
-  handleSort(colName: string) {
-    this.entries = this.sortService.sortData(this.entries, colName);
-    this.updateFilteredView();
+  updateCSTView(e: any): void {
+    this.withCSTView = e.target.checked;
+  }
+
+  updateTags(e: any): void {
+    this.withTags = e.target.checked;
   }
 }

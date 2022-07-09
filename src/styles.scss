@@ -214,6 +214,12 @@ li {
       background-color: #fff;
     }
 
+    &--blue {
+      & > span {
+        background-color: rgba(13, 110, 253, 0.6);
+      }
+    }
+
     &--green {
       & > span {
         // background-image: linear-gradient(
@@ -232,7 +238,7 @@ li {
         //   rgba(255, 193, 7, 0.1),
         //   rgba(255, 193, 7, 0.4)
         // );
-        background-color: rgba(255, 193, 7, 0.7);
+        background-color: rgba(255, 193, 7, 0.8);
       }
     }
 
@@ -448,7 +454,7 @@ ul {
 
   &--right {
     width: 170px;
-    justify-content: center;
+    justify-content: flex-end;
     margin-right: 15px;
 
     &--wide {

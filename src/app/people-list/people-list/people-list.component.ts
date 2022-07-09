@@ -36,7 +36,7 @@ import {
   SubmissionStatus,
 } from 'src/app/shared-module/page/page.component';
 
-import { DataStore, WeeklyPeopleList } from 'src/app/utils/StorageManager';
+import { DataStore } from 'src/app/utils/StorageManager';
 import { getClosestPastMonday } from 'src/app/utils';
 import { getNewWeek, getDaysLeft } from '../../shared-module/week-days/week';
 import { ProjectEditable } from 'src/app/project-list/project-list/project';

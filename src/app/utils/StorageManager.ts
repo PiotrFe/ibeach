@@ -3,13 +3,14 @@ import {
   ConfigChange,
   EmailTemplate,
 } from 'src/app/shared-module/config.service';
+
 import { Person } from 'src/app/people-list/person';
 import {
   Project,
   LeadershipEntry,
 } from 'src/app/project-list/project-list/project';
+import { StatsEntry } from 'src/app/stats/stats-entry/stats-entry.component';
 import { WeeklyData } from 'src/app/shared-module/fetch.service';
-import { link } from 'fs';
 
 export type ContactEntry = {
   first: string;
@@ -58,6 +59,12 @@ export interface StoreManager {
   dataStoreFileUpdateTs: number;
 
   exportDataStore: () => void;
+  getAllocationHistory: (
+    from: Date,
+    to: Date,
+    splitByCST: boolean,
+    splitByTags: boolean
+  ) => StatsEntry[];
   getConfig: () => Config;
   getContactList: () => ContactEntry[];
   getEmptyStore: () => DataStore;
@@ -131,6 +138,60 @@ export class DataStoreManager implements StoreManager {
   // **************************
   // GETTERS
   // **************************
+
+  getAllocationHistory(
+    from: Date,
+    to: Date,
+    splitByCST: boolean = false,
+    splitByTags: boolean = false
+  ): StatsEntry[] {
+    const fromTS = from.getTime();
+    const toTS = to.getTime();
+    const { updatedAtTs, ...projectEntries } = this.dataStore.projects;
+    const projectMap: {
+      [client: string]: {
+        got: number;
+        asked: number;
+      };
+    } = Object.entries(projectEntries)
+      .filter(([key]) => {
+        const int = parseInt(key);
+
+        return int >= fromTS && int <= toTS;
+      })
+      .flatMap(([key, projectArr]) => projectArr)
+      .reduce((acc: any, project) => {
+        const { client, week, daysLeft } = project as Project;
+
+        const daysAllocated = Object.values(week).reduce((acc: number, val) => {
+          if (typeof val !== 'boolean') {
+            return acc + 1;
+          }
+
+          return acc;
+        }, 0);
+
+        return {
+          ...acc,
+          [client]: {
+            ...(acc[client] || {}),
+            asked: acc[client]?.asked || 0 + daysAllocated + daysLeft,
+            got: acc[client]?.got || 0 + daysAllocated,
+          },
+        };
+      }, {});
+
+    const statsEntryArr: StatsEntry[] = Object.entries(projectMap).map(
+      ([client, entry]) => ({
+        client,
+        days: {
+          ...entry,
+        },
+      })
+    );
+
+    return statsEntryArr;
+  }
 
   getConfig(): Config {
     return this.dataStore.config || this.#getDefaultConfig();
