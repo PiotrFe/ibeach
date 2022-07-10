@@ -123,7 +123,7 @@ export class FetchService {
       .get(`${baseUrl}/contacts`, { responseType: 'text' })
       .pipe(catchError(this.handleError));
   }
-
+  //
   saveConfig(data: ConfigChange[]): Observable<Config> {
     return this.http
       .patch<Config>(`${baseUrl}/config`, data)
