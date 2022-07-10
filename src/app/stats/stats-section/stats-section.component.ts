@@ -33,14 +33,14 @@ import { TypeaheadService } from 'src/app/shared-module/typeahead.service';
   styleUrls: ['./stats-section.component.scss'],
 })
 export class StatsSectionComponent implements OnInit, OnDestroy, AfterViewInit {
-  @ViewChild('searchInput') searchInput!: ElementRef;
+  // @ViewChild('searchInput') searchInput!: ElementRef;
   dateRange!: [Date, Date];
   entries: StatsEntry[] = [];
   fetchError!: string;
   fetching: boolean = false;
   filters: Filter[] = [];
   filteredEntries: StatsEntry[] = this.entries;
-  searchSubscription!: Subscription;
+  // searchSubscription!: Subscription;
   showCSTHeader: boolean = false;
   sortService: SortService = new SortService();
   splitByCST: boolean = false;
@@ -56,30 +56,30 @@ export class StatsSectionComponent implements OnInit, OnDestroy, AfterViewInit {
   ngOnInit(): void {}
 
   ngAfterViewInit(): void {
-    this.searchSubscription = fromEvent<any>(
-      this.searchInput.nativeElement,
-      'input'
-    )
-      .pipe(
-        tap(() => (this.typeaheadList = [])),
-        map((e) => e.target.value),
-        startWith(''),
-        debounceTime(500),
-        distinctUntilChanged()
-      )
-      .pipe(
-        switchMap((text) =>
-          this.typeaheadService.getTypeahead(
-            this.typeaheadService.fields.Stats,
-            text
-          )
-        )
-      )
-      .subscribe();
+    // this.searchSubscription = fromEvent<any>(
+    //   this.searchInput.nativeElement,
+    //   'input'
+    // )
+    //   .pipe(
+    //     tap(() => (this.typeaheadList = [])),
+    //     map((e) => e.target.value),
+    //     startWith(''),
+    //     debounceTime(500),
+    //     distinctUntilChanged()
+    //   )
+    //   .pipe(
+    //     switchMap((text) =>
+    //       this.typeaheadService.getTypeahead(
+    //         this.typeaheadService.fields.Stats,
+    //         text
+    //       )
+    //     )
+    //   )
+    //   .subscribe();
   }
 
   ngOnDestroy(): void {
-    this.searchSubscription.unsubscribe();
+    // this.searchSubscription.unsubscribe();
   }
 
   #fetchFromOnlineStore() {
