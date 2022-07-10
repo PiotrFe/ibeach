@@ -8,8 +8,11 @@ export class FirstInitialPipe implements PipeTransform {
     if (value === undefined) {
       return '';
     }
+
     const nameParts = value.split(' ');
 
-    return `${nameParts[0][0].toUpperCase()} ${nameParts.slice(1).join(' ')}`;
+    return nameParts.length === 1
+      ? nameParts[0]
+      : `${nameParts[0][0].toUpperCase()} ${nameParts.slice(1).join(' ')}`;
   }
 }
