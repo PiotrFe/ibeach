@@ -18,7 +18,7 @@ export const PAGE_SECTIONS = {
 export class AppComponent implements OnInit {
   title = 'client-dev-app';
 
-  pageSection = PAGE_SECTIONS.STATS;
+  pageSection = PAGE_SECTIONS.ALLOCATE;
   referenceDate: Date = new Date();
   showSettings: boolean = false;
 
