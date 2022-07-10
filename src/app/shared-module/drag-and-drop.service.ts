@@ -80,6 +80,7 @@ export class DragAndDropService {
     draggableElem.style.margin = '0px';
     // draggableElem.style.backgroundColor = 'rgba(25, 135, 84, 1)';
     draggableElem.style.backgroundColor = 'var(--bs-gray-700)';
+    draggableElem.style.color = 'var(--bs-white)';
     draggableElem.innerText = getInitials(draggableElem.innerText);
 
     draggableElem.classList.add('phase-in');
