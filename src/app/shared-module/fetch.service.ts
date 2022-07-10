@@ -34,10 +34,6 @@ export class FetchService {
     }
 
     return throwError(() => error);
-
-    // return throwError(
-    //   () => new Error('Something went wrong. Please try again')
-    // );
   }
 
   login(name: string, password: string): Observable<any> {
