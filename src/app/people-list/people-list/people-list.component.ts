@@ -294,6 +294,13 @@ export class PeopleListComponent
   // FILTER HANDLERS
   // *****************
 
+  clearPDMFilter() {
+    this.filters = [];
+    this.updateStatusLabel();
+    // this.updateFilteredView();
+    this.pdmFilter.setValue('All');
+  }
+
   getPDMList(): string[] {
     if (!this.status) {
       return [];
@@ -711,6 +718,7 @@ export class PeopleListComponent
   }
 
   handleDateChange(date: Date) {
+    this.clearPDMFilter();
     this.onDateChange(date);
     this.fetchData(false);
   }
