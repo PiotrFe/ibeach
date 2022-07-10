@@ -202,6 +202,8 @@ class EmailBuilder {
 
         if (this._calString) {
           body = body.replace('Monday to Friday', 'as per below');
+        } else if (this._daysString) {
+          body = body.replace('Monday to Friday', `on ${this._daysString}`);
         }
         this._body = encodeWhitespaces(body);
       } else {
