@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Subject, Observable } from 'rxjs';
+import { Subject, Observable, throttle } from 'rxjs';
 import { AllocateService } from 'src/app/shared-module/allocate.service';
 import { Week } from './week-days/week';
 
@@ -15,6 +15,8 @@ export interface DragAndDropEvent {
 export class DragAndDropService {
   _subject: Subject<DragAndDropEvent> = new Subject<DragAndDropEvent>();
   onDragAndDrop$: Observable<DragAndDropEvent> = this._subject.asObservable();
+  #scrollYBy: number = 0;
+  #scrollContainer: Element | undefined;
 
   constructor(private allocateService: AllocateService) {}
 
@@ -96,8 +98,13 @@ export class DragAndDropService {
 
     this._subject.next({ type: 'dragstart' });
 
-    function onPointerMove(event: any) {
+    // this.#updateScrollContainer(event);
+
+    const onPointerMove = (event: any) => {
       const { pageX, pageY } = event;
+
+      // this.#scrollContainerIfNeeded(event);
+
       draggableElem!.style.left = pageX - shiftX + 'px';
       draggableElem!.style.top = pageY - shiftY + 'px';
       const elements: Array<Element> = document.elementsFromPoint(pageX, pageY);
@@ -152,9 +159,12 @@ export class DragAndDropService {
           lastDroppable = droppable;
         }
       }
-    }
+    };
 
-    function onPointerUp(event: any) {
+    const onPointerUp = (event: any) => {
+      this.#scrollYBy = 0;
+      this.#scrollContainer = undefined;
+
       if (reapplySort) {
         target.classList.toggle('sorted', true);
       }
@@ -199,7 +209,9 @@ export class DragAndDropService {
         elemType,
         day: weekDay as keyof Week | 'match',
       });
-    }
+
+      // this.#clearScrollContainer();
+    };
 
     document.addEventListener('pointermove', onPointerMove);
     document.addEventListener('pointerup', onPointerUp);
@@ -210,6 +222,77 @@ export class DragAndDropService {
       elemType,
     });
   }
+
+  // #doScrollContainer = () => {
+  //   this.#scrollContainer?.scroll({
+  //     top: this.#scrollYBy,
+  //     behavior: 'smooth',
+  //   });
+  // };
+
+  // #clearScrollContainer = () => {
+  //   if (this.#scrollContainer) {
+  //     this.#scrollContainer.removeEventListener(
+  //       'scroll',
+  //       this.#doScrollContainer
+  //     );
+  //   }
+  //   this.#scrollContainer = undefined;
+  //   this.#scrollYBy = 0;
+  // };
+
+  // #updateScrollContainer = (event: any) => {
+  //   const { pageX, pageY } = event;
+  //   const scrollContainer = document
+  //     .elementsFromPoint(pageX, pageY)
+  //     .find(
+  //       (elem) =>
+  //         elem.classList.contains('people-content') ||
+  //         elem.classList.contains('project-content')
+  //     );
+
+  //   if (scrollContainer && scrollContainer !== this.#scrollContainer) {
+  //     if (this.#scrollContainer) {
+  //       this.#scrollContainer.removeEventListener(
+  //         'scroll',
+  //         this.#doScrollContainer
+  //       );
+  //     }
+  //     let doScroll = true;
+  //     scrollContainer.addEventListener('scroll', this.#doScrollContainer);
+  //     this.#scrollContainer = scrollContainer;
+  //   }
+  // };
+
+  // #scrollContainerIfNeeded = (event: any) => {
+  //   const { pageX, pageY } = event;
+  //   const screenArea = pageY / document.documentElement.clientHeight;
+
+  //   if (screenArea >= 0.2 && screenArea <= 0.85) {
+  //     this.#scrollYBy = 0;
+  //     this.#scrollContainer = undefined;
+  //   }
+
+  //   if (screenArea < 0.2 && screenArea >= 0.1) {
+  //     this.#scrollYBy = -20;
+  //   }
+
+  //   if (screenArea < 0.1) {
+  //     this.#scrollYBy = -40;
+  //   }
+
+  //   if (screenArea <= 0.9 && screenArea > 0.85) {
+  //     this.#scrollYBy = 20;
+  //   }
+
+  //   if (screenArea > 0.9) {
+  //     this.#scrollYBy = 40;
+  //   }
+
+  //   if (this.#scrollYBy !== 0) {
+  //     this.#doScrollContainer();
+  //   }
+  // };
 }
 
 const getInitials = (text: string | null): string => {
