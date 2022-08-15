@@ -591,10 +591,8 @@ export class ProjectListComponent
     );
     const universalBOM = '\uFEFF';
 
-    const blob = new Blob([csv], { type: 'text/csv' });
     const link = document.createElement('a');
     link.setAttribute('download', 'assignments.csv');
-    // link.setAttribute('href', URL.createObjectURL(blob));
     link.setAttribute(
       'href',
       'data:text/csv; charset=utf-8,' + encodeURIComponent(universalBOM + csv)

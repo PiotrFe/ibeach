@@ -12,6 +12,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 })
 export class LoginPageComponent implements OnInit {
   loginError: string = '';
+  isLoading: boolean = false;
   loginForm = new FormGroup({
     name: new FormControl('', [Validators.required]),
     password: new FormControl('', [Validators.required]),
@@ -41,6 +42,7 @@ export class LoginPageComponent implements OnInit {
       return;
     }
 
+    this.isLoading = true;
     const name = this.loginForm.get('name')?.value;
     const password = this.loginForm.get('password')?.value;
 
@@ -51,9 +53,7 @@ export class LoginPageComponent implements OnInit {
         }
       },
       error: (e: HttpErrorResponse) => {
-        console.log({
-          e,
-        });
+        this.isLoading = false;
         if (e.status === 401) {
           this.loginError = 'Wrong password';
         } else {
