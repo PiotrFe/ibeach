@@ -9,6 +9,7 @@ import {
   SimpleChanges,
   OnDestroy,
 } from '@angular/core';
+import { AllocationToCSV } from 'src/app/shared-module/allocation-to-csv.class';
 import { FormControl } from '@angular/forms';
 import { ContactEntry } from 'src/app/utils/StorageManager';
 import { CsvParserService } from 'src/app/shared-module/csv-parser.service';
@@ -584,6 +585,21 @@ export class ProjectListComponent
   }
 
   downloadProjectList(): void {
-    exportProjectListToPDF(this.pageContainer.nativeElement);
+    // exportProjectListToPDF(this.pageContainer.nativeElement);
+    const csv = AllocationToCSV.exportDataToCSV(
+      this.dataSet as ProjectEditable[]
+    );
+    const universalBOM = '\uFEFF';
+
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const link = document.createElement('a');
+    link.setAttribute('download', 'assignments.csv');
+    // link.setAttribute('href', URL.createObjectURL(blob));
+    link.setAttribute(
+      'href',
+      'data:text/csv; charset=utf-8,' + encodeURIComponent(universalBOM + csv)
+    );
+    link.click();
+    URL.revokeObjectURL(link.href);
   }
 }

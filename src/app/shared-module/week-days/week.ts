@@ -1,4 +1,4 @@
-type WeekEntry = boolean | { id: string; text: string; skill?: string };
+export type WeekEntry = boolean | { id: string; text: string; skill?: string };
 
 export interface Week {
   mon: WeekEntry;
