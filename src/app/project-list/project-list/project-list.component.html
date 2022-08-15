@@ -130,6 +130,7 @@
           [referenceDate]="referenceDate"
           [entryContainerWidth]="entryContainerWidth"
           (editEvent)="editRow($event)"
+          (emailEvent)="markEmailSent($event)"
           (deleteEvent)="removeExistingRow($event)"
           (calendarChangeEvent)="updateCalendar($event)"
           (tagChangeEvent)="handleUpdateTags($event)"

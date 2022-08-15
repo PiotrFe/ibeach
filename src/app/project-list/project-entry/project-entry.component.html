@@ -125,6 +125,7 @@
   <!-- [class.btn-grayed-out]="!canSendEmail()" -->
   <i
     class="bi bi-envelope send-icon project-list-envelope"
+    [class.project-list-envelope--sent]="project.emailSent"
     (click)="handleGenerateEmail()"
   ></i>
 </div>

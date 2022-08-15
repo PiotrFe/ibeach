@@ -220,9 +220,6 @@ export class ProjectListComponent
         }
       },
       error: (err) => {
-        console.log({
-          err,
-        });
         this.fetchError = err;
       },
     });
@@ -425,6 +422,17 @@ export class ProjectListComponent
       this.showPastRecordsLabel = false;
       this.listEditModeStatusService.onExitEditMode('projects');
     }
+  }
+
+  markEmailSent(id: string, sent: boolean = true): void {
+    const idx = this.dataSet.findIndex((entry) => entry.id === id);
+
+    this.dataSet[idx] = {
+      ...this.dataSet[idx],
+      emailSent: sent,
+    };
+    this.updateFilteredView();
+    this.postChanges();
   }
 
   parseAndSortProjectData(projects: Project[]) {

@@ -1,4 +1,11 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ViewChild,
+  ElementRef,
+  Output,
+  EventEmitter,
+} from '@angular/core';
 import { Subscription } from 'rxjs';
 import {
   AllocateService,
@@ -27,6 +34,7 @@ export class ProjectEntryComponent extends EntryComponent implements OnInit {
   emailTemplate!: EmailTemplate;
 
   @ViewChild('entryContainer') entryContainer!: ElementRef;
+  @Output() emailEvent = new EventEmitter<string>();
 
   constructor(
     private allocateService: AllocateService,
@@ -109,6 +117,7 @@ export class ProjectEntryComponent extends EntryComponent implements OnInit {
 
   handleGenerateEmail() {
     this.dataStoreService.monitorNavigation = false;
+    this.emailEvent.emit(this.id);
     generateEmail(
       this.entryData as ProjectEditable,
       this.entryContainer,

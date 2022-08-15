@@ -599,6 +599,7 @@ export class AllocateService {
       ...projectData[projectIdx],
       week: projectWeek,
       daysLeft: getDaysLeft(projectWeek),
+      emailSent: false,
     };
   };
 
@@ -648,6 +649,7 @@ export class AllocateService {
     }
     personEntry.daysLeft = getDaysLeft(personEntry.week);
     projectEntry.daysLeft = getDaysLeft(projectEntry.week);
+    projectEntry.emailSent = false;
   };
 
   #clearWeek = ({
@@ -693,9 +695,15 @@ export class AllocateService {
           week: secondaryEntryWeek,
           daysLeft: secondaryEntryDaysLeft,
         };
+        if ((seconDaryDataSet[secondaryEntryIndex] as Project).emailSent) {
+          (seconDaryDataSet[secondaryEntryIndex] as Project).emailSent = false;
+        }
       }
     }
     primaryEntry.daysLeft = getDaysLeft(primaryEntry.week);
+    if (primaryEntry.emailSent) {
+      primaryEntry.emailSent = false;
+    }
   };
 
   #reallocatePerson = ({
@@ -749,6 +757,7 @@ export class AllocateService {
       ...projectData[currentProjectIndex],
       week: currentProjectWeek,
       daysLeft: getDaysLeft(currentProjectWeek),
+      emailSent: false,
     };
 
     const newProjectWeek = {
@@ -766,6 +775,7 @@ export class AllocateService {
       ...projectData[newProjectIndex],
       week: newProjectWeek,
       daysLeft: getDaysLeft(newProjectWeek),
+      emailSent: false,
     };
   };
 
@@ -813,6 +823,7 @@ export class AllocateService {
       ...projectData[projectIdx],
       week: projectWeek,
       daysLeft: getDaysLeft(projectWeek),
+      emailSent: false,
     };
 
     const currentPersonWeek = {

@@ -19,6 +19,7 @@ export interface Project {
   leadership: LeadershipEntry[];
   comments?: string;
   tags: Tag[];
+  emailSent?: boolean;
 }
 
 export interface ProjectEditable extends Project {
