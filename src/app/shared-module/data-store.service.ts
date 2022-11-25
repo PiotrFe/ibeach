@@ -6,6 +6,7 @@ import {
   DataStore,
   DataStoreManager,
   getEmptyStore,
+  ProjectLookupEntry,
   StoreManager,
   WeeklyPeopleList,
   WeeklyProjectList,
@@ -86,8 +87,12 @@ export class DataStoreService {
     return this.dataStoreManager.getEmptyStore();
   }
 
-  getLookupTable(): Person[] {
-    return this.dataStoreManager.dataStore.lookup;
+  getLookupTable(
+    tableType: 'people' | 'projects' = 'people'
+  ): Person[] | ProjectLookupEntry {
+    return tableType === 'people'
+      ? this.dataStoreManager.dataStore.lookup
+      : this.dataStoreManager.dataStore.lookupProjects;
   }
 
   getPeopleList(week: Date): WeeklyPeopleList {

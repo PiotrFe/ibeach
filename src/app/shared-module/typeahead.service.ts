@@ -1,14 +1,19 @@
 import { Injectable } from '@angular/core';
 import { Person } from 'src/app/people-list/person';
+import { Project } from '../project-list/project-list/project';
 import { Tag } from 'src/app/shared-module/entry/entry.component';
 import { getAvailableTags } from 'src/app/utils/getTagsFromData';
+import { ProjectLookupEntry } from '../utils/StorageManager';
 
 enum TableTypes {
   People,
+  Projects,
 }
 
 enum Fields {
+  Client,
   Name,
+  Leadership,
   Tag,
   Stats,
 }
@@ -18,6 +23,7 @@ enum Fields {
 })
 export class TypeaheadService {
   _peopleList!: Person[];
+  _projectList!: ProjectLookupEntry;
   _tagList!: Tag[];
 
   tableTypes = TableTypes;
@@ -30,13 +36,12 @@ export class TypeaheadService {
   storeLookupList(type: TableTypes, list: any): void {
     if (type === TableTypes.People) {
       this._peopleList = list as Person[];
+    }
 
-      // TO CHANGE - FETCH TAGS SEPARATELY FROM SERVER
-      const tags = this._peopleList
-        .map((person) => person.tags)
-        .filter((tags) => tags.length > 0)
-        .map((tags) => tags.map((tag) => JSON.stringify(tag)))
-        .flat();
+    if (type === TableTypes.Projects) {
+      this._projectList = list as ProjectLookupEntry;
+
+      console.log({ projectList: this._projectList });
     }
   }
 
@@ -46,6 +51,10 @@ export class TypeaheadService {
     }
     if (field === Fields.Tag) {
       return this._getTagTypeahead(dataSet);
+    }
+
+    if (field === Fields.Client) {
+      return this._getClientTypeahead(dataSet);
     }
 
     if (field === Fields.Stats) {
@@ -83,6 +92,10 @@ export class TypeaheadService {
           .map((person: Person) => person.name);
 
     return retVal;
+  }
+
+  _getClientTypeahead(data?: any[]): string[] {
+    return [];
   }
 
   _getTagTypeahead(dataSet?: Tag[]): string[] {

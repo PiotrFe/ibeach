@@ -11,6 +11,7 @@ import {
 } from 'src/app/project-list/project-list/project';
 import { StatsEntry } from 'src/app/stats/stats-entry/stats-entry.component';
 import { WeeklyData } from 'src/app/shared-module/fetch.service';
+import { cleanString } from 'src/app/utils';
 
 export type ContactEntry = {
   first: string;
@@ -26,6 +27,11 @@ export type WeeklyPeopleList = {
 export type WeeklyProjectList = {
   data: Project[];
   updatedAtTs: number;
+};
+
+export type ProjectLookupEntry = {
+  clients: string[];
+  leadership: string[];
 };
 
 export interface DataStore {
@@ -47,6 +53,7 @@ export interface DataStore {
     updatedAtTs: number;
   };
   lookup: Person[];
+  lookupProjects: ProjectLookupEntry;
   config: Config;
   updatedAtTs: number;
   contacts: ContactEntry[];
@@ -68,7 +75,7 @@ const getDefaultConfig = () => ({
   },
 });
 
-export const getEmptyStore = () => ({
+export const getEmptyStore = (): DataStore => ({
   master: { updatedAtTs: 0 },
   people: {
     updatedAtTs: 0,
@@ -78,6 +85,10 @@ export const getEmptyStore = () => ({
   },
   config: getDefaultConfig(),
   lookup: [],
+  lookupProjects: {
+    clients: [],
+    leadership: [],
+  },
   contacts: [],
   updatedAtTs: 0,
 });
@@ -123,6 +134,7 @@ export class DataStoreManager implements StoreManager {
   dataStoreFileUpdateTs: number = 0;
 
   constructor() {
+    console.log('Running contructor');
     this.dataStore = this.getEmptyStore();
   }
 
@@ -148,6 +160,7 @@ export class DataStoreManager implements StoreManager {
 
   importDataStore(store: DataStore) {
     this.dataStore = store;
+    this.storeMasterProjectData(store.projects);
     this.dataStoreFileUpdateTs = store.updatedAtTs;
   }
 
@@ -429,11 +442,16 @@ export class DataStoreManager implements StoreManager {
     this.#syncLocalStorage();
   }
 
-  saveListForLookup(data: any) {
+  saveListForLookup(data: any, listType: 'people' | 'projects' = 'people') {
     if (this.dataStore === undefined) {
       this.dataStore = this.getEmptyStore();
     }
-    this.dataStore.lookup = data;
+    if (listType === 'people') {
+      this.dataStore.lookup = data;
+    } else {
+      this.dataStore.lookupProjects = data;
+    }
+
     this.dataStore.updatedAtTs = Date.now();
     this.#syncLocalStorage();
   }
@@ -484,6 +502,48 @@ export class DataStoreManager implements StoreManager {
     this.dataStore.updatedAtTs = ts;
 
     this.saveListForLookup(full);
+  }
+
+  storeMasterProjectData(data: {
+    [key: number]: Project[];
+    updatedAtTs: number;
+  }) {
+    const clientSet = new Set<string>();
+    const leaderSet = new Set<string>();
+
+    for (let [key, val] of Object.entries(data)) {
+      if (key === 'updatedAtTs' || typeof val === 'number') {
+        continue;
+      }
+
+      for (let project of val) {
+        const { client, leadership } = project;
+
+        clientSet.add(cleanString(client));
+
+        for (let { name } of leadership) {
+          leaderSet.add(cleanString(name));
+        }
+      }
+    }
+
+    if (!this.dataStore?.lookupProjects) {
+      this.dataStore.lookupProjects = {
+        clients: [],
+        leadership: [],
+      };
+    }
+
+    const clientArr = [...clientSet].sort();
+    const leaderArr = [...leaderSet].sort();
+
+    this.dataStore.lookupProjects.clients = clientArr;
+    this.dataStore.lookupProjects.leadership = leaderArr;
+
+    this.saveListForLookup(
+      { clients: clientArr, leadership: leaderArr },
+      'projects'
+    );
   }
 
   submitPeopleList(weekOf: Date, pdm: string, data: Person[]) {

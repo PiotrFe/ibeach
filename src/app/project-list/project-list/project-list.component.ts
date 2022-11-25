@@ -86,6 +86,7 @@ export class ProjectListComponent
           if (dataType === 'projects') {
             this.dataSet = this.sortService.applyCurrentSort(data);
             this.updateFilteredView();
+            this.updateLookupTable();
 
             // post changes to store in the offline mode
             // (allocation service does not do it)
@@ -404,6 +405,13 @@ export class ProjectListComponent
     this.allocateService.handleDeleteRecord(removedEntry, 'projects');
     this.dataSet = this.dataSet.filter((entry) => entry.id !== id);
     this.updateFilteredView();
+  }
+
+  updateLookupTable() {
+    this.typeaheadService.storeLookupList(
+      this.typeaheadService.tableTypes.Projects,
+      this.dataStoreService.getLookupTable('projects')
+    );
   }
 
   setInEditMode(inEditMode: boolean): void {
