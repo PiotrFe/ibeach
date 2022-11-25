@@ -47,9 +47,15 @@
   <span
     @insertRemoveTrigger
     *ngIf="entryContainerWidth === 2 || entryContainerWidth > 2"
-    class="section-tags section-tags-header header-entry txt-center pl-3 mr-12"
-    >Tags</span
-  >
+    class="section-tags section-tags-header header-entry txt-center pl-3 mr-12 clickable"
+    (click)="handleClick('tags')"
+    >Tags
+    <i
+      *ngIf="getSort('tags', 1)"
+      class="bi bi-sort-down-alt fs-085 ptop-3 ml-2"
+    ></i>
+    <i *ngIf="getSort('tags', -1)" class="bi bi-sort-up fs-085 ptop-3 ml-2"></i
+  ></span>
   <span
     @insertRemoveTrigger
     *ngIf="entryContainerWidth === 3 || entryContainerWidth > 3"

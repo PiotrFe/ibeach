@@ -7,7 +7,9 @@ import { AllocationEntry } from 'src/app/shared-module/allocate.service';
 import { Config, ConfigChange } from 'src/app/shared-module/config.service';
 import { StatsEntry } from 'src/app/stats/stats-entry/stats-entry.component';
 
-export const baseAuthUrl = 'https://ibeach-api.herokuapp.com';
+// export const baseAuthUrl = 'https://ibeach-api.herokuapp.com';
+export const baseAuthUrl =
+  'http://node-express-env.eba-nhpwnnsc.eu-central-1.elasticbeanstalk.com';
 export const baseUrl = 'http://localhost:3000';
 
 export interface WeeklyData {

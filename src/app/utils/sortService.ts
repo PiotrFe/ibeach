@@ -1,7 +1,7 @@
-import { Injectable } from '@angular/core';
 import { Person, PersonEditable } from 'src/app/people-list/person';
 import { Project, ProjectEditable } from '../project-list/project-list/project';
 import { StatsEntry } from 'src/app/stats/stats-entry/stats-entry.component';
+import { Tag } from 'src/app/shared-module/entry/entry.component';
 
 const SKILL_INDEX = {
   AP: 6,
@@ -255,6 +255,35 @@ export class SortService {
     return 0;
   };
 
+  sortByTags = (
+    a: Person | PersonEditable | Project | ProjectEditable,
+    b: Person | PersonEditable | Project | ProjectEditable,
+    asc: boolean = false
+  ): number => {
+    const order = this.sort.order;
+
+    if (a.tags[0].type === b.tags[0].type) {
+      if (a.tags[0].value < b.tags[0].value) {
+        return asc ? -1 : order * -1;
+      }
+
+      if (a.tags[0].value > b.tags[0].value) {
+        return asc ? 1 : order;
+      }
+
+      return 0;
+    } else {
+      if (a.tags[0].type === 'ind') {
+        return -1;
+      }
+      if (b.tags[0].type === 'ind') {
+        return 1;
+      }
+
+      return 0;
+    }
+  };
+
   sortByStats = (
     a: StatsEntry,
     b: StatsEntry,
@@ -316,6 +345,7 @@ export class SortService {
     const sortByDays = this.sortByDays;
     const sortByDate = this.sortByDate;
     const sortByPDM = this.sortByPDM;
+    const sortByTags = this.sortByTags;
     const sortByStats = this.sortByStats;
 
     const sortedDataSet = [...dataSet];
@@ -389,6 +419,17 @@ export class SortService {
           return returnVal;
         }
         return sortBySkill(a, b);
+      });
+    }
+
+    if (colName === 'tags') {
+      sortedDataSet.sort(function (a, b) {
+        let returnVal: number = sortByTags(a, b);
+
+        if (returnVal !== 0) {
+          return returnVal;
+        }
+        return sortByName(a, b, true);
       });
     }
 
