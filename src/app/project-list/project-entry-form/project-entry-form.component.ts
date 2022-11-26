@@ -8,8 +8,11 @@ import {
   SimpleChanges,
   ViewChild,
   ElementRef,
+  OnDestroy,
 } from '@angular/core';
+import { fromEvent, Subject, takeUntil } from 'rxjs';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { TypeaheadMatch } from 'ngx-bootstrap/typeahead';
 import { EntryComponent } from 'src/app/shared-module/entry/entry.component';
 import { TypeaheadService } from 'src/app/shared-module/typeahead.service';
 
@@ -20,6 +23,7 @@ import {
   getNewAvailDate,
   getCalendarFromDate,
   removeExtraSpacesFromStr,
+  cleanString,
 } from 'src/app/utils';
 import {
   Week,
@@ -34,11 +38,14 @@ import {
 })
 export class ProjectEntryFormComponent
   extends EntryComponent
-  implements OnInit, AfterViewInit
+  implements OnInit, AfterViewInit, OnDestroy
 {
+  private onDestroy$: Subject<void> = new Subject<void>();
+
   @Input() dispatchToParentAndClose: boolean = false;
   @Input() cleanSlate!: boolean;
   @Input() getClientTypeAhead!: Function;
+  @Input() getLeadershipTypeAhead!: Function;
 
   @Output() formEditEvent = new EventEmitter<{
     id: string;
@@ -66,11 +73,37 @@ export class ProjectEntryFormComponent
   @Output() formPendingEvent = new EventEmitter<any>();
 
   @ViewChild('entryContainer') entryContainer!: ElementRef;
+  @ViewChild('leadershipInput') leadershipInput!: ElementRef;
+  @ViewChild('leadershipInputSecondary') leadershipInputSecondary!: ElementRef;
 
-  showAddLeader: boolean = false;
+  newLeaderVal = '';
 
   constructor(typeaheadService: TypeaheadService) {
     super(typeaheadService);
+  }
+
+  projectForm = new FormGroup({
+    client: new FormControl('', [Validators.required]),
+    type: new FormControl('', [Validators.required]),
+    availDate: new FormControl(getWeekDayDate(1, 'next'), [
+      Validators.required,
+    ]),
+    comments: new FormControl(''),
+    leadership: new FormControl('', [Validators.required]),
+    leadershipNew: new FormControl({ value: '', disabled: true }),
+  });
+
+  cstInput = new FormControl('');
+
+  ignoreNextDateChange: boolean = false;
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (
+      changes['dispatchToParentAndClose'] &&
+      changes['dispatchToParentAndClose'].currentValue === true
+    ) {
+      this.onSubmit();
+    }
   }
 
   ngOnInit(): void {
@@ -103,9 +136,13 @@ export class ProjectEntryFormComponent
               },
               ''
             ),
+        leadershipNew: '',
       });
       this.tags = this.entryData.tags;
       this.id = this.entryData.id;
+      if (leadership.length) {
+        this.projectForm.get('leadershipNew')?.enable();
+      }
     } else {
       this.tags = [];
       this.projectForm.patchValue({
@@ -135,21 +172,66 @@ export class ProjectEntryFormComponent
         this.entryContainer.nativeElement.querySelector('.input--client');
       clientInput.focus();
     }
+
+    this.addListeners();
   }
 
-  projectForm = new FormGroup({
-    client: new FormControl('', [Validators.required]),
-    type: new FormControl('', [Validators.required]),
-    availDate: new FormControl(getWeekDayDate(1, 'next'), [
-      Validators.required,
-    ]),
-    comments: new FormControl(''),
-    leadership: new FormControl('', [Validators.required]),
-  });
+  ngOnDestroy(): void {
+    this.onDestroy$.next();
+    this.onDestroy$.complete();
+  }
 
-  cstInput = new FormControl('');
+  addListeners(): void {
+    fromEvent(this.leadershipInput.nativeElement, 'focus')
+      .pipe(takeUntil(this.onDestroy$))
+      .subscribe(
+        () =>
+          ((
+            this.leadershipInputSecondary.nativeElement as HTMLInputElement
+          ).disabled = true)
+      );
 
-  ignoreNextDateChange: boolean = false;
+    fromEvent(this.leadershipInput.nativeElement, 'blur')
+      .pipe(takeUntil(this.onDestroy$))
+      .subscribe(() => {
+        this.projectForm.patchValue({
+          leadershipNew: '',
+        });
+
+        if (this.projectForm.get('leadership')?.value.length) {
+          (
+            this.leadershipInputSecondary.nativeElement as HTMLInputElement
+          ).disabled = false;
+        }
+      });
+
+    fromEvent(this.leadershipInputSecondary.nativeElement, 'focus')
+      .pipe(takeUntil(this.onDestroy$))
+      .subscribe(
+        () =>
+          ((this.leadershipInput.nativeElement as HTMLInputElement).disabled =
+            true)
+      );
+
+    fromEvent(this.leadershipInputSecondary.nativeElement, 'blur')
+      .pipe(takeUntil(this.onDestroy$))
+      .subscribe(() => {
+        this.projectForm.patchValue({
+          leadershipNew: '',
+        });
+
+        (this.leadershipInput.nativeElement as HTMLInputElement).disabled =
+          false;
+      });
+
+    fromEvent(this.leadershipInputSecondary.nativeElement, 'keyup')
+      .pipe(takeUntil(this.onDestroy$))
+      .subscribe((e: any) => {
+        if (e.key === 'Enter') {
+          this.handleSubmitLeader(this.projectForm.get('leadershipNew')?.value);
+        }
+      });
+  }
 
   handleDelete(): void {
     this.deleteEvent.emit(this.id);
@@ -272,23 +354,23 @@ export class ProjectEntryFormComponent
     });
   }
 
-  onLeaderDelete(person: string) {
-    console.log('Click');
+  onLeadershipSubmit(entry: TypeaheadMatch) {
+    this.handleSubmitLeader(entry.value);
   }
 
-  onLeaderSubmit(): void {}
-
-  setShowAddLeader(show: boolean) {
-    this.showAddLeader = show;
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if (
-      changes['dispatchToParentAndClose'] &&
-      changes['dispatchToParentAndClose'].currentValue === true
-    ) {
-      this.onSubmit();
+  handleSubmitLeader(name: string) {
+    let leadershipStr = this.projectForm.get('leadership')?.value;
+    if (leadershipStr.length) {
+      const arr = leadershipStr
+        .split(',')
+        .map((entry: any) => cleanString(entry, false));
+      const set = new Set([...arr, name]);
+      leadershipStr = [...set].join(', ');
     }
+    this.projectForm.patchValue({
+      leadership: leadershipStr.length ? leadershipStr : name,
+      leadershipNew: '',
+    });
   }
 
   override getTagTypeahead(): string[] {

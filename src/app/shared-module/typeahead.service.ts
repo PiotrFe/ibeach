@@ -4,7 +4,7 @@ import { Project } from '../project-list/project-list/project';
 import { Tag } from 'src/app/shared-module/entry/entry.component';
 import { getAvailableTags } from 'src/app/utils/getTagsFromData';
 import { ProjectLookupEntry } from '../utils/StorageManager';
-import { lCaseCompareFn } from '../utils';
+import { cleanString, lCaseCompareFn } from '../utils';
 
 enum TableTypes {
   People,
@@ -56,6 +56,10 @@ export class TypeaheadService {
       return this._getClientTypeahead(dataSet);
     }
 
+    if (field === Fields.Leadership) {
+      return this._getLeaderTypeahead(dataSet);
+    }
+
     if (field === Fields.Stats) {
       return this._getStatsTypeahead(dataSet);
     }
@@ -94,9 +98,27 @@ export class TypeaheadService {
   }
 
   _getClientTypeahead(data?: any[]): string[] {
-    const clientsOnPage = data?.map((entry) => entry?.client) || [];
-    const clientSet = new Set([...this._projectList.clients, ...clientsOnPage]);
+    const clientsOnPage =
+      data?.map((entry) => cleanString(entry?.client)) || [];
+    const clientSet = new Set([
+      ...(this._projectList?.clients || []),
+      ...clientsOnPage,
+    ]);
     return [...clientSet].sort(lCaseCompareFn);
+  }
+
+  _getLeaderTypeahead(data?: any[]): string[] {
+    const leadersOnPage =
+      data
+        ?.map((entry) =>
+          entry?.leadership?.map((leader: any) => cleanString(leader?.name))
+        )
+        ?.flat() || [];
+    const leaderSet = new Set([
+      ...(this._projectList?.leadership || []),
+      ...leadersOnPage,
+    ]);
+    return [...leaderSet].sort(lCaseCompareFn);
   }
 
   _getTagTypeahead(dataSet?: Tag[]): string[] {

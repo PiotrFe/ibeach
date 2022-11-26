@@ -60,6 +60,7 @@ export class ProjectListComponent
   modifiedEntries: ProjectEditable[] = [];
 
   boundGetClientTypeahead!: Function;
+  boundGetLeadershipTypeahead!: Function;
 
   constructor(
     private fetchService: FetchService,
@@ -77,6 +78,7 @@ export class ProjectListComponent
 
   ngOnInit(): void {
     this.boundGetClientTypeahead = this.getClientTypeAhead.bind(this);
+    this.boundGetLeadershipTypeahead = this.getLeadershipTypeAhead.bind(this);
     this.subscribeToServices();
   }
 
@@ -626,6 +628,13 @@ export class ProjectListComponent
   getClientTypeAhead(): string[] {
     return this.typeaheadService.getTypeahead(
       this.typeaheadService.fields.Client,
+      this.dataSet
+    );
+  }
+
+  getLeadershipTypeAhead(): string[] {
+    return this.typeaheadService.getTypeahead(
+      this.typeaheadService.fields.Leadership,
       this.dataSet
     );
   }

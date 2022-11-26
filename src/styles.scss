@@ -335,9 +335,15 @@ li {
   }
 
   &-leadership {
-    width: 7rem;
-    min-width: 7rem;
-    max-width: 22rem;
+    width: 6rem;
+    min-width: 6rem;
+    max-width: 18rem;
+  }
+
+  &-leadership-new {
+    width: 5rem;
+    min-width: 5rem;
+    max-width: 10rem;
   }
 
   &-allocation {
