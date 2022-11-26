@@ -16,7 +16,11 @@ import { TypeaheadMatch } from 'ngx-bootstrap/typeahead';
 import { EntryComponent } from 'src/app/shared-module/entry/entry.component';
 import { TypeaheadService } from 'src/app/shared-module/typeahead.service';
 
-import { LeadershipEntry, Project } from '../project-list/project';
+import {
+  LeadershipEntry,
+  Project,
+  ProjectPriority,
+} from '../project-list/project';
 import { Tag } from 'src/app/shared-module/entry/entry.component';
 import {
   getWeekDayDate,
@@ -24,6 +28,7 @@ import {
   getCalendarFromDate,
   removeExtraSpacesFromStr,
   cleanString,
+  getPrioClasses,
 } from 'src/app/utils';
 import {
   Week,
@@ -76,7 +81,8 @@ export class ProjectEntryFormComponent
   @ViewChild('leadershipInput') leadershipInput!: ElementRef;
   @ViewChild('leadershipInputSecondary') leadershipInputSecondary!: ElementRef;
 
-  newLeaderVal = '';
+  priority: ProjectPriority | undefined = undefined;
+  getPrioClasses = getPrioClasses;
 
   constructor(typeaheadService: TypeaheadService) {
     super(typeaheadService);
@@ -110,7 +116,7 @@ export class ProjectEntryFormComponent
     this.isCollapsed = false;
 
     if (this.entryData) {
-      const { client, type, comments, availDate, leadership } = this
+      const { client, type, comments, availDate, leadership, priority } = this
         .entryData as Project;
       this.projectForm.setValue({
         client,
@@ -140,6 +146,7 @@ export class ProjectEntryFormComponent
       });
       this.tags = this.entryData.tags;
       this.id = this.entryData.id;
+      this.priority = (this.entryData as Project).priority;
       if (leadership.length) {
         this.projectForm.get('leadershipNew')?.enable();
       }
@@ -380,6 +387,20 @@ export class ProjectEntryFormComponent
       this.typeaheadService.fields.Tag,
       tags
     );
+  }
+
+  onPrioClick(): void {
+    if (this.priority === undefined) {
+      this.priority = 0;
+    }
+
+    if (this.priority < 3) {
+      this.priority = (this.priority + 1) as ProjectPriority;
+      return;
+    }
+    if (this.priority === 3) {
+      this.priority = 0;
+    }
   }
 
   // onNameSelect(name: TypeaheadMatch) {

@@ -8,6 +8,11 @@ $menu-color: rgb(0, 55, 55);
 $menu-color-button: #406969;
 $menu-color-button-hover: rgba(var(--bs-dark-rgb), 0.75);
 
+$color-green: rgba(25, 135, 84, 0.6);
+$color-yellow: rgba(255, 193, 7, 0.7);
+$color-orange: rgba(253, 125, 20, 0.6);
+$color-red: rgba(220, 53, 69, 0.6);
+
 // ****************
 // GLOBAL SETTINGS
 // ****************
@@ -868,6 +873,18 @@ ul {
   font-size: 0.75rem !important;
   line-height: 1.5;
   border-radius: 0.2rem;
+}
+
+.prio-1 {
+  color: $color-green;
+}
+
+.prio-2 {
+  color: $color-yellow;
+}
+
+.prio-3 {
+  color: $color-orange;
 }
 
 // ****************************************************************

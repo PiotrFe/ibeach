@@ -9,6 +9,8 @@ export type LeadershipEntry = {
   mainContact: boolean;
 };
 
+export type ProjectPriority = 0 | 1 | 2 | 3;
+
 export interface Project {
   id: string;
   client: string;
@@ -20,6 +22,7 @@ export interface Project {
   comments?: string;
   tags: Tag[];
   emailSent?: boolean;
+  priority?: ProjectPriority;
 }
 
 export interface ProjectEditable extends Project {

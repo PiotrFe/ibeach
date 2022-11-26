@@ -19,3 +19,4 @@ export { stringToTitleCase } from './stringToTitleCase';
 export { getSkillGroupColor } from './getSkillGroupColor';
 export { cleanString } from './cleanString';
 export { lCaseCompareFn } from './lCaseCompareFn';
+export { getPrioClasses } from './getPrioClasses';

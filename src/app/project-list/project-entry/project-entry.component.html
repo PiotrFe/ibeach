@@ -68,6 +68,11 @@
   >
     {{ project.client | projectName | max25chars }}
   </span>
+  <i
+    *ngIf="inEditMode || this.project.priority"
+    [ngClass]="getPrioClasses(this.project.priority)"
+    (click)="onPrioClick()"
+  ></i>
   <span [ngClass]="getFieldClasses('type')">{{ project.type }}</span>
   <span [ngClass]="getFieldClasses('days')">{{ project.daysLeft }}</span>
   <div class="calendar-group mr-12">

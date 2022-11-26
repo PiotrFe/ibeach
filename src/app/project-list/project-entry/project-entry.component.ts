@@ -19,9 +19,14 @@ import { DataStoreService } from 'src/app/shared-module/data-store.service';
 import { DragAndDropService } from 'src/app/shared-module/drag-and-drop.service';
 import { EntryComponent } from 'src/app/shared-module/entry/entry.component';
 import { generateEmail } from 'src/app/shared-module/email';
-import { Project, ProjectEditable } from '../project-list/project';
+import {
+  Project,
+  ProjectEditable,
+  ProjectPriority,
+} from '../project-list/project';
 import { TypeaheadService } from 'src/app/shared-module/typeahead.service';
 import { Week } from 'src/app/shared-module/week-days/week';
+import { getPrioClasses } from 'src/app/utils';
 
 @Component({
   selector: 'project-entry',
@@ -32,6 +37,7 @@ export class ProjectEntryComponent extends EntryComponent implements OnInit {
   project!: ProjectEditable;
   subscription: Subscription = new Subscription();
   emailTemplate!: EmailTemplate;
+  getPrioClasses = getPrioClasses;
 
   @ViewChild('entryContainer') entryContainer!: ElementRef;
   @Output() emailEvent = new EventEmitter<string>();
@@ -113,6 +119,37 @@ export class ProjectEntryComponent extends EntryComponent implements OnInit {
     }
 
     return `${baseClass}${sortedClass}${otherClass}`;
+  }
+
+  onPrioClick(): void {
+    if (!this.inEditMode) {
+      return;
+    }
+
+    let { priority } = this.project;
+
+    if (priority === undefined) {
+      this.project = {
+        ...this.project,
+        priority: 0,
+      };
+      priority = 0;
+    }
+
+    if (priority < 3) {
+      this.project = {
+        ...this.project,
+        priority: (priority + 1) as ProjectPriority,
+      };
+
+      return;
+    }
+    if (priority === 3) {
+      this.project = {
+        ...this.project,
+        priority: 0,
+      };
+    }
   }
 
   handleGenerateEmail() {
