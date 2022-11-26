@@ -4,6 +4,7 @@ import { Project } from '../project-list/project-list/project';
 import { Tag } from 'src/app/shared-module/entry/entry.component';
 import { getAvailableTags } from 'src/app/utils/getTagsFromData';
 import { ProjectLookupEntry } from '../utils/StorageManager';
+import { lCaseCompareFn } from '../utils';
 
 enum TableTypes {
   People,
@@ -40,8 +41,6 @@ export class TypeaheadService {
 
     if (type === TableTypes.Projects) {
       this._projectList = list as ProjectLookupEntry;
-
-      console.log({ projectList: this._projectList });
     }
   }
 
@@ -95,7 +94,9 @@ export class TypeaheadService {
   }
 
   _getClientTypeahead(data?: any[]): string[] {
-    return [];
+    const clientsOnPage = data?.map((entry) => entry?.client) || [];
+    const clientSet = new Set([...this._projectList.clients, ...clientsOnPage]);
+    return [...clientSet].sort(lCaseCompareFn);
   }
 
   _getTagTypeahead(dataSet?: Tag[]): string[] {

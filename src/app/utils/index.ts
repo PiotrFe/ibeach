@@ -18,3 +18,4 @@ export { forbiddenValueValidator } from './forbiddenValueValidator';
 export { stringToTitleCase } from './stringToTitleCase';
 export { getSkillGroupColor } from './getSkillGroupColor';
 export { cleanString } from './cleanString';
+export { lCaseCompareFn } from './lCaseCompareFn';

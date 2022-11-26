@@ -112,6 +112,7 @@
           [sortField]="sortService.sort.field"
           [entryContainerWidth]="entryContainerWidth"
           [dispatchToParentAndClose]="saveChangesInProgress"
+          [getClientTypeAhead]="boundGetClientTypeahead"
           (deleteEvent)="removeRow($event)"
           (formSubmitEvent)="addProject($event)"
           (formPendingEvent)="handleFormPending()"

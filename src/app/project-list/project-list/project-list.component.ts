@@ -59,6 +59,8 @@ export class ProjectListComponent
   // records are stored in this array until save / cancel event on the people side
   modifiedEntries: ProjectEditable[] = [];
 
+  boundGetClientTypeahead!: Function;
+
   constructor(
     private fetchService: FetchService,
     private allocateService: AllocateService,
@@ -74,6 +76,7 @@ export class ProjectListComponent
   }
 
   ngOnInit(): void {
+    this.boundGetClientTypeahead = this.getClientTypeAhead.bind(this);
     this.subscribeToServices();
   }
 
@@ -86,7 +89,6 @@ export class ProjectListComponent
           if (dataType === 'projects') {
             this.dataSet = this.sortService.applyCurrentSort(data);
             this.updateFilteredView();
-            this.updateLookupTable();
 
             // post changes to store in the offline mode
             // (allocation service does not do it)
@@ -217,6 +219,7 @@ export class ProjectListComponent
           this.dataSet = this.parseAndSortProjectData(newWeeklyData);
           this.updateFilteredView();
           this.lastDataUpdateTs = updatedAtTs;
+          this.updateLookupTable();
           this.onFetchCompleted();
         }
       },
@@ -615,5 +618,15 @@ export class ProjectListComponent
     );
     link.click();
     URL.revokeObjectURL(link.href);
+  }
+
+  // **************
+  // TYPEAHEADS
+  // **************
+  getClientTypeAhead(): string[] {
+    return this.typeaheadService.getTypeahead(
+      this.typeaheadService.fields.Client,
+      this.dataSet
+    );
   }
 }

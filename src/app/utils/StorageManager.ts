@@ -11,7 +11,7 @@ import {
 } from 'src/app/project-list/project-list/project';
 import { StatsEntry } from 'src/app/stats/stats-entry/stats-entry.component';
 import { WeeklyData } from 'src/app/shared-module/fetch.service';
-import { cleanString } from 'src/app/utils';
+import { cleanString, lCaseCompareFn } from 'src/app/utils';
 
 export type ContactEntry = {
   first: string;
@@ -534,11 +534,8 @@ export class DataStoreManager implements StoreManager {
       };
     }
 
-    const clientArr = [...clientSet].sort();
-    const leaderArr = [...leaderSet].sort();
-
-    this.dataStore.lookupProjects.clients = clientArr;
-    this.dataStore.lookupProjects.leadership = leaderArr;
+    const clientArr = [...clientSet].sort(lCaseCompareFn);
+    const leaderArr = [...leaderSet].sort(lCaseCompareFn);
 
     this.saveListForLookup(
       { clients: clientArr, leadership: leaderArr },

@@ -38,6 +38,7 @@ export class ProjectEntryFormComponent
 {
   @Input() dispatchToParentAndClose: boolean = false;
   @Input() cleanSlate!: boolean;
+  @Input() getClientTypeAhead!: Function;
 
   @Output() formEditEvent = new EventEmitter<{
     id: string;
@@ -298,6 +299,20 @@ export class ProjectEntryFormComponent
       tags
     );
   }
+
+  // onNameSelect(name: TypeaheadMatch) {
+  //   const { value } = name;
+  //   const person = this.typeaheadService.getPersonByName(value);
+
+  //   if (person) {
+  //     this.personForm.patchValue({
+  //       skill: person.skill,
+  //       pdm: person.pdm,
+  //     });
+  //     this.tags = person.tags;
+  //     this.fmno = person.id;
+  //   }
+  // }
 }
 
 const capitalizeFirst = (str: string): string => {

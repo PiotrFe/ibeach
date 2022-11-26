@@ -208,13 +208,6 @@ export class PageComponent implements AfterViewInit {
   // EDITING
   // ********************
 
-  getClientTypeAhead(): string[] {
-    return this.typeaheadService.getTypeahead(
-      this.typeaheadService.fields.Client,
-      this.dataSet
-    );
-  }
-
   getNameTypeAhead(): string[] {
     return this.typeaheadService.getTypeahead(
       this.typeaheadService.fields.Name,

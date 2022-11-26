@@ -51,6 +51,7 @@
     type="text"
     placeholder="Client"
     formControlName="client"
+    [typeahead]="getClientTypeAhead()"
     required
   />
   <select
