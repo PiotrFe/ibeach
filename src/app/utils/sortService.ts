@@ -262,17 +262,17 @@ export class SortService {
   ): number => {
     const order = this.sort.order;
 
-    if (a.tags[0].type === b.tags[0].type) {
-      if (a.tags[0].value < b.tags[0].value) {
+    if (a.tags[0]?.type === b.tags[0]?.type) {
+      if (a.tags[0]?.value < b.tags[0]?.value) {
         return asc ? -1 : order * -1;
       }
 
-      if (a.tags[0].value > b.tags[0].value) {
+      if (a.tags[0]?.value > b.tags[0]?.value) {
         return asc ? 1 : order;
       }
 
       return 0;
-    } else {
+    } else if (a.tags[0]?.type && b.tags[0]?.type) {
       if (a.tags[0].type === 'ind') {
         return -1;
       }
@@ -281,7 +281,15 @@ export class SortService {
       }
 
       return 0;
+    } else if (a.tags[0]?.type || b.tags[0]?.type) {
+      if (a.tags[0]?.type) {
+        return -1;
+      }
+
+      return 1;
     }
+
+    return 0;
   };
 
   sortByStats = (

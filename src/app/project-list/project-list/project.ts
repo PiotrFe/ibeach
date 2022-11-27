@@ -29,6 +29,19 @@ export interface ProjectEditable extends Project {
   inEditMode: boolean;
 }
 
+export type ProjectEvent = {
+  id: string;
+  client: string;
+  type: string;
+  comments: string;
+  availDate: Date;
+  week: Week;
+  tags: Tag[];
+  leadership: string[];
+  doDuplicate?: boolean;
+  priority?: ProjectPriority;
+};
+
 @Component({
   template: '',
 })

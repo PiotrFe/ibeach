@@ -19,6 +19,7 @@ import { TypeaheadService } from 'src/app/shared-module/typeahead.service';
 import {
   LeadershipEntry,
   Project,
+  ProjectEvent,
   ProjectPriority,
 } from '../project-list/project';
 import { Tag } from 'src/app/shared-module/entry/entry.component';
@@ -52,29 +53,8 @@ export class ProjectEntryFormComponent
   @Input() getClientTypeAhead!: Function;
   @Input() getLeadershipTypeAhead!: Function;
 
-  @Output() formEditEvent = new EventEmitter<{
-    id: string;
-    client: string;
-    type: string;
-    comments: string;
-    availDate: Date;
-    week: Week;
-    tags: Tag[];
-    leadership: string[];
-    doDuplicate?: boolean;
-  }>();
-  @Output() formSubmitEvent = new EventEmitter<{
-    id: string;
-    client: string;
-    type: string;
-    comments: string;
-    availDate: Date;
-    week: Week;
-    tags: Tag[];
-    leadership: string[];
-    doDuplicate?: boolean;
-  }>();
-
+  @Output() formEditEvent = new EventEmitter<ProjectEvent>();
+  @Output() formSubmitEvent = new EventEmitter<ProjectEvent>();
   @Output() formPendingEvent = new EventEmitter<any>();
 
   @ViewChild('entryContainer') entryContainer!: ElementRef;
@@ -317,6 +297,9 @@ export class ProjectEntryFormComponent
         week: this.localCalendarObj,
         tags: this.tags,
         leadership: getLeadershipStringArr(leadership),
+        ...(this.priority && {
+          priority: this.priority,
+        }),
       });
     } else {
       this.formSubmitEvent.emit({
@@ -328,6 +311,9 @@ export class ProjectEntryFormComponent
         week: this.localCalendarObj,
         tags: this.tags,
         leadership: getLeadershipStringArr(leadership),
+        ...(this.priority && {
+          priority: this.priority,
+        }),
       });
     }
   }

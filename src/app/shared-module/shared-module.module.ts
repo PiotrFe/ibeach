@@ -17,6 +17,7 @@ import { ProjectNamePipe } from './project-name.pipe';
 import { Max25charsPipe } from './max25chars.pipe';
 import { ArrayToListPipe } from './array-to-list.pipe';
 import { AppLogoComponent } from './app-logo/app-logo.component';
+import { PadEndToPipe } from './pad-end-by.pipe';
 
 @NgModule({
   declarations: [
@@ -33,6 +34,7 @@ import { AppLogoComponent } from './app-logo/app-logo.component';
     Max25charsPipe,
     ArrayToListPipe,
     AppLogoComponent,
+    PadEndToPipe,
   ],
   imports: [
     CommonModule,
@@ -56,6 +58,7 @@ import { AppLogoComponent } from './app-logo/app-logo.component';
     Max25charsPipe,
     ArrayToListPipe,
     AppLogoComponent,
+    PadEndToPipe,
   ],
   providers: [BsModalRef],
 })

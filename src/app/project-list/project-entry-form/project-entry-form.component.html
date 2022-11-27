@@ -46,7 +46,7 @@
   novalidate
 >
   <input
-    class="form-control section section-name data-entry-input input--client mw-6"
+    class="form-control section section-name data-entry-input input--client mw-6 mr-1"
     [class.is-invalid]="isFieldValid('client')"
     type="text"
     placeholder="Client"
@@ -54,7 +54,7 @@
     [typeahead]="getClientTypeAhead()"
     required
   />
-  <i [ngClass]="getPrioClasses(priority)" (click)="onPrioClick()"></i>
+
   <select
     class="form-control section section-skill data-entry-input mr-12 mw-3"
     [class.is-invalid]="isFieldValid('type')"
@@ -66,7 +66,7 @@
     <option value="PD">PD</option>
     <option value="OTH">OTH</option>
   </select>
-
+  <i [ngClass]="getPrioClasses(priority, true)" (click)="onPrioClick()"></i>
   <span [ngClass]="getFieldClasses('days')">{{ getDaysAvailable() }}</span>
 
   <div class="calendar-group mr-12">

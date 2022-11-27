@@ -41,6 +41,10 @@ export class ProjectEntryComponent extends EntryComponent implements OnInit {
 
   @ViewChild('entryContainer') entryContainer!: ElementRef;
   @Output() emailEvent = new EventEmitter<string>();
+  @Output() prioChangeEvent = new EventEmitter<{
+    id: string;
+    priority: ProjectPriority;
+  }>();
 
   constructor(
     private allocateService: AllocateService,
@@ -129,26 +133,21 @@ export class ProjectEntryComponent extends EntryComponent implements OnInit {
     let { priority } = this.project;
 
     if (priority === undefined) {
-      this.project = {
-        ...this.project,
-        priority: 0,
-      };
       priority = 0;
     }
 
     if (priority < 3) {
-      this.project = {
-        ...this.project,
-        priority: (priority + 1) as ProjectPriority,
-      };
-
-      return;
-    }
-    if (priority === 3) {
-      this.project = {
-        ...this.project,
-        priority: 0,
-      };
+      priority++;
+      this.prioChangeEvent.emit({
+        id: this.id,
+        priority: priority as ProjectPriority,
+      });
+    } else {
+      priority = 0;
+      this.prioChangeEvent.emit({
+        id: this.id,
+        priority: priority as ProjectPriority,
+      });
     }
   }
 

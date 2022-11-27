@@ -342,6 +342,7 @@ export class PeopleListComponent
     this.filters = [];
     this.showAvailableOnly = false;
     this.pdmFilter.setValue('All');
+    this.skillFilter.setValue('All');
     this.updateStatusLabel(true);
     this.updateFilteredView();
   }

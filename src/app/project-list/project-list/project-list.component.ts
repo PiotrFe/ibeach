@@ -34,6 +34,8 @@ import {
   LeadershipEntry,
   Project,
   ProjectEditable,
+  ProjectEvent,
+  ProjectPriority,
 } from 'src/app/project-list/project-list/project';
 import { Week } from 'src/app/shared-module/week-days/week';
 import { Tag } from 'src/app/shared-module/entry/entry.component';
@@ -283,17 +285,7 @@ export class ProjectListComponent
     this.fetchData();
   }
 
-  updateProjectDetails(objParam: {
-    id: string;
-    client: string;
-    type: string;
-    comments: string;
-    availDate: Date;
-    week: Week;
-    tags: Tag[];
-    leadership: string[];
-    doDuplicate?: boolean;
-  }) {
+  updateProjectDetails(objParam: ProjectEvent) {
     const { doDuplicate } = objParam;
 
     if (doDuplicate) {
@@ -301,8 +293,17 @@ export class ProjectListComponent
       return;
     }
 
-    const { id, client, type, comments, availDate, week, tags, leadership } =
-      objParam;
+    const {
+      id,
+      client,
+      type,
+      comments,
+      availDate,
+      week,
+      tags,
+      leadership,
+      priority,
+    } = objParam;
 
     this.dataSet = this.dataSet.map((project) => {
       if (project.id !== id) {
@@ -328,6 +329,9 @@ export class ProjectListComponent
         ),
         week,
         tags,
+        ...(priority && {
+          priority,
+        }),
         inEditMode: false,
       };
     });
@@ -335,18 +339,7 @@ export class ProjectListComponent
     this.onChangeSaved();
   }
 
-  addProject(objParam: {
-    id: string;
-    client: string;
-    type: string;
-    comments: string;
-    availDate: Date;
-    week: Week;
-    tags: Tag[];
-    leadership: string[];
-    doDuplicate?: boolean;
-    existing?: boolean;
-  }) {
+  addProject(objParam: ProjectEvent & { existing?: boolean }) {
     this.sortService.clearSort();
     const {
       id,
@@ -359,6 +352,7 @@ export class ProjectListComponent
       leadership,
       doDuplicate,
       existing,
+      priority,
     } = objParam;
 
     const projectObj = {
@@ -382,6 +376,9 @@ export class ProjectListComponent
               mainContact: false,
             }
       ),
+      ...(priority && {
+        priority,
+      }),
     };
 
     const entryIndex: number = existing
@@ -603,6 +600,23 @@ export class ProjectListComponent
   }): void {
     this.updateTags(objParam);
     this.onChangeSaved();
+  }
+
+  updatePrio(newPrio: { id: string; priority: ProjectPriority }): void {
+    const { id, priority } = newPrio;
+
+    this.dataSet = this.dataSet.map((entry) => {
+      if (entry.id !== id) {
+        return entry;
+      }
+      return {
+        ...entry,
+        priority,
+      };
+    });
+    this.updateFilteredView();
+
+    console.log({ dataSet: this.dataSet });
   }
 
   downloadProjectList(): void {
