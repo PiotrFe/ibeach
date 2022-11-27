@@ -63,6 +63,7 @@ export class ProjectListComponent
 
   boundGetClientTypeahead!: Function;
   boundGetLeadershipTypeahead!: Function;
+  confirmAutoAllocate: boolean = false;
 
   constructor(
     private fetchService: FetchService,
@@ -634,6 +635,14 @@ export class ProjectListComponent
     );
     link.click();
     URL.revokeObjectURL(link.href);
+  }
+
+  // **************
+  // AUTOALLOCATE
+  // **************
+
+  onRequestAutoAllocate() {
+    this.confirmAutoAllocate = true;
   }
 
   // **************

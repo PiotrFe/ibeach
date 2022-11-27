@@ -6,7 +6,7 @@ import { delay, Observable, of, tap } from 'rxjs';
   providedIn: 'root',
 })
 export class AuthService {
-  isLoggedIn: boolean = true;
+  isLoggedIn: boolean = false;
   userName: string = '';
   redirectUrl: string | null = null;
 
