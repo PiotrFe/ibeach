@@ -5,6 +5,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 
+import { TooltipModule } from 'ngx-bootstrap/tooltip';
+
 import { AllocateModule } from './allocate/allocate.module';
 import { PeopleListModule } from './people-list/people-list.module';
 import { ProjectListModule } from './project-list/project-list.module';
@@ -31,6 +33,7 @@ import { LoginPageComponent } from 'src/app/auth/login-page/login-page.component
     SharedModuleModule,
     SettingsModule,
     StatsModule,
+    TooltipModule.forRoot(),
   ],
   providers: [],
   bootstrap: [AppEntryComponent],

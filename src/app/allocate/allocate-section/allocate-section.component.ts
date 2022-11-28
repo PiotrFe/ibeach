@@ -33,6 +33,7 @@ export class AllocateSectionComponent implements OnInit, OnDestroy {
   @ViewChild('projectSide') projectSide!: ElementRef;
 
   @Input() referenceDate: Date = new Date();
+  @Input() excludePast: boolean = false;
 
   dragging: boolean = false;
   subsciption: Subscription = new Subscription();

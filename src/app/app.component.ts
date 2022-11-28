@@ -21,6 +21,7 @@ export class AppComponent implements OnInit {
   pageSection = PAGE_SECTIONS.ALLOCATE;
   referenceDate: Date = new Date();
   showSettings: boolean = false;
+  excludePast: boolean = false;
 
   constructor(
     public dataStoreService: DataStoreService,

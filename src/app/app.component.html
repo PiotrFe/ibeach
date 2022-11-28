@@ -33,6 +33,22 @@
             [askToConfirmDateChange]="true"
             (dateChangeEvent)="handleDateChange($event)"
           ></calendar>
+          <div
+            class="form-check form-switch"
+            tooltip="Exclude past dates"
+            placement="bottom"
+            [adaptivePosition]="false"
+            [delay]="700"
+          >
+            <input
+              class="form-check-input"
+              type="checkbox"
+              role="switch"
+              id="flexSwitchCheckChecked"
+              [disabled]="pageSection !== 'ALLOCATE'"
+              [(ngModel)]="excludePast"
+            />
+          </div>
         </div>
         <li class="nav-item">
           <span
@@ -111,6 +127,7 @@
   <allocate-section
     *ngIf="pageSection === 'ALLOCATE'"
     [referenceDate]="referenceDate"
+    [excludePast]="excludePast"
   ></allocate-section>
   <stats-section *ngIf="pageSection === 'STATS'"></stats-section>
 </div>

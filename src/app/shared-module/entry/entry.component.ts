@@ -20,6 +20,7 @@ import { Person } from 'src/app/people-list/person';
 export interface Tag {
   type: string;
   value: string;
+  percent?: number;
 }
 
 @Component({
@@ -45,6 +46,7 @@ export class EntryComponent {
   @Input() inEditMode!: boolean;
   @Input() editable: boolean = true;
   @Input() entryContainerWidth!: number;
+  @Input() excludePast: boolean = false;
   @Input() referenceDate!: Date;
 
   @Output() editEvent = new EventEmitter<string>();

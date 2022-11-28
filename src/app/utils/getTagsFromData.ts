@@ -9,9 +9,10 @@ export const getTagsFromData = (
   }
   const dataArrRaw = data.split('; ');
   const regex = /\(\d{1,3}%\)/i;
-  const tagArr = dataArrRaw
+  const regexPercent = /\d{1,3}/;
+  const tagMap = dataArrRaw
     .filter((item) => {
-      const percent = item.match(/\d{1,3}/);
+      const percent = item.match(regexPercent);
 
       if (!percent) {
         return false;
@@ -20,20 +21,51 @@ export const getTagsFromData = (
 
       return int >= 10;
     })
-    .map((item) => item.toLowerCase().replace(regex, '').trim())
+    // .map((item) => item.toLowerCase().replace(regex, '').trim())
     .map((item) => {
+      const percent = item.match(regexPercent);
+      const itemVal = item.toLowerCase().replace(regex, '').trim();
+      const percentVal = percent === null ? 0 : parseInt(percent[0]);
+
       const tag = {
         value:
           tagType === 'ind'
-            ? getTagMatchForIndunstryItem(item).toUpperCase()
-            : getTagMatchForFunctionItem(item).toUpperCase(),
+            ? getTagMatchForIndunstryItem(itemVal).toUpperCase()
+            : getTagMatchForFunctionItem(itemVal).toUpperCase(),
         type: tagType,
+        percent: percentVal,
       };
 
       return tag;
     })
-    .filter((item) => item.value !== '');
+    .filter((item) => item.value !== '')
+    .reduce((tagMap: any, tagItem, idx, arr) => {
+      if (tagMap[tagItem.value]) {
+        const currentPercent = tagMap[tagItem.value].percent;
+        return {
+          ...tagMap,
+          [tagItem.value]: {
+            ...tagMap[tagItem.value],
+            percent: currentPercent + tagItem.percent,
+          },
+        };
+      }
 
+      return {
+        ...tagMap,
+        [tagItem.value]: {
+          type: tagItem.type,
+          percent: tagItem.percent,
+        },
+      };
+    }, {});
+
+  const tagArr: Tag[] = Object.entries(tagMap).map<any>(([key, rest]) => {
+    return {
+      value: key,
+      ...(rest as Object),
+    };
+  });
   return tagArr;
 };
 
@@ -88,7 +120,7 @@ export const getAffiliations = (
       ? getTagMatchForIndunstryItem(affiliation.toLowerCase())
       : getTagMatchForFunctionItem(affiliation.toLowerCase());
 
-  return tag ? [{ value: tag.toUpperCase(), type }] : [];
+  return tag ? [{ value: tag.toUpperCase(), type, percent: 100 }] : [];
 };
 
 export const clearTagDuplicates = (tags: Tag[]): Tag[] => {
@@ -162,6 +194,7 @@ const ind = {
     'animal',
     'vaccines',
     'generics',
+    'life sciences',
   ],
   pss: [
     'government',

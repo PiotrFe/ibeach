@@ -39,6 +39,7 @@ export const PAGE_TYPES = {
 export class PageComponent implements AfterViewInit {
   @ViewChild('page') pageContainer!: ElementRef;
   @Input() referenceDate: Date = new Date();
+  @Input() excludePast: boolean = false;
 
   ngZone: NgZone;
 

@@ -29,6 +29,10 @@
   padding: 2px;
   color: var(--bs-gray-800);
 
+  &-past {
+    opacity: 0.35;
+  }
+
   &--blue {
     background: rgba(13, 110, 253, 0.6);
   }

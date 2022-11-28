@@ -645,6 +645,13 @@ export class ProjectListComponent
     this.confirmAutoAllocate = true;
   }
 
+  async handleModalClose(submit: boolean) {
+    this.confirmAutoAllocate = false;
+    if (submit) {
+      this.allocateService.runAutoAllocation(this.referenceDate);
+    }
+  }
+
   // **************
   // TYPEAHEADS
   // **************

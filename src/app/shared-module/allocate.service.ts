@@ -853,4 +853,36 @@ export class AllocateService {
       daysLeft: getDaysLeft(newPersonWeek),
     };
   };
+
+  runAutoAllocation(weekOf: Date) {
+    const { data: peopleData } = this.dataStoreService.getPeopleList(weekOf);
+    const { data: projectData } = this.dataStoreService.getProjectList(weekOf);
+
+    console.log({ peopleData });
+
+    const PassNames = {
+      COMMENTS: 'COMMENTS',
+      'BACKGROUND+SKILL+DAYS': 'BACKGROUND+SKILL+DAYS',
+      'BACKGROUND+SKILL+SOME_DAYS': 'BACKGROUND+SKILL+SOME_DAYS',
+      'BACKGROUND+SKILL_ONE_BELOW+DAYS': 'BACKGROUND+SKILL_ONE_BELOW+DAYS',
+      'BACKGROUND+SKILL_ONE_BELOW+SOME_DAYS':
+        'BACKGROUND+SKILL_ONE_BELOW+_SOME_DAYS',
+      'BACKGROUND+SKILL_TWO_BELOW+DAYS': 'BACKGROUND+SKILL_TWO_BELOW+DAYS',
+      'BACKGROUND+SKILL_TWO_BELOW+SOME_DAYS':
+        'BACKGROUND+SKILL_TWO_BELOW+_SOME_DAYS',
+      'SKILL+DAYS': 'SKILL+DAYS',
+      'SKILL+SOME_DAYS': 'SKILL+SOME_DAYS',
+      'SKILL_ONE_BELOW+DAYS': 'SKILL_ONE_BELOW+DAYS',
+      'SKILL_ONE_BELOW+SOME_DAYS': 'SKILL_ONE_BELOW+_SOME_DAYS',
+      'SKILL_TWO_BELOW+DAYS': 'SKILL_TWO_BELOW+DAYS',
+      'SKILL_TWO_BELOW+SOME_DAYS': 'SKILL_TWO_BELOW+_SOME_DAYS',
+    };
+
+    const matchParams = {
+      comments: true,
+      background: 70,
+      skill: 0,
+      days: 0,
+    };
+  }
 }

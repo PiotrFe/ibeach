@@ -134,7 +134,6 @@ export class DataStoreManager implements StoreManager {
   dataStoreFileUpdateTs: number = 0;
 
   constructor() {
-    console.log('Running contructor');
     this.dataStore = this.getEmptyStore();
   }
 

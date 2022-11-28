@@ -135,6 +135,7 @@
           [entryData]="row"
           [cleanSlate]="true"
           [sortField]="sortService.sort.field"
+          [excludePast]="excludePast"
           [entryContainerWidth]="entryContainerWidth"
           [dispatchToParentAndClose]="saveChangesInProgress"
           [getClientTypeAhead]="boundGetClientTypeahead"
@@ -152,6 +153,7 @@
           [id]="project.id"
           [entryData]="project"
           [inEditMode]="inEditMode"
+          [excludePast]="excludePast"
           [sortField]="sortService.sort.field"
           [isCollapsed]="isCollapsed(project.id)"
           [referenceDate]="referenceDate"
@@ -169,6 +171,7 @@
           [id]="project.id"
           [entryData]="project"
           [cleanSlate]="false"
+          [excludePast]="excludePast"
           [sortField]="sortService.sort.field"
           [referenceDate]="referenceDate"
           [entryContainerWidth]="entryContainerWidth"
@@ -185,4 +188,12 @@
     </li>
   </div>
 </ul>
+<modal-window
+  *ngIf="confirmAutoAllocate"
+  [text]="'Run auto-allocation?'"
+  [btnConfirmText]="'Yes'"
+  [btnCloseText]="'Cancel'"
+  [modalType]="'CONFIRM'"
+  (closeEvent)="handleModalClose($event)"
+></modal-window>
 <loading-overlay *ngIf="fetching || uploading"> </loading-overlay>

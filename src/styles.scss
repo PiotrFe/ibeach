@@ -803,16 +803,24 @@ ul {
   }
 }
 
-.btn-primary--light {
-  background-color: rgba(0, 55, 55, 0.55) !important;
-  border-color: rgba(0, 55, 55, 0.55) !important;
-  font-size: 0.88rem !important;
+.btn-primary--base {
   border: none;
+  font-size: 0.88rem !important;
 
   &-printable {
     background-color: var(--bs-gray-400) !important;
     border-color: var(--bs-gray-400) !important;
   }
+}
+
+.btn-primary--light {
+  background-color: rgba(0, 55, 55, 0.55) !important;
+  border-color: rgba(0, 55, 55, 0.55) !important;
+}
+
+.btn-primary--past {
+  background-color: rgba(0, 55, 55, 0.2) !important;
+  border-color: rgba(0, 55, 55, 0.2) !important;
 }
 
 .badge {

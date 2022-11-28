@@ -7,18 +7,76 @@ import {
   SimpleChanges,
   ViewChild,
   ElementRef,
+  OnDestroy,
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import { Subject, takeUntil, pipe } from 'rxjs';
 import { Week, getNewWeek } from './week';
 import {
   AllocateService,
   DropdownEntry,
 } from 'src/app/shared-module/allocate.service';
+import { RefreshNowTsService } from 'src/app/shared-module/refresh-now-ts.service';
 
 import { DragAndDropService } from '../drag-and-drop.service';
 import { getSkillGroupColor } from 'src/app/utils';
 
-const weekStrArr = ['mon', 'tue', 'wed', 'thu', 'fri'];
+const dayInMs = 1000 * 60 * 60 * 24;
+const weekStrArr: string[] = ['mon', 'tue', 'wed', 'thu', 'fri'];
+
+const getDayInt = (day: string): number => {
+  const idx = weekStrArr.findIndex((weekDay) => weekDay === day);
+  if (idx > -1) {
+    return idx + 1;
+  }
+
+  return idx;
+};
+
+const setTimeToMidnight = (date: Date): Date => {
+  const dateCopy = new Date(date.getTime());
+  dateCopy.setHours(0);
+  dateCopy.setMinutes(0);
+  dateCopy.setSeconds(0);
+  dateCopy.setMilliseconds(0);
+
+  return dateCopy;
+};
+
+const getMondayOfSameWeek = (date: Date): Date => {
+  const dateCopy = setTimeToMidnight(new Date(date.getTime()));
+  const weekDay = dateCopy.getDay();
+
+  if (weekDay === 1) {
+    return date;
+  }
+
+  const dayDiff = weekDay === 0 ? 6 : weekDay - 1;
+
+  return new Date(dateCopy.getTime() - dayDiff * dayInMs);
+};
+
+const isDayInPast = (day: keyof Week, referenceDate: Date): boolean => {
+  // get monday of current week;
+  // check if ref date equal to that monday
+
+  // 1. If equal, compare day with today's day
+  // 2. If older, return true
+
+  const referenceDateCopy = setTimeToMidnight(
+    new Date(referenceDate.getTime())
+  );
+  const today = setTimeToMidnight(new Date(Date.now() + 3 * dayInMs));
+  const lastMonday = getMondayOfSameWeek(today);
+
+  if (referenceDateCopy < lastMonday) {
+    return true;
+  }
+
+  const dayInt = getDayInt(day);
+  const todayInt = today.getDay();
+  return dayInt < todayInt;
+};
 
 interface CalendarEntry {
   type: 'filled' | 'avail' | 'away';
@@ -28,6 +86,7 @@ interface CalendarEntry {
     text: string;
     skill?: string;
   };
+  past?: boolean;
 }
 
 @Component({
@@ -35,12 +94,15 @@ interface CalendarEntry {
   templateUrl: './week-days.component.html',
   styleUrls: ['./week-days.component.scss'],
 })
-export class WeekDaysComponent implements OnInit {
+export class WeekDaysComponent implements OnInit, OnDestroy {
   @Input() id!: string;
   @Input() weekObj!: Week;
   @Input() inEditMode: boolean = false;
   @Input() droppable!: boolean;
   @Input() displayedIn!: 'people' | 'projects';
+  @Input() excludePast!: boolean;
+  @Input() referenceDate!: Date;
+
   @Output() calendarChange = new EventEmitter<Week>();
   @Output() allocation = new EventEmitter<{
     id: string;
@@ -49,6 +111,9 @@ export class WeekDaysComponent implements OnInit {
     skill?: string;
   }>();
   @ViewChild('dropdown') dropdown!: ElementRef;
+
+  currentTs: number = Date.now();
+  onDestroy$: Subject<void> = new Subject<void>();
 
   weekModel: Week = getNewWeek();
   weekDaysArr: CalendarEntry[] = Object.keys(this.weekModel).map((val) => ({
@@ -66,30 +131,73 @@ export class WeekDaysComponent implements OnInit {
 
   constructor(
     private allocateService: AllocateService,
-    private dragAndDrop: DragAndDropService
+    private dragAndDrop: DragAndDropService,
+    private refreshTsService: RefreshNowTsService
   ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.refreshTsService.timestamp$
+      .pipe(takeUntil(this.onDestroy$))
+      .subscribe((ts) => {
+        this.currentTs = ts;
+      }); // Todo: refresh week view on each tick
+  }
   ngOnChanges(changes: SimpleChanges): void {
+    let refreshWeek = false;
+
     if (changes['weekObj'] && changes['weekObj'].currentValue) {
       this.weekModel = {
         ...changes['weekObj'].currentValue,
       };
-      this.weekDaysArr = Object.entries(this.weekModel).map(([key, value]) => {
-        if (typeof value === 'boolean') {
-          return {
-            type: value ? 'avail' : 'away',
-            day: key as keyof Week,
-            value: {
-              id: null,
-              text: key,
-            },
-          };
-        } else {
-          return { type: 'filled', day: key as keyof Week, value };
-        }
-      });
+      refreshWeek = true;
     }
+
+    if (changes['excludePast']) {
+      refreshWeek = true;
+
+      console.log({ changes });
+    }
+
+    if (refreshWeek) {
+      this.refreshWeek();
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.onDestroy$.next();
+    this.onDestroy$.complete();
+  }
+
+  refreshWeek() {
+    this.weekDaysArr = Object.entries(this.weekModel).map(([key, value]) => {
+      const day = key as keyof Week;
+      if (typeof value === 'boolean') {
+        return {
+          type: value ? 'avail' : 'away',
+          day,
+          value: {
+            id: null,
+            text: key,
+          },
+          ...(this.excludePast && {
+            past: isDayInPast(day, this.referenceDate),
+          }),
+        };
+      } else {
+        return {
+          type: 'filled',
+          day,
+          value,
+          ...(this.excludePast && {
+            past: isDayInPast(day, this.referenceDate),
+          }),
+        };
+      }
+    });
+
+    console.log({
+      weekDaysArr: this.weekDaysArr,
+    });
   }
 
   getDropdownTypeahead(): string[] {
@@ -129,6 +237,10 @@ export class WeekDaysComponent implements OnInit {
     const weekDay = weekStrArr[idx] as keyof Week;
     const weekAllocationItem = this.weekDaysArr[idx];
 
+    if (weekAllocationItem.past) {
+      return;
+    }
+
     if (!this.inEditMode && weekAllocationItem.type === 'away') {
       return;
     }
@@ -163,31 +275,38 @@ export class WeekDaysComponent implements OnInit {
   getClass(idx: number): string {
     const item = this.weekDaysArr[idx];
     const disabledCls =
-      !this.inEditMode && !this.droppable ? ' btn-inactive' : '';
+      (!this.inEditMode && !this.droppable) || item.past ? ' btn-inactive' : '';
     const activeDragAndDropFor =
       this.displayedIn === 'people' ? 'projects' : 'people';
+    const isPastItem = this.excludePast && item.past;
 
     if (item.type === 'away') {
       return `btn btn-unavail${disabledCls} cal-entry cal-entry--${item.day}`;
     }
 
     if (item.type === 'avail') {
-      let classes = `btn btn-primary btn-primary--light${disabledCls} cal-entry cal-entry--${item.day}`;
+      let baseColor = isPastItem ? 'past' : 'light';
+      let classes = `btn btn-primary btn-primary--${baseColor}${disabledCls} cal-entry cal-entry--${item.day}`;
 
-      return !this.inEditMode
+      return !this.inEditMode && !isPastItem
         ? `${classes} droppable droppable-${activeDragAndDropFor}`
         : classes;
     }
 
-    let btnColor = ' ';
+    let pastSuffix = !isPastItem ? ' ' : ' btn-allocated-past ';
+    let baseAllocated = ` btn-allocated${pastSuffix}`;
+    let btnColor = '';
     if (this.displayedIn === 'projects' && item.value.skill) {
       const skillColor = getSkillGroupColor(item.value.skill);
       btnColor = ` btn-allocated--${skillColor} `;
     }
 
-    let classes = `btn-allocated${btnColor}cal-entry cal-entry--${item.day} flex flex-hor-ctr flex-ver-ctr`;
+    let classes = `${baseAllocated}${btnColor}cal-entry cal-entry--${item.day} flex flex-hor-ctr flex-ver-ctr`;
 
-    return !this.inEditMode
+    if (this.displayedIn === 'projects') {
+      console.log({ classes });
+    }
+    return !this.inEditMode && !isPastItem
       ? `${classes} draggable draggable-${activeDragAndDropFor}`
       : classes;
   }

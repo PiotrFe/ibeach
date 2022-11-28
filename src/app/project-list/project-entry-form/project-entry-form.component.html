@@ -75,6 +75,8 @@
       [weekObj]="localCalendarObj"
       (calendarChange)="onCalendarChange($event)"
       [inEditMode]="true"
+      [excludePast]="excludePast"
+      [referenceDate]="referenceDate"
     ></week-days>
   </div>
   <i

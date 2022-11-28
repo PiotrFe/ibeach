@@ -85,6 +85,8 @@
       [inEditMode]="inEditMode"
       [droppable]="!inEditMode"
       [displayedIn]="'projects'"
+      [excludePast]="excludePast"
+      [referenceDate]="referenceDate"
       (calendarChange)="onCalendarChange($event)"
       (allocation)="onAllocation($event)"
     ></week-days>
