@@ -43,8 +43,8 @@
   id="{{ id }}"
   class="entry-item tl-row no-select"
   [class.entry-item--uncollapsed]="entryContainerWidth < 4 && !isCollapsed"
-  [class.droppable]="!inEditMode && entryData.daysLeft > 0"
-  [class.droppable-projects]="!inEditMode && entryData.daysLeft > 0"
+  [class.droppable]="!inEditMode && daysLeft > 0"
+  [class.droppable-projects]="!inEditMode && daysLeft > 0"
 >
   <span
     *ngIf="entryContainerWidth === 4"

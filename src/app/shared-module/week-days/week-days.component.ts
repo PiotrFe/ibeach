@@ -66,7 +66,7 @@ export const isDayInPast = (day: keyof Week, referenceDate: Date): boolean => {
   const referenceDateCopy = setTimeToMidnight(
     new Date(referenceDate.getTime())
   );
-  const today = setTimeToMidnight(new Date(Date.now() + 3 * dayInMs));
+  const today = setTimeToMidnight(new Date(Date.now()));
   const lastMonday = getMondayOfSameWeek(today);
 
   if (referenceDateCopy < lastMonday) {

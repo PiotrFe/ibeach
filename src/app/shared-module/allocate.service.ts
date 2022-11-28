@@ -11,6 +11,7 @@ import { ReferenceDateService } from './reference-date.service';
 import { DayHighlighterService } from 'src/app/shared-module/day-highlighter.service';
 import { FetchService } from 'src/app/shared-module/fetch.service';
 import { IsOnlineService } from 'src/app/shared-module/is-online.service';
+import { isDayInPast } from './week-days/week-days.component';
 
 export interface Dataset {
   dataType: 'people' | 'projects';
@@ -111,6 +112,14 @@ export class AllocateService {
     return this.getProjectsForDay(day);
   }
 
+  isPastDay(day: keyof Week) {
+    return (
+      this.referenceDateService.excludePast &&
+      this.referenceDateService.referenceDate &&
+      isDayInPast(day, this.referenceDateService.referenceDate)
+    );
+  }
+
   getPeopleForDay(day: keyof Week): DropdownEntry[] {
     if (!this.peopleDataSet.length) {
       return [];
@@ -118,7 +127,10 @@ export class AllocateService {
 
     return this.peopleDataSet
       .filter(
-        (person) => typeof person.week[day] === 'boolean' && person.week[day]
+        (person) =>
+          typeof person.week[day] === 'boolean' &&
+          person.week[day] &&
+          !this.isPastDay(day)
       )
       .map((person) => ({
         id: person.id,
@@ -134,7 +146,10 @@ export class AllocateService {
 
     return this.projectDataSet
       .filter(
-        (project) => typeof project.week[day] === 'boolean' && project.week[day]
+        (project) =>
+          typeof project.week[day] === 'boolean' &&
+          project.week[day] &&
+          !this.isPastDay(day)
       )
       .map((project) => ({
         id: project.id,
@@ -150,9 +165,12 @@ export class AllocateService {
     const deletedRecordType = entryType;
     const affectedSubIDs = Array.from(
       new Set(
-        Object.values(entry.week)
-          .filter((val) => typeof val !== 'boolean')
-          .map((val) => val.id)
+        Object.entries(entry.week)
+          .filter(
+            ([day, val]) =>
+              typeof val !== 'boolean' && !this.isPastDay(day as keyof Week)
+          )
+          .map((val) => (val as any).id)
       )
     );
 
@@ -372,7 +390,10 @@ export class AllocateService {
     if (!allocationCriteriaMet && (draggable || droppable) && dayFrom) {
       const calendarEntry = draggable.week[dayFrom as keyof Week];
 
-      if (typeof calendarEntry === 'boolean') {
+      if (
+        typeof calendarEntry === 'boolean' ||
+        (dayFrom !== 'match' && this.isPastDay(dayFrom))
+      ) {
         return;
       }
 
@@ -460,7 +481,9 @@ export class AllocateService {
 
     if (draggable && dayTo !== 'match') {
       const isLegal =
-        typeof draggable?.week[dayTo] === 'boolean' && draggable?.week[dayTo];
+        typeof draggable?.week[dayTo] === 'boolean' &&
+        draggable?.week[dayTo] &&
+        !this.isPastDay(dayTo as keyof Week);
       if (!isLegal) {
         this._highlightIllegalAllocation(draggable.id, dayTo as keyof Week);
       }
@@ -644,7 +667,8 @@ export class AllocateService {
     for (let weekDay of Object.keys(peopleData[personIdx].week)) {
       if (
         personEntry.week[weekDay as keyof Week] === true &&
-        projectEntry.week[weekDay as keyof Week] === true
+        projectEntry.week[weekDay as keyof Week] === true &&
+        !this.isPastDay(weekDay as keyof Week)
       ) {
         personEntry.week[weekDay as keyof Week] = {
           id: projectEntry.id,
@@ -690,7 +714,7 @@ export class AllocateService {
     // loop through person's / project's calendar
     for (let [key, val] of Object.entries(primaryEntry.week)) {
       // if value is an obj (not boolean), it means there's an allocation entry
-      if (typeof val === 'object') {
+      if (typeof val === 'object' && !this.isPastDay(key as keyof Week)) {
         // change the value of weekday to true
         primaryEntry.week = {
           ...primaryEntry.week,
