@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { DataStoreService } from 'src/app/shared-module/data-store.service';
 import { IsOnlineService } from 'src/app/shared-module/is-online.service';
+import { ReferenceDateService } from './shared-module/reference-date.service';
 import { DataStore } from 'src/app/utils/StorageManager';
 
 export const PAGE_SECTIONS = {
@@ -19,18 +20,33 @@ export class AppComponent implements OnInit {
   title = 'client-dev-app';
 
   pageSection = PAGE_SECTIONS.ALLOCATE;
-  referenceDate: Date = new Date();
   showSettings: boolean = false;
-  excludePast: boolean = false;
+
+  referenceDate!: Date;
+  excludePast!: boolean;
 
   constructor(
     public dataStoreService: DataStoreService,
-    private isOnline: IsOnlineService
+    private isOnline: IsOnlineService,
+    private referenceDateService: ReferenceDateService
   ) {
     this.isOnline.setIsOnline(false);
+    this.referenceDate = this.referenceDateService.referenceDate;
+    this.excludePast = this.referenceDateService.excludePast;
   }
 
   ngOnInit(): void {
+    this.referenceDateService.onReferenceDateChange$.subscribe({
+      next: ({ referenceDate, excludePast }) => {
+        if (referenceDate !== undefined) {
+          this.referenceDate = referenceDate;
+        }
+        if (excludePast !== undefined) {
+          this.excludePast = excludePast;
+        }
+      },
+    });
+
     const storeStr = window.localStorage.getItem('iBeach');
 
     if (!storeStr) {
@@ -50,9 +66,7 @@ export class AppComponent implements OnInit {
   }
 
   handleDateChange(date: Date) {
-    const newDate = date;
-    newDate.setHours(0, 0, 0, 0);
-    this.referenceDate = newDate;
+    this.referenceDateService.onDateChange(date);
   }
 
   saveChanges() {
@@ -65,5 +79,11 @@ export class AppComponent implements OnInit {
 
   toggleShowSettings() {
     this.showSettings = !this.showSettings;
+  }
+
+  toggleShowPast(e: any) {
+    const show = e.target.checked;
+
+    this.referenceDateService.onExcludePastChange(show);
   }
 }

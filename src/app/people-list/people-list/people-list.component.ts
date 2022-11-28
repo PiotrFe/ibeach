@@ -265,7 +265,11 @@ export class PeopleListComponent
         return {
           ...elem,
           week: updatedWeek as Week,
-          daysLeft: getDaysLeft(updatedWeek as Week),
+          daysLeft: getDaysLeft(
+            updatedWeek as Week,
+            this.excludePast,
+            this.referenceDate
+          ),
         };
       }
     );
@@ -442,7 +446,7 @@ export class PeopleListComponent
         skill,
         comments,
         availDate,
-        daysLeft: getDaysLeft(week),
+        daysLeft: getDaysLeft(week, this.excludePast, this.referenceDate),
         pdm,
         week,
         tags,
@@ -475,7 +479,7 @@ export class PeopleListComponent
       pdm,
       comments,
       inEditMode: false,
-      daysLeft: getDaysLeft(week),
+      daysLeft: getDaysLeft(week, this.excludePast, this.referenceDate),
       tags,
     });
 

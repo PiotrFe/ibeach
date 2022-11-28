@@ -1,3 +1,5 @@
+import { isDayInPast } from './week-days.component';
+
 export type WeekEntry = boolean | { id: string; text: string; skill?: string };
 
 export interface Week {
@@ -36,9 +38,18 @@ export const getClearWeek = (): Week => {
   };
 };
 
-export const getDaysLeft = (weekObj: Week): number => {
-  return Object.values(weekObj).reduce((acc, val) => {
-    if (typeof val === 'boolean' && val === true) {
+export const getDaysLeft = (
+  weekObj: Week,
+  excludePast = false,
+  referenceDate: Date | undefined = undefined
+): number => {
+  return Object.entries(weekObj).reduce((acc, [key, val]) => {
+    if (
+      typeof val === 'boolean' &&
+      val === true &&
+      (!excludePast ||
+        (referenceDate && !isDayInPast(key as keyof Week, referenceDate)))
+    ) {
       return acc + 1;
     }
     return acc;

@@ -15,6 +15,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { TypeaheadMatch } from 'ngx-bootstrap/typeahead';
 import { EntryComponent } from 'src/app/shared-module/entry/entry.component';
 import { TypeaheadService } from 'src/app/shared-module/typeahead.service';
+import { ReferenceDateService } from 'src/app/shared-module/reference-date.service';
 
 import {
   LeadershipEntry,
@@ -64,8 +65,11 @@ export class ProjectEntryFormComponent
   priority: ProjectPriority | undefined = undefined;
   getPrioClasses = getPrioClasses;
 
-  constructor(typeaheadService: TypeaheadService) {
-    super(typeaheadService);
+  constructor(
+    typeaheadService: TypeaheadService,
+    referenceDateService: ReferenceDateService
+  ) {
+    super(typeaheadService, referenceDateService);
   }
 
   projectForm = new FormGroup({
@@ -93,6 +97,7 @@ export class ProjectEntryFormComponent
   }
 
   ngOnInit(): void {
+    this.subscribeToServices();
     this.isCollapsed = false;
 
     if (this.entryData) {
@@ -139,12 +144,11 @@ export class ProjectEntryFormComponent
 
     if (this.entryData?.week) {
       this.localCalendarObj = this.entryData.week;
-      this.setDaysLeft(this.entryData.week);
     } else {
-      this.daysLeft = 5;
       this.localCalendarObj = getNewWeek();
       this.projectForm.patchValue({ availDate: this.referenceDate });
     }
+    this.setDaysLeft(this.localCalendarObj);
   }
 
   ngAfterViewInit(): void {
@@ -164,6 +168,7 @@ export class ProjectEntryFormComponent
   }
 
   ngOnDestroy(): void {
+    this.unsubscribeFromServices();
     this.onDestroy$.next();
     this.onDestroy$.complete();
   }
@@ -319,7 +324,11 @@ export class ProjectEntryFormComponent
   }
 
   setDaysLeft(calendarObj: Week) {
-    this.daysLeft = getDaysLeft(calendarObj);
+    this.daysLeft = getDaysLeft(
+      calendarObj,
+      this.excludePast,
+      this.referenceDate
+    );
   }
 
   getFieldClasses(fieldName: string): string {

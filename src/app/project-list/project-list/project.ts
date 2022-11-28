@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { EntryComponent } from 'src/app/shared-module/entry/entry.component';
 import { TypeaheadService } from 'src/app/shared-module/typeahead.service';
+import { ReferenceDateService } from 'src/app/shared-module/reference-date.service';
 import { Week } from 'src/app/shared-module/week-days/week';
 import { Tag } from 'src/app/shared-module/entry/entry.component';
 
@@ -46,8 +47,11 @@ export type ProjectEvent = {
   template: '',
 })
 export class ProjectEntry extends EntryComponent {
-  constructor(typeaheadService: TypeaheadService) {
-    super(typeaheadService);
+  constructor(
+    typeaheadService: TypeaheadService,
+    referenceDateService: ReferenceDateService
+  ) {
+    super(typeaheadService, referenceDateService);
   }
 
   getFieldClasses(fieldName: string): string {

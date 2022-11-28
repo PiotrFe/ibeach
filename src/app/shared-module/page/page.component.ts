@@ -253,7 +253,11 @@ export class PageComponent implements AfterViewInit {
         week: {
           ...calendarObj,
         },
-        daysLeft: getDaysLeft(calendarObj),
+        daysLeft: getDaysLeft(
+          calendarObj,
+          this.excludePast,
+          this.referenceDate
+        ),
       };
     });
     this.updateFilteredView();

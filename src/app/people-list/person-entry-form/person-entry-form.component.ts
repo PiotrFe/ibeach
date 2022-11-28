@@ -16,6 +16,7 @@ import { TypeaheadMatch } from 'ngx-bootstrap/typeahead';
 import { PersonEntry } from '../person';
 import { Tag } from 'src/app/shared-module/entry/entry.component';
 import { TypeaheadService } from '../../shared-module/typeahead.service';
+import { ReferenceDateService } from 'src/app/shared-module/reference-date.service';
 import { ConfigService, Config } from 'src/app/shared-module/config.service';
 import { Person } from '../person';
 import {
@@ -83,9 +84,10 @@ export class PersonEntryFormComponent
 
   constructor(
     typeaheadService: TypeaheadService,
-    private config: ConfigService
+    private config: ConfigService,
+    referenceDateService: ReferenceDateService
   ) {
-    super(typeaheadService);
+    super(typeaheadService, referenceDateService);
   }
 
   // ***************
@@ -128,12 +130,12 @@ export class PersonEntryFormComponent
 
     if (this.entryData?.week) {
       this.localCalendarObj = this.entryData.week;
-      this.setDaysLeft(this.entryData.week);
     } else {
-      this.daysLeft = 5;
       this.localCalendarObj = getNewWeek();
       this.personForm.patchValue({ availDate: this.referenceDate });
     }
+
+    this.setDaysLeft(this.localCalendarObj);
 
     const configSubscr = this.config.onConfig.subscribe({
       next: (config: Config) => {
@@ -142,11 +144,12 @@ export class PersonEntryFormComponent
         this.pdmArr = pdms;
       },
     });
-
+    this.subscribeToServices();
     this.subscription.add(configSubscr);
   }
 
-  ngOnDestroy() {
+  override ngOnDestroy() {
+    this.unsubscribeFromServices();
     this.subscription.unsubscribe();
   }
 
@@ -273,7 +276,11 @@ export class PersonEntryFormComponent
       );
 
       this.personForm.patchValue({ availDate: date });
-      this.daysLeft = getDaysLeft(newCalendarObj);
+      this.daysLeft = getDaysLeft(
+        newCalendarObj,
+        this.excludePast,
+        this.referenceDate
+      );
       this.localCalendarObj = newCalendarObj;
     }
   }
@@ -287,7 +294,11 @@ export class PersonEntryFormComponent
   }
 
   setDaysLeft(calendarObj: Week) {
-    this.daysLeft = getDaysLeft(calendarObj);
+    this.daysLeft = getDaysLeft(
+      calendarObj,
+      this.excludePast,
+      this.referenceDate
+    );
   }
 
   getFieldClasses(fieldName: string): string {

@@ -11,8 +11,11 @@ import {
 import { FormControl } from '@angular/forms';
 import { trigger, style, animate, transition } from '@angular/animations';
 
-import { Week } from 'src/app/shared-module/week-days/week';
+import { Subject, pipe, takeUntil } from 'rxjs';
+
+import { Week, getDaysLeft } from 'src/app/shared-module/week-days/week';
 import { TypeaheadService } from 'src/app/shared-module/typeahead.service';
+import { ReferenceDateService } from 'src/app/shared-module/reference-date.service';
 import { sortTags } from 'src/app/utils';
 import { Project } from 'src/app/project-list/project-list/project';
 import { Person } from 'src/app/people-list/person';
@@ -46,8 +49,6 @@ export class EntryComponent {
   @Input() inEditMode!: boolean;
   @Input() editable: boolean = true;
   @Input() entryContainerWidth!: number;
-  @Input() excludePast: boolean = false;
-  @Input() referenceDate!: Date;
 
   @Output() editEvent = new EventEmitter<string>();
   @Output() deleteEvent = new EventEmitter<string>();
@@ -73,10 +74,47 @@ export class EntryComponent {
   tagInput = new FormControl('');
 
   typeaheadService: TypeaheadService;
+  referenceDateService: ReferenceDateService;
   tagArr!: string[];
 
-  constructor(typeaheadService: TypeaheadService) {
+  excludePast: boolean = false;
+  referenceDate!: Date;
+
+  entryDestroy$: Subject<void> = new Subject<void>();
+
+  constructor(
+    typeaheadService: TypeaheadService,
+    referenceDateService: ReferenceDateService
+  ) {
     this.typeaheadService = typeaheadService;
+    this.referenceDateService = referenceDateService;
+  }
+
+  subscribeToServices() {
+    this.referenceDateService.onReferenceDateChange$
+      .pipe(takeUntil(this.entryDestroy$))
+      .subscribe({
+        next: ({ referenceDate, excludePast }) => {
+          if (referenceDate !== undefined) {
+            this.referenceDate = referenceDate;
+          }
+          if (excludePast !== undefined) {
+            this.excludePast = excludePast;
+          }
+          if (referenceDate !== undefined || excludePast !== undefined) {
+            this.daysLeft = getDaysLeft(
+              this.entryData?.week || this.localCalendarObj,
+              this.excludePast,
+              this.referenceDate
+            );
+          }
+        },
+      });
+  }
+
+  unsubscribeFromServices() {
+    this.entryDestroy$.next();
+    this.entryDestroy$.complete();
   }
 
   setShowAddTag(show: boolean): void {

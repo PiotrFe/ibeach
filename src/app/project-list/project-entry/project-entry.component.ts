@@ -5,6 +5,7 @@ import {
   ElementRef,
   Output,
   EventEmitter,
+  OnDestroy,
 } from '@angular/core';
 import { Subscription } from 'rxjs';
 import {
@@ -17,6 +18,7 @@ import {
 } from 'src/app/shared-module/config.service';
 import { DataStoreService } from 'src/app/shared-module/data-store.service';
 import { DragAndDropService } from 'src/app/shared-module/drag-and-drop.service';
+import { ReferenceDateService } from 'src/app/shared-module/reference-date.service';
 import { EntryComponent } from 'src/app/shared-module/entry/entry.component';
 import { generateEmail } from 'src/app/shared-module/email';
 import {
@@ -33,7 +35,10 @@ import { getPrioClasses } from 'src/app/utils';
   templateUrl: './project-entry.component.html',
   styleUrls: ['./project-entry.component.scss'],
 })
-export class ProjectEntryComponent extends EntryComponent implements OnInit {
+export class ProjectEntryComponent
+  extends EntryComponent
+  implements OnInit, OnDestroy
+{
   project!: ProjectEditable;
   subscription: Subscription = new Subscription();
   emailTemplate!: EmailTemplate;
@@ -51,17 +56,23 @@ export class ProjectEntryComponent extends EntryComponent implements OnInit {
     private dataStoreService: DataStoreService,
     private dragAndDrop: DragAndDropService,
     typeaheadService: TypeaheadService,
+    referenceDateService: ReferenceDateService,
     private config: ConfigService
   ) {
-    super(typeaheadService);
+    super(typeaheadService, referenceDateService);
   }
 
   ngOnInit(): void {
+    this.subscribeToServices();
     const entry = this.entryData as Project;
     this.project = {
       ...entry,
       inEditMode: false,
     };
+  }
+
+  ngOnDestroy(): void {
+    this.unsubscribeFromServices();
   }
 
   handleEdit(): void {

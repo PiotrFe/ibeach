@@ -11,7 +11,6 @@ import {
 } from '@angular/core';
 import { AllocationToCSV } from 'src/app/shared-module/allocation-to-csv.class';
 import { FormControl } from '@angular/forms';
-import { ContactEntry } from 'src/app/utils/StorageManager';
 import { CsvParserService } from 'src/app/shared-module/csv-parser.service';
 import { DataStoreService } from 'src/app/shared-module/data-store.service';
 import { FetchService } from '../../shared-module/fetch.service';
@@ -175,7 +174,11 @@ export class ProjectListComponent
               return {
                 ...elem,
                 week: updatedWeek as Week,
-                daysLeft: getDaysLeft(updatedWeek as Week),
+                daysLeft: getDaysLeft(
+                  updatedWeek as Week,
+                  this.excludePast,
+                  this.referenceDate
+                ),
               };
             }
           );
@@ -316,7 +319,7 @@ export class ProjectListComponent
         type,
         comments,
         availDate,
-        daysLeft: getDaysLeft(week),
+        daysLeft: getDaysLeft(week, this.excludePast, this.referenceDate),
         leadership: leadership.map<LeadershipEntry>((str) =>
           str.match(/\*/i)
             ? {
@@ -364,7 +367,7 @@ export class ProjectListComponent
       week,
       comments,
       inEditMode: false,
-      daysLeft: getDaysLeft(week),
+      daysLeft: getDaysLeft(week, this.excludePast, this.referenceDate),
       tags,
       leadership: leadership.map<LeadershipEntry>((str) =>
         str.match(/\*/i)

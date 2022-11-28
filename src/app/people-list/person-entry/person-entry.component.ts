@@ -7,6 +7,7 @@ import {
 } from 'src/app/shared-module/allocate.service';
 import { getSkillGroupColor } from 'src/app/utils';
 import { DragAndDropService } from 'src/app/shared-module/drag-and-drop.service';
+import { ReferenceDateService } from 'src/app/shared-module/reference-date.service';
 import { Week } from 'src/app/shared-module/week-days/week';
 
 @Component({
@@ -18,12 +19,11 @@ export class PersonEntryComponent extends PersonEntry {
   constructor(
     typeaheadService: TypeaheadService,
     private allocateService: AllocateService,
-    private dragAndDrop: DragAndDropService
+    private dragAndDrop: DragAndDropService,
+    referenceDateService: ReferenceDateService
   ) {
-    super(typeaheadService);
+    super(typeaheadService, referenceDateService);
   }
-
-  ngOnChanges() {}
 
   handleEdit(): void {
     this.editEvent.emit(this.id);

@@ -3,6 +3,7 @@ import { getDaysLeft } from 'src/app/shared-module/week-days/week';
 import { Person } from 'src/app/people-list/person';
 import { Week, getNewWeek } from 'src/app/shared-module/week-days/week';
 import { Tag } from 'src/app/shared-module/entry/entry.component';
+import { ReferenceDateService } from './reference-date.service';
 import { parse } from 'src/app/utils/csv-parser/index';
 import {
   getTagsFromData,
@@ -18,7 +19,7 @@ import { ContactEntry } from 'src/app/utils/StorageManager';
   providedIn: 'root',
 })
 export class CsvParserService {
-  constructor() {}
+  constructor(private referenceDateService: ReferenceDateService) {}
 
   parse(
     data: any,
@@ -51,7 +52,11 @@ export class CsvParserService {
               new Date(Date.parse(entry['Availability date']))
             )
           : getNewWeek();
-        const daysLeft: number = getDaysLeft(week);
+        const daysLeft: number = getDaysLeft(
+          week,
+          this.referenceDateService.excludePast,
+          this.referenceDateService.referenceDate
+        );
         const indTags = clearTagDuplicates([
           ...getTagsFromData(entry['Sector experience'], 'ind'),
           ...getAffiliations(entry['Core industry affiliations'], 'ind'),

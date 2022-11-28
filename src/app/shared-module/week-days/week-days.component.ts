@@ -56,7 +56,7 @@ const getMondayOfSameWeek = (date: Date): Date => {
   return new Date(dateCopy.getTime() - dayDiff * dayInMs);
 };
 
-const isDayInPast = (day: keyof Week, referenceDate: Date): boolean => {
+export const isDayInPast = (day: keyof Week, referenceDate: Date): boolean => {
   // get monday of current week;
   // check if ref date equal to that monday
 
@@ -154,8 +154,6 @@ export class WeekDaysComponent implements OnInit, OnDestroy {
 
     if (changes['excludePast']) {
       refreshWeek = true;
-
-      console.log({ changes });
     }
 
     if (refreshWeek) {
@@ -193,10 +191,6 @@ export class WeekDaysComponent implements OnInit, OnDestroy {
           }),
         };
       }
-    });
-
-    console.log({
-      weekDaysArr: this.weekDaysArr,
     });
   }
 
@@ -303,9 +297,6 @@ export class WeekDaysComponent implements OnInit, OnDestroy {
 
     let classes = `${baseAllocated}${btnColor}cal-entry cal-entry--${item.day} flex flex-hor-ctr flex-ver-ctr`;
 
-    if (this.displayedIn === 'projects') {
-      console.log({ classes });
-    }
     return !this.inEditMode && !isPastItem
       ? `${classes} draggable draggable-${activeDragAndDropFor}`
       : classes;

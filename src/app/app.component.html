@@ -46,7 +46,8 @@
               role="switch"
               id="flexSwitchCheckChecked"
               [disabled]="pageSection !== 'ALLOCATE'"
-              [(ngModel)]="excludePast"
+              [checked]="excludePast"
+              (change)="toggleShowPast($event)"
             />
           </div>
         </div>
