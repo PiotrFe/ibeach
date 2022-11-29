@@ -1,6 +1,7 @@
 import { BehaviorSubject } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { Config, ConfigChange } from 'src/app/shared-module/config.service';
+
 import {
   ContactEntry,
   DataStore,

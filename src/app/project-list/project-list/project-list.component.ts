@@ -52,6 +52,7 @@ export class ProjectListComponent
   implements OnInit, OnChanges, OnDestroy
 {
   allocationDataSubscription!: Subscription;
+  allocateService!: AllocateService;
   deleteRecordSubscription!: Subscription;
   subscription: Subscription = new Subscription();
   projectFilter = new FormControl('All');
@@ -66,7 +67,7 @@ export class ProjectListComponent
 
   constructor(
     private fetchService: FetchService,
-    private allocateService: AllocateService,
+    allocateService: AllocateService,
     private dataStoreService: DataStoreService,
     private isOnlineService: IsOnlineService,
     typeaheadService: TypeaheadService,
@@ -76,6 +77,7 @@ export class ProjectListComponent
     private listEditModeStatusService: ListEditModeStatusService
   ) {
     super(ngZone, resizeObserverService, typeaheadService);
+    this.allocateService = allocateService;
   }
 
   ngOnInit(): void {

@@ -12,8 +12,9 @@
     <button
       *ngIf="!inEditMode"
       type="button"
-      class="btn btn-primary btn-menu mr-20 auto-button"
+      class="btn btn-primary btn-menu btn-menu--light mr-20 auto-button"
       (click)="onRequestAutoAllocate()"
+      [disabled]="!allocateService.hasEntriesToAutoAllocate"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -32,6 +33,16 @@
       </svg>
 
       Auto
+    </button>
+    <button
+      *ngIf="!inEditMode"
+      type="button"
+      class="btn btn-menu btn-warning btn-menu--warning mr-20 auto-button"
+      (click)="onRequestAutoAllocate()"
+      [disabled]="!allocateService.hasEntriesToClear"
+    >
+      <i class="bi bi-trash"></i>
+      Clear
     </button>
 
     <button

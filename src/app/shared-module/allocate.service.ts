@@ -7,11 +7,10 @@ import {
 } from 'src/app/project-list/project-list/project';
 import { Week, getDaysLeft } from 'src/app/shared-module/week-days/week';
 import { DataStoreService } from 'src/app/shared-module/data-store.service';
-import { ReferenceDateService } from './reference-date.service';
+import { ReferenceDateService } from 'src/app/shared-module/reference-date.service';
 import { DayHighlighterService } from 'src/app/shared-module/day-highlighter.service';
 import { FetchService } from 'src/app/shared-module/fetch.service';
 import { IsOnlineService } from 'src/app/shared-module/is-online.service';
-import { isDayInPast } from './week-days/week-days.component';
 
 export interface Dataset {
   dataType: 'people' | 'projects';
@@ -86,6 +85,8 @@ export class AllocateService {
   deleteRecordSubject: Subject<DeletionEvent | SaveEvent> = new Subject<
     DeletionEvent | SaveEvent
   >();
+  hasEntriesToAutoAllocate: boolean = false;
+  hasEntriesToClear: boolean = false;
   peopleDataSet!: PersonEditable[];
   projectDataSet!: ProjectEditable[];
   registeredDragEvent!: RegisteredAllocationDragDropEvent | null;
@@ -99,7 +100,16 @@ export class AllocateService {
     private fetchService: FetchService,
     private isOnlineService: IsOnlineService,
     private referenceDateService: ReferenceDateService
-  ) {}
+  ) {
+    referenceDateService.onReferenceDateChange$.subscribe({
+      next: ({ referenceDate, excludePast }) => {
+        if (referenceDate || typeof excludePast === 'boolean') {
+          this.hasEntriesToAutoAllocate = this.canAutoAllocateEntries();
+          this.hasEntriesToClear = this.canClearEntries();
+        }
+      },
+    });
+  }
 
   getDataForDay(
     dataType: 'people' | 'projects',
@@ -112,14 +122,6 @@ export class AllocateService {
     return this.getProjectsForDay(day);
   }
 
-  isPastDay(day: keyof Week) {
-    return (
-      this.referenceDateService.excludePast &&
-      this.referenceDateService.referenceDate &&
-      isDayInPast(day, this.referenceDateService.referenceDate)
-    );
-  }
-
   getPeopleForDay(day: keyof Week): DropdownEntry[] {
     if (!this.peopleDataSet.length) {
       return [];
@@ -130,7 +132,7 @@ export class AllocateService {
         (person) =>
           typeof person.week[day] === 'boolean' &&
           person.week[day] &&
-          !this.isPastDay(day)
+          !this.referenceDateService.isPastDay(day)
       )
       .map((person) => ({
         id: person.id,
@@ -149,7 +151,7 @@ export class AllocateService {
         (project) =>
           typeof project.week[day] === 'boolean' &&
           project.week[day] &&
-          !this.isPastDay(day)
+          !this.referenceDateService.isPastDay(day)
       )
       .map((project) => ({
         id: project.id,
@@ -168,7 +170,8 @@ export class AllocateService {
         Object.entries(entry.week)
           .filter(
             ([day, val]) =>
-              typeof val !== 'boolean' && !this.isPastDay(day as keyof Week)
+              typeof val !== 'boolean' &&
+              !this.referenceDateService.isPastDay(day as keyof Week)
           )
           .map((val) => (val as any).id)
       )
@@ -192,6 +195,8 @@ export class AllocateService {
       this.projectDataSet = data as ProjectEditable[];
     }
 
+    this.hasEntriesToAutoAllocate = this.canAutoAllocateEntries();
+    this.hasEntriesToClear = this.canClearEntries();
     this.weekOf = weekOf;
   }
 
@@ -329,6 +334,9 @@ export class AllocateService {
       ...entry,
       inEditMode: false,
     }));
+
+    this.hasEntriesToAutoAllocate = this.canAutoAllocateEntries();
+    this.hasEntriesToClear = this.canClearEntries();
   }
 
   // ******************************************
@@ -392,7 +400,7 @@ export class AllocateService {
 
       if (
         typeof calendarEntry === 'boolean' ||
-        (dayFrom !== 'match' && this.isPastDay(dayFrom))
+        (dayFrom !== 'match' && this.referenceDateService.isPastDay(dayFrom))
       ) {
         return;
       }
@@ -483,7 +491,7 @@ export class AllocateService {
       const isLegal =
         typeof draggable?.week[dayTo] === 'boolean' &&
         draggable?.week[dayTo] &&
-        !this.isPastDay(dayTo as keyof Week);
+        !this.referenceDateService.isPastDay(dayTo as keyof Week);
       if (!isLegal) {
         this._highlightIllegalAllocation(draggable.id, dayTo as keyof Week);
       }
@@ -619,18 +627,18 @@ export class AllocateService {
       ...peopleData[personIdx],
       week: personWeek,
       daysLeft: getDaysLeft(
-        personWeek,
-        this.referenceDateService.excludePast,
-        this.referenceDateService.referenceDate
+        personWeek
+        // this.referenceDateService.excludePast,
+        // this.referenceDateService.referenceDate
       ),
     };
     projectData[projectIdx] = {
       ...projectData[projectIdx],
       week: projectWeek,
       daysLeft: getDaysLeft(
-        projectWeek,
-        this.referenceDateService.excludePast,
-        this.referenceDateService.referenceDate
+        projectWeek
+        // this.referenceDateService.excludePast,
+        // this.referenceDateService.referenceDate
       ),
       emailSent: false,
     };
@@ -668,7 +676,7 @@ export class AllocateService {
       if (
         personEntry.week[weekDay as keyof Week] === true &&
         projectEntry.week[weekDay as keyof Week] === true &&
-        !this.isPastDay(weekDay as keyof Week)
+        !this.referenceDateService.isPastDay(weekDay as keyof Week)
       ) {
         personEntry.week[weekDay as keyof Week] = {
           id: projectEntry.id,
@@ -682,14 +690,14 @@ export class AllocateService {
       }
     }
     personEntry.daysLeft = getDaysLeft(
-      personEntry.week,
-      this.referenceDateService.excludePast,
-      this.referenceDateService.referenceDate
+      personEntry.week
+      // this.referenceDateService.excludePast,
+      // this.referenceDateService.referenceDate
     );
     projectEntry.daysLeft = getDaysLeft(
-      projectEntry.week,
-      this.referenceDateService.excludePast,
-      this.referenceDateService.referenceDate
+      projectEntry.week
+      // this.referenceDateService.excludePast,
+      // this.referenceDateService.referenceDate
     );
     projectEntry.emailSent = false;
   };
@@ -714,7 +722,10 @@ export class AllocateService {
     // loop through person's / project's calendar
     for (let [key, val] of Object.entries(primaryEntry.week)) {
       // if value is an obj (not boolean), it means there's an allocation entry
-      if (typeof val === 'object' && !this.isPastDay(key as keyof Week)) {
+      if (
+        typeof val === 'object' &&
+        !this.referenceDateService.isPastDay(key as keyof Week)
+      ) {
         // change the value of weekday to true
         primaryEntry.week = {
           ...primaryEntry.week,
@@ -731,9 +742,9 @@ export class AllocateService {
           [key]: true,
         };
         const secondaryEntryDaysLeft = getDaysLeft(
-          secondaryEntryWeek,
-          this.referenceDateService.excludePast,
-          this.referenceDateService.referenceDate
+          secondaryEntryWeek
+          // this.referenceDateService.excludePast,
+          // this.referenceDateService.referenceDate
         );
 
         seconDaryDataSet[secondaryEntryIndex] = {
@@ -747,9 +758,9 @@ export class AllocateService {
       }
     }
     primaryEntry.daysLeft = getDaysLeft(
-      primaryEntry.week,
-      this.referenceDateService.excludePast,
-      this.referenceDateService.referenceDate
+      primaryEntry.week
+      // this.referenceDateService.excludePast,
+      // this.referenceDateService.referenceDate
     );
     if (primaryEntry.emailSent) {
       primaryEntry.emailSent = false;
@@ -796,9 +807,9 @@ export class AllocateService {
       ...peopleData[personIdx],
       week: personWeek,
       daysLeft: getDaysLeft(
-        personWeek,
-        this.referenceDateService.excludePast,
-        this.referenceDateService.referenceDate
+        personWeek
+        // this.referenceDateService.excludePast,
+        // this.referenceDateService.referenceDate
       ),
     };
 
@@ -811,9 +822,9 @@ export class AllocateService {
       ...projectData[currentProjectIndex],
       week: currentProjectWeek,
       daysLeft: getDaysLeft(
-        currentProjectWeek,
-        this.referenceDateService.excludePast,
-        this.referenceDateService.referenceDate
+        currentProjectWeek
+        // this.referenceDateService.excludePast,
+        // this.referenceDateService.referenceDate
       ),
       emailSent: false,
     };
@@ -833,9 +844,9 @@ export class AllocateService {
       ...projectData[newProjectIndex],
       week: newProjectWeek,
       daysLeft: getDaysLeft(
-        newProjectWeek,
-        this.referenceDateService.excludePast,
-        this.referenceDateService.referenceDate
+        newProjectWeek
+        // this.referenceDateService.excludePast,
+        // this.referenceDateService.referenceDate
       ),
       emailSent: false,
     };
@@ -885,9 +896,9 @@ export class AllocateService {
       ...projectData[projectIdx],
       week: projectWeek,
       daysLeft: getDaysLeft(
-        projectWeek,
-        this.referenceDateService.excludePast,
-        this.referenceDateService.referenceDate
+        projectWeek
+        // this.referenceDateService.excludePast,
+        // this.referenceDateService.referenceDate
       ),
       emailSent: false,
     };
@@ -901,9 +912,9 @@ export class AllocateService {
       ...peopleData[currentPersonIndex],
       week: currentPersonWeek,
       daysLeft: getDaysLeft(
-        currentPersonWeek,
-        this.referenceDateService.excludePast,
-        this.referenceDateService.referenceDate
+        currentPersonWeek
+        // this.referenceDateService.excludePast,
+        // this.referenceDateService.referenceDate
       ),
     };
 
@@ -921,12 +932,79 @@ export class AllocateService {
       ...peopleData[newPersonIndex],
       week: newPersonWeek,
       daysLeft: getDaysLeft(
-        newPersonWeek,
-        this.referenceDateService.excludePast,
-        this.referenceDateService.referenceDate
+        newPersonWeek
+        // this.referenceDateService.excludePast,
+        // this.referenceDateService.referenceDate
       ),
     };
   };
+
+  // ********************
+  // AUTO_ALLOCATION
+  // ********************
+
+  canClearEntries(): boolean {
+    if (!this.projectDataSet.length) {
+      return false;
+    }
+
+    for (let project of this.projectDataSet) {
+      const { week } = project;
+
+      for (let [day, entry] of Object.entries(week)) {
+        if (
+          typeof entry !== 'boolean' &&
+          !this.referenceDateService.isPastDay(day as keyof Week)
+        ) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  canAutoAllocateEntries(): boolean {
+    if (!this.projectDataSet.length || !this.peopleDataSet.length) {
+      return false;
+    }
+
+    let projectHasUnallocated = false;
+
+    for (let project of this.projectDataSet) {
+      const { week } = project;
+
+      for (let [day, entry] of Object.entries(week)) {
+        if (
+          typeof entry === 'boolean' &&
+          entry === true &&
+          !this.referenceDateService.isPastDay(day as keyof Week)
+        ) {
+          projectHasUnallocated = true;
+        }
+      }
+    }
+
+    if (!projectHasUnallocated) {
+      return false;
+    }
+
+    for (let project of this.peopleDataSet) {
+      const { week } = project;
+
+      for (let [day, entry] of Object.entries(week)) {
+        if (
+          typeof entry === 'boolean' &&
+          entry === true &&
+          !this.referenceDateService.isPastDay(day as keyof Week)
+        ) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
 
   runAutoAllocation(weekOf: Date) {
     const { data: peopleData } = this.dataStoreService.getPeopleList(weekOf);
@@ -954,7 +1032,7 @@ export class AllocateService {
 
     const matchParams = {
       comments: true,
-      background: 70,
+      backgroundThreshold: 70,
       skill: 0,
       days: 0,
     };

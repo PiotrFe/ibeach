@@ -832,12 +832,41 @@ ul {
   background-color: $menu-color-button !important;
   border-color: $menu-color-button !important;
 
-  &:focus {
-    box-shadow: 0 0 0 0.15rem #4b8080 !important;
-  }
   &:hover {
     background-color: $menu-color-button-hover !important;
     border-color: $menu-color-button-hover !important;
+  }
+
+  &--warning {
+    color: #000 !important;
+    background-color: #ffc107 !important;
+    border-color: #ffc107 !important;
+
+    & > i {
+      color: #000;
+    }
+
+    &:hover {
+      color: #000 !important;
+      background-color: #ffca2c !important;
+      border-color: #ffc720 !important;
+    }
+  }
+
+  &--light {
+    color: #000 !important;
+    background-color: #f8f9fa !important;
+    border-color: #f8f9fa !important;
+
+    &:hover {
+      color: #000 !important;
+      background-color: #f9fafccd !important;
+      border-color: #f9fafccd !important;
+    }
+  }
+
+  &:focus {
+    box-shadow: 0 0 0 0.15rem #4b8080 !important;
   }
 
   &--small {

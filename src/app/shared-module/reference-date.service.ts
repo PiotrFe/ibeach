@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ReplaySubject } from 'rxjs';
+import { Week, getDaysLeft } from 'src/app/shared-module/week-days/week';
+import { isDayInPast } from 'src/app/shared-module/week-days/week-days.component';
 
 type ReferenceDateEntry = {
   referenceDate?: Date;
@@ -35,5 +37,13 @@ export class ReferenceDateService {
     this.#referenceChangeSubject$.next({
       excludePast: newExclude,
     });
+  }
+
+  isPastDay(day: keyof Week) {
+    return (
+      this.excludePast &&
+      this.referenceDate &&
+      isDayInPast(day, this.referenceDate)
+    );
   }
 }
