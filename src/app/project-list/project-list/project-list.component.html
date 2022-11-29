@@ -38,7 +38,7 @@
       *ngIf="!inEditMode"
       type="button"
       class="btn btn-menu btn-warning btn-menu--warning mr-20 auto-button"
-      (click)="onRequestAutoAllocate()"
+      (click)="onRequestClear()"
       [disabled]="!allocateService.hasEntriesToClear"
     >
       <i class="bi bi-trash"></i>
@@ -199,6 +199,19 @@
   [btnConfirmText]="'Yes'"
   [btnCloseText]="'Cancel'"
   [modalType]="'CONFIRM'"
-  (closeEvent)="handleModalClose($event)"
+  (closeEvent)="handleAutoAllocateModalClose($event)"
 ></modal-window>
+<modal-window
+  *ngIf="confirmClear"
+  [text]="'Run auto-allocation?'"
+  [title]="'Clear weekly allocation?'"
+  [btnConfirmText]="'Confirm'"
+  [btnCloseText]="'Cancel'"
+  [modalType]="'INPUT_SMALL'"
+  [confirmBtnEnabled]="(confirmClearString | lowercase) === 'clear'"
+  (closeEvent)="handleClearModalClose($event)"
+>
+  <div class="input-modal-text">Type 'clear' to confirm</div>
+  <input class="form-control" type="text" [(ngModel)]="confirmClearString" />
+</modal-window>
 <loading-overlay *ngIf="fetching || uploading"> </loading-overlay>

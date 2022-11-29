@@ -689,16 +689,8 @@ export class AllocateService {
         };
       }
     }
-    personEntry.daysLeft = getDaysLeft(
-      personEntry.week
-      // this.referenceDateService.excludePast,
-      // this.referenceDateService.referenceDate
-    );
-    projectEntry.daysLeft = getDaysLeft(
-      projectEntry.week
-      // this.referenceDateService.excludePast,
-      // this.referenceDateService.referenceDate
-    );
+    personEntry.daysLeft = getDaysLeft(personEntry.week);
+    projectEntry.daysLeft = getDaysLeft(projectEntry.week);
     projectEntry.emailSent = false;
   };
 
@@ -714,7 +706,7 @@ export class AllocateService {
     const { person, project } = entry;
     const entryID = person ? person.id : project?.id;
     const primaryDataSet = person ? peopleData : projectData;
-    const seconDaryDataSet = person ? projectData : peopleData;
+    const secondaryDataSet = person ? projectData : peopleData;
     const primaryEntry = (primaryDataSet as any[]).find(
       (entry) => entry.id === entryID
     );
@@ -733,35 +725,28 @@ export class AllocateService {
         };
 
         // find the index of the other entry (if person primary entry, then project and vice versa)
-        const secondaryEntryIndex = seconDaryDataSet.findIndex(
+        const secondaryEntryIndex = secondaryDataSet.findIndex(
           (elem) => elem.id == (val as { id: string; text: string }).id
         );
         // change the value of that weekday to boolean true
         const secondaryEntryWeek = {
-          ...seconDaryDataSet[secondaryEntryIndex].week,
+          ...secondaryDataSet[secondaryEntryIndex].week,
           [key]: true,
         };
-        const secondaryEntryDaysLeft = getDaysLeft(
-          secondaryEntryWeek
-          // this.referenceDateService.excludePast,
-          // this.referenceDateService.referenceDate
-        );
+        const secondaryEntryDaysLeft = getDaysLeft(secondaryEntryWeek);
 
-        seconDaryDataSet[secondaryEntryIndex] = {
-          ...seconDaryDataSet[secondaryEntryIndex],
+        secondaryDataSet[secondaryEntryIndex] = {
+          ...secondaryDataSet[secondaryEntryIndex],
           week: secondaryEntryWeek,
           daysLeft: secondaryEntryDaysLeft,
         };
-        if ((seconDaryDataSet[secondaryEntryIndex] as Project).emailSent) {
-          (seconDaryDataSet[secondaryEntryIndex] as Project).emailSent = false;
+        if ((secondaryDataSet[secondaryEntryIndex] as Project).emailSent) {
+          (secondaryDataSet[secondaryEntryIndex] as Project).emailSent = false;
         }
       }
     }
-    primaryEntry.daysLeft = getDaysLeft(
-      primaryEntry.week
-      // this.referenceDateService.excludePast,
-      // this.referenceDateService.referenceDate
-    );
+    primaryEntry.daysLeft = getDaysLeft(primaryEntry.week);
+
     if (primaryEntry.emailSent) {
       primaryEntry.emailSent = false;
     }
@@ -944,7 +929,7 @@ export class AllocateService {
   // ********************
 
   canClearEntries(): boolean {
-    if (!this.projectDataSet.length) {
+    if (!this.projectDataSet?.length) {
       return false;
     }
 
@@ -965,7 +950,7 @@ export class AllocateService {
   }
 
   canAutoAllocateEntries(): boolean {
-    if (!this.projectDataSet.length || !this.peopleDataSet.length) {
+    if (!this.projectDataSet?.length || !this.peopleDataSet?.length) {
       return false;
     }
 
@@ -1006,9 +991,43 @@ export class AllocateService {
     return false;
   }
 
-  runAutoAllocation(weekOf: Date) {
-    const { data: peopleData } = this.dataStoreService.getPeopleList(weekOf);
-    const { data: projectData } = this.dataStoreService.getProjectList(weekOf);
+  runClearAllocation() {
+    if (!this.hasEntriesToClear) {
+      return;
+    }
+
+    const { data: peopleData } = this.dataStoreService.getPeopleList(
+      this.referenceDateService.referenceDate
+    );
+
+    const { data: projectData } = this.dataStoreService.getProjectList(
+      this.referenceDateService.referenceDate
+    );
+
+    for (let person of peopleData) {
+      const allocationEntry: AllocationEntry = {
+        person: {
+          id: person.id,
+          value: null,
+          skill: person.skill,
+        },
+        day: 'match',
+      };
+
+      this.#clearWeek({ peopleData, projectData, entry: allocationEntry });
+    }
+
+    this.#updateDataset(peopleData, projectData);
+    this.#emitData();
+  }
+
+  runAutoAllocation() {
+    const { data: peopleData } = this.dataStoreService.getPeopleList(
+      this.referenceDateService.referenceDate
+    );
+    const { data: projectData } = this.dataStoreService.getProjectList(
+      this.referenceDateService.referenceDate
+    );
 
     console.log({ peopleData });
 

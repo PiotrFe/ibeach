@@ -64,6 +64,8 @@ export class ProjectListComponent
   boundGetClientTypeahead!: Function;
   boundGetLeadershipTypeahead!: Function;
   confirmAutoAllocate: boolean = false;
+  confirmClear: boolean = false;
+  confirmClearString: string = '';
 
   constructor(
     private fetchService: FetchService,
@@ -650,10 +652,23 @@ export class ProjectListComponent
     this.confirmAutoAllocate = true;
   }
 
-  async handleModalClose(submit: boolean) {
+  onRequestClear() {
+    this.confirmClear = true;
+  }
+
+  handleAutoAllocateModalClose(submit: boolean) {
     this.confirmAutoAllocate = false;
     if (submit) {
-      this.allocateService.runAutoAllocation(this.referenceDate);
+      this.allocateService.runAutoAllocation();
+    }
+  }
+
+  handleClearModalClose(submit: boolean) {
+    this.confirmClear = false;
+    this.confirmClearString = '';
+
+    if (submit) {
+      this.allocateService.runClearAllocation();
     }
   }
 

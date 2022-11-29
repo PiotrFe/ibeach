@@ -38,6 +38,7 @@ export class ModalWindowComponent implements OnInit, OnDestroy {
   @Input() modalType!: keyof typeof MODAL_TYPES;
   @Input() hideOnBackdropClick: boolean = true;
   @Input() canSubmit: boolean = false;
+  @Input() confirmBtnEnabled: boolean = true;
 
   @Output() closeEvent = new EventEmitter<boolean>();
 
