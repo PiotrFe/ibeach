@@ -80,9 +80,10 @@ interface RegisteredAllocationDragDropEvent extends AllocationDragDropEvent {
 }
 
 type ProfileConfig = {
-  skill: boolean | -1 | -2;
-  days: boolean | -1 | -2;
-  tagThreshold: number;
+  skill: boolean | -1 | -2 | -3;
+  days: boolean | -1 | -2 | -3 | -4;
+  tagThreshold: 90 | 70 | 50 | 30 | 0;
+  comments?: boolean;
 };
 
 @Injectable({
@@ -1041,43 +1042,59 @@ export class AllocateService {
       this.referenceDateService.referenceDate
     );
 
-    const PassNames = {
-      COMMENTS: 'COMMENTS',
-      'BACKGROUND+SKILL+DAYS': 'BACKGROUND+SKILL+DAYS',
-      'BACKGROUND+SKILL+SOME_DAYS': 'BACKGROUND+SKILL+SOME_DAYS',
-      'BACKGROUND+SKILL_ONE_BELOW+DAYS': 'BACKGROUND+SKILL_ONE_BELOW+DAYS',
-      'BACKGROUND+SKILL_ONE_BELOW+SOME_DAYS':
-        'BACKGROUND+SKILL_ONE_BELOW+_SOME_DAYS',
-      'BACKGROUND+SKILL_TWO_BELOW+DAYS': 'BACKGROUND+SKILL_TWO_BELOW+DAYS',
-      'BACKGROUND+SKILL_TWO_BELOW+SOME_DAYS':
-        'BACKGROUND+SKILL_TWO_BELOW+_SOME_DAYS',
-      'SKILL+DAYS': 'SKILL+DAYS',
-      'SKILL+SOME_DAYS': 'SKILL+SOME_DAYS',
-      'SKILL_ONE_BELOW+DAYS': 'SKILL_ONE_BELOW+DAYS',
-      'SKILL_ONE_BELOW+SOME_DAYS': 'SKILL_ONE_BELOW+_SOME_DAYS',
-      'SKILL_TWO_BELOW+DAYS': 'SKILL_TWO_BELOW+DAYS',
-      'SKILL_TWO_BELOW+SOME_DAYS': 'SKILL_TWO_BELOW+_SOME_DAYS',
+    const getPassPhase = (
+      comments: ProfileConfig['comments'],
+      tagThreshold: ProfileConfig['tagThreshold'],
+      skill: ProfileConfig['skill'],
+      days: ProfileConfig['days']
+    ): ProfileConfig => {
+      return {
+        tagThreshold,
+        skill,
+        days,
+        comments,
+      };
     };
 
-    type PassPhase = 'comments' | 'full profile match';
-    const passPhases: PassPhase[] = ['comments', 'full profile match'];
-
-    const profileConfig: ProfileConfig = {
-      tagThreshold: 70,
-      skill: true,
-      days: true,
+    const generatePassArrForTagThreshold = (
+      tagThreshold: ProfileConfig['tagThreshold']
+    ): ProfileConfig[] => {
+      return [
+        getPassPhase(false, tagThreshold, true, true),
+        getPassPhase(false, tagThreshold, true, -1),
+        getPassPhase(false, tagThreshold, true, -2),
+        getPassPhase(false, tagThreshold, -1, true),
+        getPassPhase(false, tagThreshold, -1, -1),
+        getPassPhase(false, tagThreshold, true, -3),
+        getPassPhase(false, tagThreshold, -1, -2),
+        getPassPhase(false, tagThreshold, -2, true),
+        getPassPhase(false, tagThreshold, -2, -1),
+        getPassPhase(false, tagThreshold, -2, -2),
+        getPassPhase(false, tagThreshold, -1, -3),
+        getPassPhase(false, tagThreshold, -2, -3),
+        getPassPhase(false, tagThreshold, -3, -3),
+        getPassPhase(false, tagThreshold, true, -4),
+        getPassPhase(false, tagThreshold, -1, -4),
+        getPassPhase(false, tagThreshold, -2, -4),
+        getPassPhase(false, tagThreshold, -3, -4),
+      ];
     };
+
+    const passPhases: ProfileConfig[] = [
+      getPassPhase(true, 0, false, false),
+      getPassPhase(false, 90, true, true),
+      ...generatePassArrForTagThreshold(70),
+      ...generatePassArrForTagThreshold(50),
+      ...generatePassArrForTagThreshold(30),
+      ...generatePassArrForTagThreshold(0),
+      getPassPhase(false, 0, false, false),
+    ];
 
     for (let phase of passPhases) {
-      switch (phase) {
-        case 'comments':
-          this.#allocateByComments(peopleData, projectData);
-          break;
-        case 'full profile match':
-          this.#allocateByProfile(peopleData, projectData, profileConfig);
-          break;
-        default:
-          break;
+      if (phase.comments) {
+        this.#allocateByComments(peopleData, projectData);
+      } else {
+        this.#allocateByProfile(peopleData, projectData, phase);
       }
     }
 
@@ -1213,7 +1230,7 @@ export class AllocateService {
               (projectTag) =>
                 projectTag.value === personTag.value &&
                 personTag.percent &&
-                personTag.percent > profileConfig.tagThreshold
+                personTag.percent >= profileConfig.tagThreshold
             );
 
             if (tagsMatch) {

@@ -15,14 +15,14 @@ export type ProjectPriority = 0 | 1 | 2 | 3;
 
 export const matchSkillToProjectPriority = (
   color: SkillColor,
-  adjustBy: 0 | -1 | -2 = 0
+  adjustBy: 0 | -1 | -2 | -3 = 0
 ): ProjectPriority => {
   if (color === 'green') {
     return (3 + adjustBy) as ProjectPriority;
   }
 
   if (color === 'yellow') {
-    return (2 + adjustBy) as ProjectPriority;
+    return Math.min(2 + adjustBy, 0) as ProjectPriority;
   }
 
   if (color === 'orange') {
