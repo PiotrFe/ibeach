@@ -623,8 +623,6 @@ export class ProjectListComponent
       };
     });
     this.updateFilteredView();
-
-    console.log({ dataSet: this.dataSet });
   }
 
   downloadProjectList(): void {

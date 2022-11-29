@@ -16,7 +16,7 @@ export { decodeWhitespaces, encodeWhitespaces } from './handleWhitespaces'; // a
 export { exportProjectListToPDF } from './exportProjectListToPDF';
 export { forbiddenValueValidator } from './forbiddenValueValidator';
 export { stringToTitleCase } from './stringToTitleCase';
-export { getSkillGroupColor } from './getSkillGroupColor';
+export { getSkillGroupColor, SkillColor } from './getSkillGroupColor';
 export { cleanString } from './cleanString';
 export { lCaseCompareFn } from './lCaseCompareFn';
 export { getPrioClasses } from './getPrioClasses';

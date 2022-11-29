@@ -4,6 +4,7 @@ import { TypeaheadService } from 'src/app/shared-module/typeahead.service';
 import { ReferenceDateService } from 'src/app/shared-module/reference-date.service';
 import { Week } from 'src/app/shared-module/week-days/week';
 import { Tag } from 'src/app/shared-module/entry/entry.component';
+import { SkillColor } from 'src/app/utils';
 
 export type LeadershipEntry = {
   name: string;
@@ -11,6 +12,25 @@ export type LeadershipEntry = {
 };
 
 export type ProjectPriority = 0 | 1 | 2 | 3;
+
+export const matchSkillToProjectPriority = (
+  color: SkillColor,
+  adjustBy: 0 | -1 | -2 = 0
+): ProjectPriority => {
+  if (color === 'green') {
+    return (3 + adjustBy) as ProjectPriority;
+  }
+
+  if (color === 'yellow') {
+    return (2 + adjustBy) as ProjectPriority;
+  }
+
+  if (color === 'orange') {
+    return Math.min(1 + adjustBy, 0) as ProjectPriority;
+  }
+
+  return 0;
+};
 
 export interface Project {
   id: string;

@@ -1,4 +1,6 @@
-export const getSkillGroupColor = (skill: string): string => {
+export type SkillColor = 'blue' | 'green' | 'yellow' | 'orange' | 'red' | '';
+
+export const getSkillGroupColor = (skill: string): SkillColor => {
   if (['AP', 'EAP'].includes(skill)) {
     return 'blue';
   }

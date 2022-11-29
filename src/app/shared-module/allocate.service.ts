@@ -4,6 +4,7 @@ import { Person, PersonEditable } from 'src/app/people-list/person';
 import {
   Project,
   ProjectEditable,
+  matchSkillToProjectPriority,
 } from 'src/app/project-list/project-list/project';
 import { Week, getDaysLeft } from 'src/app/shared-module/week-days/week';
 import { DataStoreService } from 'src/app/shared-module/data-store.service';
@@ -11,6 +12,7 @@ import { ReferenceDateService } from 'src/app/shared-module/reference-date.servi
 import { DayHighlighterService } from 'src/app/shared-module/day-highlighter.service';
 import { FetchService } from 'src/app/shared-module/fetch.service';
 import { IsOnlineService } from 'src/app/shared-module/is-online.service';
+import { cleanString, getSkillGroupColor, SkillColor } from 'src/app/utils';
 
 export interface Dataset {
   dataType: 'people' | 'projects';
@@ -77,6 +79,12 @@ interface RegisteredAllocationDragDropEvent extends AllocationDragDropEvent {
   droppable?: PersonEditable | ProjectEditable;
 }
 
+type ProfileConfig = {
+  skill: boolean | -1 | -2;
+  days: boolean | -1 | -2;
+  tagThreshold: number;
+};
+
 @Injectable({
   providedIn: 'root',
 })
@@ -104,8 +112,8 @@ export class AllocateService {
     referenceDateService.onReferenceDateChange$.subscribe({
       next: ({ referenceDate, excludePast }) => {
         if (referenceDate || typeof excludePast === 'boolean') {
-          this.hasEntriesToAutoAllocate = this.canAutoAllocateEntries();
-          this.hasEntriesToClear = this.canClearEntries();
+          this.hasEntriesToAutoAllocate = this.#canAutoAllocateEntries();
+          this.hasEntriesToClear = this.#canClearEntries();
         }
       },
     });
@@ -195,8 +203,8 @@ export class AllocateService {
       this.projectDataSet = data as ProjectEditable[];
     }
 
-    this.hasEntriesToAutoAllocate = this.canAutoAllocateEntries();
-    this.hasEntriesToClear = this.canClearEntries();
+    this.hasEntriesToAutoAllocate = this.#canAutoAllocateEntries();
+    this.hasEntriesToClear = this.#canClearEntries();
     this.weekOf = weekOf;
   }
 
@@ -335,8 +343,8 @@ export class AllocateService {
       inEditMode: false,
     }));
 
-    this.hasEntriesToAutoAllocate = this.canAutoAllocateEntries();
-    this.hasEntriesToClear = this.canClearEntries();
+    this.hasEntriesToAutoAllocate = this.#canAutoAllocateEntries();
+    this.hasEntriesToClear = this.#canClearEntries();
   }
 
   // ******************************************
@@ -928,7 +936,7 @@ export class AllocateService {
   // AUTO_ALLOCATION
   // ********************
 
-  canClearEntries(): boolean {
+  #canClearEntries(): boolean {
     if (!this.projectDataSet?.length) {
       return false;
     }
@@ -949,7 +957,7 @@ export class AllocateService {
     return false;
   }
 
-  canAutoAllocateEntries(): boolean {
+  #canAutoAllocateEntries(): boolean {
     if (!this.projectDataSet?.length || !this.peopleDataSet?.length) {
       return false;
     }
@@ -1022,14 +1030,16 @@ export class AllocateService {
   }
 
   runAutoAllocation() {
+    if (!this.hasEntriesToAutoAllocate) {
+      return;
+    }
+
     const { data: peopleData } = this.dataStoreService.getPeopleList(
       this.referenceDateService.referenceDate
     );
     const { data: projectData } = this.dataStoreService.getProjectList(
       this.referenceDateService.referenceDate
     );
-
-    console.log({ peopleData });
 
     const PassNames = {
       COMMENTS: 'COMMENTS',
@@ -1049,11 +1059,214 @@ export class AllocateService {
       'SKILL_TWO_BELOW+SOME_DAYS': 'SKILL_TWO_BELOW+_SOME_DAYS',
     };
 
-    const matchParams = {
-      comments: true,
-      backgroundThreshold: 70,
-      skill: 0,
-      days: 0,
+    type PassPhase = 'comments' | 'full profile match';
+    const passPhases: PassPhase[] = ['comments', 'full profile match'];
+
+    const profileConfig: ProfileConfig = {
+      tagThreshold: 70,
+      skill: true,
+      days: true,
     };
+
+    for (let phase of passPhases) {
+      switch (phase) {
+        case 'comments':
+          this.#allocateByComments(peopleData, projectData);
+          break;
+        case 'full profile match':
+          this.#allocateByProfile(peopleData, projectData, profileConfig);
+          break;
+        default:
+          break;
+      }
+    }
+
+    this.#updateDataset(peopleData, projectData);
+    this.#emitData();
+  }
+
+  #allocateByComments(peopleList: Person[], projectList: Project[]) {
+    for (let person of peopleList) {
+      const nameParsed = cleanString(person.name).toLowerCase();
+
+      for (let project of projectList) {
+        const commentParsed = project.comments
+          ? cleanString(project.comments).toLowerCase()
+          : undefined;
+
+        if (!commentParsed) {
+          continue;
+        }
+
+        const nameFound = commentParsed.match(new RegExp(`${nameParsed}`, 'i'));
+
+        if (!nameFound) {
+          continue;
+        }
+
+        const allocationEntry: AllocationEntry = {
+          person: {
+            id: person.id,
+            value: person.name,
+            skill: person.skill,
+          },
+          project: {
+            id: project.id,
+            value: project.client,
+          },
+          day: 'match',
+        };
+
+        this.#allocateFullWeek({
+          projectData: projectList,
+          peopleData: peopleList,
+          newEntry: allocationEntry,
+        });
+      }
+    }
+  }
+
+  #allocateByProfile(
+    peopleList: Person[],
+    projectList: Project[],
+    profileConfig: ProfileConfig
+  ) {
+    for (let person of peopleList) {
+      const personDays = Object.values(person.week).filter(
+        (day) => typeof day === 'boolean' && day
+      ).length;
+
+      if (!personDays) {
+        continue;
+      }
+      let projectDays = 0;
+      let matchedProject: Project | null = null;
+
+      const tagsAboveThreshold = !profileConfig.tagThreshold
+        ? []
+        : person.tags.filter(
+            (tag) => tag.percent && tag.percent >= profileConfig.tagThreshold
+          );
+
+      // if (person.name === 'Anna Hamsted') {
+      //   console.log({
+      //     tagsAboveThreshold,
+      //     profileConfig,
+      //   });
+      // }
+
+      if (profileConfig.tagThreshold > 0 && !tagsAboveThreshold.length) {
+        continue;
+      }
+
+      for (let project of projectList) {
+        projectDays = Object.values(project.week).filter(
+          (day) => typeof day === 'boolean' && day
+        ).length;
+
+        // if (person.name === 'Anna Hamsted') {
+        //   console.log({
+        //     project,
+        //     projectDays,
+        //   });
+        // }
+
+        if (!projectDays) {
+          continue;
+        }
+
+        // match skill
+        const skillAdjustement =
+          typeof profileConfig.skill === 'boolean' ? 0 : profileConfig.skill;
+        const personPriority = project.priority
+          ? matchSkillToProjectPriority(
+              getSkillGroupColor(person.skill) as SkillColor,
+              skillAdjustement
+            )
+          : 0;
+
+        // if (person.name === 'Anna Hamsted') {
+        //   console.log({
+        //     skillAdjustement,
+        //     personPriority,
+        //     projectPriority: project.priority,
+        //   });
+        // }
+
+        if (personPriority !== (project.priority || 0)) {
+          continue;
+        }
+
+        // match tags
+        if (profileConfig.tagThreshold > 0) {
+          let tagsMatch = false;
+
+          for (let personTag of tagsAboveThreshold) {
+            // if (person.name === 'Anna Hamsted') {
+            //   console.log({
+            //     personTag,
+            //     projectTags: project.tags,
+            //   });
+            // }
+
+            tagsMatch = project.tags.some(
+              (projectTag) =>
+                projectTag.value === personTag.value &&
+                personTag.percent &&
+                personTag.percent > profileConfig.tagThreshold
+            );
+
+            if (tagsMatch) {
+              break;
+            }
+          }
+
+          if (!tagsMatch) {
+            continue;
+          }
+        }
+
+        // match days
+        const expectedPersonDays =
+          profileConfig.days === true // full match required
+            ? projectDays
+            : profileConfig.days === false // no match required
+            ? personDays
+            : personDays + profileConfig.days; // partial match required (either -1 or -2 days)
+
+        if (person.name === 'Anna Hamsted') {
+          console.log({
+            expectedPersonDays,
+            projectDays,
+          });
+        }
+        if (expectedPersonDays !== projectDays) {
+          continue;
+        }
+
+        matchedProject = project;
+      }
+
+      if (matchedProject) {
+        const allocationEntry: AllocationEntry = {
+          person: {
+            id: person.id,
+            value: person.name,
+            skill: person.skill,
+          },
+          project: {
+            id: matchedProject.id,
+            value: matchedProject.client,
+          },
+          day: 'match',
+        };
+
+        this.#allocateFullWeek({
+          projectData: projectList,
+          peopleData: peopleList,
+          newEntry: allocationEntry,
+        });
+      }
+    }
   }
 }
