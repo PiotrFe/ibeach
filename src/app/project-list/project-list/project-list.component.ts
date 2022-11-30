@@ -202,8 +202,20 @@ export class ProjectListComponent
         },
       });
 
+    const workInProgressSubscription =
+      this.allocateService.onWorkInProgress$.subscribe({
+        next: (workInProgress: boolean) => {
+          if (workInProgress && !this.fetching) {
+            this.fetching = true;
+          } else if (!workInProgress && this.fetching) {
+            this.fetching = false;
+          }
+        },
+      });
+
     this.subscription.add(allocationDataSubscription);
     this.subscription.add(deleteRecordSubscription);
+    this.subscription.add(workInProgressSubscription);
 
     if (this.isOnlineService.isOnline) {
       const fetchSubscription = this.fetchService.fetchContactData().subscribe({
@@ -665,7 +677,9 @@ export class ProjectListComponent
   handleAutoAllocateModalClose(submit: boolean) {
     this.confirmAutoAllocate = false;
     if (submit) {
-      this.allocateService.runAutoAllocation();
+      setTimeout(() => {
+        this.allocateService.runAutoAllocation();
+      });
     }
   }
 

@@ -159,8 +159,20 @@ export class PeopleListComponent
         },
       });
 
+    const workInProgressSubscription =
+      this.allocateService.onWorkInProgress$.subscribe({
+        next: (workInProgress: boolean) => {
+          if (workInProgress && !this.fetching) {
+            this.fetching = true;
+          } else if (!workInProgress && this.fetching) {
+            this.fetching = false;
+          }
+        },
+      });
+
     this.subscription.add(allocationDataSubscription);
     this.subscription.add(deleteRecordSubscription);
+    this.subscription.add(workInProgressSubscription);
   }
 
   subscribeToStoreServices() {

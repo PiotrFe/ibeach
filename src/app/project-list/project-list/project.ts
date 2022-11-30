@@ -13,20 +13,23 @@ export type LeadershipEntry = {
 
 export type ProjectPriority = 0 | 1 | 2 | 3;
 
+const cap = (val: number, min: number, max: number): number =>
+  val < min ? min : val > max ? max : val;
+
 export const matchSkillToProjectPriority = (
   color: SkillColor,
-  adjustBy: 0 | -1 | -2 | -3 = 0
+  adjustBy: 1 | 0 | -1 | -2 | -3 = 0
 ): ProjectPriority => {
   if (color === 'green') {
-    return (3 + adjustBy) as ProjectPriority;
+    return cap(1 + adjustBy, 0, 3) as ProjectPriority;
   }
 
   if (color === 'yellow') {
-    return Math.min(2 + adjustBy, 0) as ProjectPriority;
+    return cap(2 + adjustBy, 0, 3) as ProjectPriority;
   }
 
   if (color === 'orange') {
-    return Math.min(1 + adjustBy, 0) as ProjectPriority;
+    return cap(3 + adjustBy, 0, 3) as ProjectPriority;
   }
 
   return 0;

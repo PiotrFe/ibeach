@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
+import { Subject, ReplaySubject } from 'rxjs';
 import { Person, PersonEditable } from 'src/app/people-list/person';
 import {
   Project,
@@ -80,9 +80,9 @@ interface RegisteredAllocationDragDropEvent extends AllocationDragDropEvent {
 }
 
 type ProfileConfig = {
-  skill: boolean | -1 | -2 | -3;
+  skill: boolean | 1 | -1 | -2 | -3;
   days: boolean | -1 | -2 | -3 | -4;
-  tagThreshold: 90 | 70 | 50 | 30 | 0;
+  tagThreshold: 90 | 70 | 50 | 20 | 0;
   comments?: boolean;
 };
 
@@ -94,6 +94,7 @@ export class AllocateService {
   deleteRecordSubject: Subject<DeletionEvent | SaveEvent> = new Subject<
     DeletionEvent | SaveEvent
   >();
+  workInProgressSubject$: ReplaySubject<boolean> = new ReplaySubject<boolean>();
   hasEntriesToAutoAllocate: boolean = false;
   hasEntriesToClear: boolean = false;
   peopleDataSet!: PersonEditable[];
@@ -101,6 +102,7 @@ export class AllocateService {
   registeredDragEvent!: RegisteredAllocationDragDropEvent | null;
   onDataset = this.datasetSubject.asObservable();
   onDeleteRecord = this.deleteRecordSubject.asObservable();
+  onWorkInProgress$ = this.workInProgressSubject$.asObservable();
   weekOf!: Date;
 
   constructor(
@@ -176,12 +178,8 @@ export class AllocateService {
     const deletedRecordType = entryType;
     const affectedSubIDs = Array.from(
       new Set(
-        Object.entries(entry.week)
-          .filter(
-            ([day, val]) =>
-              typeof val !== 'boolean' &&
-              !this.referenceDateService.isPastDay(day as keyof Week)
-          )
+        Object.values(entry.week)
+          .filter((val) => typeof val !== 'boolean')
           .map((val) => (val as any).id)
       )
     );
@@ -1063,20 +1061,32 @@ export class AllocateService {
         getPassPhase(false, tagThreshold, true, true),
         getPassPhase(false, tagThreshold, true, -1),
         getPassPhase(false, tagThreshold, true, -2),
+        getPassPhase(false, tagThreshold, true, -3),
+        getPassPhase(false, tagThreshold, true, -4),
+        getPassPhase(false, tagThreshold, true, false),
         getPassPhase(false, tagThreshold, -1, true),
         getPassPhase(false, tagThreshold, -1, -1),
-        getPassPhase(false, tagThreshold, true, -3),
         getPassPhase(false, tagThreshold, -1, -2),
+        getPassPhase(false, tagThreshold, -1, -3),
+        getPassPhase(false, tagThreshold, -1, -4),
+        getPassPhase(false, tagThreshold, -1, false),
+        getPassPhase(false, tagThreshold, 1, true),
+        getPassPhase(false, tagThreshold, 1, -1),
+        getPassPhase(false, tagThreshold, 1, -2),
+        getPassPhase(false, tagThreshold, 1, -3),
+        getPassPhase(false, tagThreshold, 1, -4),
+        getPassPhase(false, tagThreshold, 1, false),
         getPassPhase(false, tagThreshold, -2, true),
         getPassPhase(false, tagThreshold, -2, -1),
         getPassPhase(false, tagThreshold, -2, -2),
-        getPassPhase(false, tagThreshold, -1, -3),
         getPassPhase(false, tagThreshold, -2, -3),
+        getPassPhase(false, tagThreshold, -3, -1),
+        getPassPhase(false, tagThreshold, -3, -2),
         getPassPhase(false, tagThreshold, -3, -3),
-        getPassPhase(false, tagThreshold, true, -4),
-        getPassPhase(false, tagThreshold, -1, -4),
         getPassPhase(false, tagThreshold, -2, -4),
+        getPassPhase(false, tagThreshold, -2, false),
         getPassPhase(false, tagThreshold, -3, -4),
+        getPassPhase(false, tagThreshold, -3, false),
       ];
     };
 
@@ -1085,7 +1095,7 @@ export class AllocateService {
       getPassPhase(false, 90, true, true),
       ...generatePassArrForTagThreshold(70),
       ...generatePassArrForTagThreshold(50),
-      ...generatePassArrForTagThreshold(30),
+      ...generatePassArrForTagThreshold(20),
       ...generatePassArrForTagThreshold(0),
       getPassPhase(false, 0, false, false),
     ];
@@ -1148,12 +1158,19 @@ export class AllocateService {
     projectList: Project[],
     profileConfig: ProfileConfig
   ) {
-    const nameToCheck = 'Marius Huber';
+    this.workInProgressSubject$.next(true);
+
+    const personNameToCheck = '';
+    const clientNameToCheck = '';
 
     for (let person of peopleList) {
       const personDays = Object.values(person.week).filter(
         (day) => typeof day === 'boolean' && day
       ).length;
+
+      // if (person.name === personNameToCheck) {
+      //   console.log({ person, personDays, profileConfig });
+      // }
 
       if (!personDays) {
         continue;
@@ -1167,14 +1184,6 @@ export class AllocateService {
             (tag) => tag.percent && tag.percent >= profileConfig.tagThreshold
           );
 
-      if (person.name === nameToCheck) {
-        console.log({
-          tagsAboveThreshold,
-          profileConfig,
-          person,
-        });
-      }
-
       if (profileConfig.tagThreshold > 0 && !tagsAboveThreshold.length) {
         continue;
       }
@@ -1184,13 +1193,11 @@ export class AllocateService {
           (day) => typeof day === 'boolean' && day
         ).length;
 
-        if (person.name === nameToCheck) {
-          console.log({
-            project,
-            projectDays,
-            person,
-          });
-        }
+        // if (project.client === clientNameToCheck) {
+        //   if (person.name === personNameToCheck) {
+        //     console.log({ project, projectDays });
+        //   }
+        // }
 
         if (!projectDays) {
           continue;
@@ -1206,13 +1213,14 @@ export class AllocateService {
             )
           : 0;
 
-        if (person.name === nameToCheck) {
-          console.log({
-            skillAdjustement,
-            personPriority,
-            projectPriority: project.priority,
-          });
-        }
+        // if (person.name === personNameToCheck) {
+        //   console.log({
+        //     skillAdjustement,
+        //     personPriority,
+        //     projectPriority: project.priority,
+        //     priorityMismatch: personPriority !== (project.priority || 0),
+        //   });
+        // }
 
         if (personPriority !== (project.priority || 0)) {
           continue;
@@ -1223,13 +1231,6 @@ export class AllocateService {
           let tagsMatch = false;
 
           for (let personTag of tagsAboveThreshold) {
-            if (person.name === nameToCheck) {
-              console.log({
-                personTag,
-                projectTags: project.tags,
-              });
-            }
-
             tagsMatch = project.tags.some(
               (projectTag) =>
                 projectTag.value === personTag.value &&
@@ -1241,6 +1242,11 @@ export class AllocateService {
               break;
             }
           }
+          // if (person.name === personNameToCheck) {
+          //   console.log({
+          //     tagsMatch,
+          //   });
+          // }
 
           if (!tagsMatch) {
             continue;
@@ -1248,29 +1254,33 @@ export class AllocateService {
         }
 
         // match days
-        const expectedPersonDays =
+        const daysOverlap =
           profileConfig.days === true // full match required
-            ? projectDays
+            ? projectDays === personDays
             : profileConfig.days === false // no match required
-            ? personDays
-            : personDays + profileConfig.days; // partial match required (either -1 or -2 days)
+            ? true
+            : Math.abs(projectDays - personDays) ===
+              Math.abs(profileConfig.days); // partial match, e.g. person days = 4; project days = 2; diff: 2; if profileConfig.days === -2 (i.e. allows for a 2-day difference), there's a match
+        //  Math.max(projectDays + profileConfig.days, 1); // partial match required (either -1 or -2 days)
 
-        if (person.name === nameToCheck) {
-          console.log({
-            expectedPersonDays,
-            projectDays,
-          });
-        }
-        if (expectedPersonDays !== projectDays) {
+        // if (person.name === personNameToCheck) {
+        //   console.log({
+        //     daysOverlap,
+        //     projectDays,
+        //     personDays,
+        //   });
+        // }
+
+        if (!daysOverlap) {
           continue;
         }
 
         matchedProject = project;
       }
-
-      if (person.name === nameToCheck) {
-        console.log({ matchedProject });
-      }
+      // if (person.name === personNameToCheck) {
+      //   console.log({ matchedProject });
+      //   console.log('=====================================');
+      // }
 
       if (matchedProject) {
         const allocationEntry: AllocationEntry = {
@@ -1293,5 +1303,7 @@ export class AllocateService {
         });
       }
     }
+
+    this.workInProgressSubject$.next(false);
   }
 }
