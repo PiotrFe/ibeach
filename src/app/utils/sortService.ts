@@ -37,7 +37,7 @@ function isPerson(entry: any): entry is Person {
   return entry.name !== undefined && entry.skill !== undefined;
 }
 
-function isPersonEditable(entry: any): entry is PersonEditable {
+export function isPersonEditable(entry: any): entry is PersonEditable {
   return (
     entry.name !== undefined &&
     entry.skill !== undefined &&
@@ -49,7 +49,7 @@ function isProject(entry: any): entry is Project {
   return entry.client !== undefined;
 }
 
-function isProjectEditable(entry: any): entry is ProjectEditable {
+export function isProjectEditable(entry: any): entry is ProjectEditable {
   return (
     entry.client !== undefined &&
     entry.type !== undefined &&

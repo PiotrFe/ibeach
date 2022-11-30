@@ -7,6 +7,7 @@ import {
   NgZone,
   OnChanges,
   SimpleChanges,
+  OnDestroy,
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
@@ -17,6 +18,7 @@ import { IsOnlineService } from 'src/app/shared-module/is-online.service';
 import { ListEditModeStatusService } from 'src/app/shared-module/list-edit-mode-status.service';
 import { TypeaheadService } from 'src/app/shared-module/typeahead.service';
 import { ResizeObserverService } from 'src/app/shared-module/resize-observer.service';
+import { ReferenceDateService } from 'src/app/shared-module/reference-date.service';
 import {
   AllocateService,
   Dataset,
@@ -48,7 +50,7 @@ import { ProjectEditable } from 'src/app/project-list/project-list/project';
 })
 export class PeopleListComponent
   extends PageComponent
-  implements OnInit, OnChanges
+  implements OnInit, OnChanges, OnDestroy
 {
   @Input() displayedIn!: 'SUBMIT' | 'ALLOCATE';
   @Input() peopleData!: any;
@@ -77,9 +79,15 @@ export class PeopleListComponent
     private listEditModeStatusService: ListEditModeStatusService,
     ngZone: NgZone,
     resizeObserverService: ResizeObserverService,
+    referenceDateService: ReferenceDateService,
     typeaheadService: TypeaheadService
   ) {
-    super(ngZone, resizeObserverService, typeaheadService);
+    super(
+      ngZone,
+      resizeObserverService,
+      referenceDateService,
+      typeaheadService
+    );
   }
 
   // *****************
@@ -95,6 +103,8 @@ export class PeopleListComponent
       this.subscribeToAllocationServices();
       this.entryContainerWidth = 1;
     }
+
+    this.onPageInit();
   }
 
   ngOnChanges(changes: SimpleChanges): void {

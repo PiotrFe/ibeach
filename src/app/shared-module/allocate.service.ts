@@ -1148,6 +1148,8 @@ export class AllocateService {
     projectList: Project[],
     profileConfig: ProfileConfig
   ) {
+    const nameToCheck = 'Marius Huber';
+
     for (let person of peopleList) {
       const personDays = Object.values(person.week).filter(
         (day) => typeof day === 'boolean' && day
@@ -1165,12 +1167,13 @@ export class AllocateService {
             (tag) => tag.percent && tag.percent >= profileConfig.tagThreshold
           );
 
-      // if (person.name === 'Anna Hamsted') {
-      //   console.log({
-      //     tagsAboveThreshold,
-      //     profileConfig,
-      //   });
-      // }
+      if (person.name === nameToCheck) {
+        console.log({
+          tagsAboveThreshold,
+          profileConfig,
+          person,
+        });
+      }
 
       if (profileConfig.tagThreshold > 0 && !tagsAboveThreshold.length) {
         continue;
@@ -1181,12 +1184,13 @@ export class AllocateService {
           (day) => typeof day === 'boolean' && day
         ).length;
 
-        // if (person.name === 'Anna Hamsted') {
-        //   console.log({
-        //     project,
-        //     projectDays,
-        //   });
-        // }
+        if (person.name === nameToCheck) {
+          console.log({
+            project,
+            projectDays,
+            person,
+          });
+        }
 
         if (!projectDays) {
           continue;
@@ -1202,13 +1206,13 @@ export class AllocateService {
             )
           : 0;
 
-        // if (person.name === 'Anna Hamsted') {
-        //   console.log({
-        //     skillAdjustement,
-        //     personPriority,
-        //     projectPriority: project.priority,
-        //   });
-        // }
+        if (person.name === nameToCheck) {
+          console.log({
+            skillAdjustement,
+            personPriority,
+            projectPriority: project.priority,
+          });
+        }
 
         if (personPriority !== (project.priority || 0)) {
           continue;
@@ -1219,12 +1223,12 @@ export class AllocateService {
           let tagsMatch = false;
 
           for (let personTag of tagsAboveThreshold) {
-            // if (person.name === 'Anna Hamsted') {
-            //   console.log({
-            //     personTag,
-            //     projectTags: project.tags,
-            //   });
-            // }
+            if (person.name === nameToCheck) {
+              console.log({
+                personTag,
+                projectTags: project.tags,
+              });
+            }
 
             tagsMatch = project.tags.some(
               (projectTag) =>
@@ -1251,7 +1255,7 @@ export class AllocateService {
             ? personDays
             : personDays + profileConfig.days; // partial match required (either -1 or -2 days)
 
-        if (person.name === 'Anna Hamsted') {
+        if (person.name === nameToCheck) {
           console.log({
             expectedPersonDays,
             projectDays,
@@ -1262,6 +1266,10 @@ export class AllocateService {
         }
 
         matchedProject = project;
+      }
+
+      if (person.name === nameToCheck) {
+        console.log({ matchedProject });
       }
 
       if (matchedProject) {

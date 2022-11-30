@@ -7,7 +7,7 @@ export { sortTags } from './sortTags';
 export {
   getTagsFromData,
   getAffiliations,
-  clearTagDuplicates,
+  consolidateTags,
 } from './getTagsFromData';
 export { getCalendarFromData } from './getCalendarFromData';
 export { removeExtraSpacesFromStr } from './removeExtraSpacesFromStr';

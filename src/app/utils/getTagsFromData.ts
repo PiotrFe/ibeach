@@ -1,4 +1,5 @@
 import { Tag } from 'src/app/shared-module/entry/entry.component';
+import { cleanString } from 'src/app/utils';
 
 export const getTagsFromData = (
   data: string,
@@ -111,23 +112,54 @@ export const getAffiliations = (
   affiliation: string,
   type: 'ind' | 'fun'
 ): Tag[] => {
-  if (!affiliation || affiliation === '') {
+  if (!affiliation) {
     return [];
   }
 
-  const tag =
-    type === 'ind'
-      ? getTagMatchForIndunstryItem(affiliation.toLowerCase())
-      : getTagMatchForFunctionItem(affiliation.toLowerCase());
+  const affiliationArray = affiliation
+    .split(';')
+    .map((str) => cleanString(str));
+  const affiliationSet = new Set();
 
-  return tag ? [{ value: tag.toUpperCase(), type, percent: 100 }] : [];
+  for (let affiliationString of affiliationArray) {
+    const tag =
+      type === 'ind'
+        ? getTagMatchForIndunstryItem(affiliationString.toLowerCase())
+        : getTagMatchForFunctionItem(affiliationString.toLowerCase());
+
+    if (tag) {
+      affiliationSet.add(tag);
+    }
+  }
+
+  return !affiliationSet.size
+    ? []
+    : ([...affiliationSet].map((tagName: any) => ({
+        value: tagName.toUpperCase(),
+        type,
+        percent: 100,
+      })) as Tag[]);
 };
 
-export const clearTagDuplicates = (tags: Tag[]): Tag[] => {
-  const tagStrArr = tags.map((tag) => JSON.stringify(tag));
-  const tagSet = new Set(tagStrArr);
+export const consolidateTags = (tags: Tag[], type: 'ind' | 'fun'): Tag[] => {
+  if (!tags.length) {
+    return [];
+  }
 
-  return Array.from(tagSet).map((str) => JSON.parse(str));
+  const tagMap: { [key: string]: number } = {};
+
+  for (let tag of tags) {
+    if (tagMap[tag.value]) {
+      tagMap[tag.value] += tag.percent || 0;
+    } else {
+      tagMap[tag.value] = tag.percent || 0;
+    }
+  }
+  return Object.entries(tagMap).map(([tag, percent]) => ({
+    value: tag,
+    percent,
+    type,
+  }));
 };
 
 export const getAvailableTags = (): Tag[] => {
@@ -181,7 +213,7 @@ const ind = {
     'basic materials',
   ],
   ins: ['multi-line', 'casualty', 'insurance'],
-  pe: ['private equity'],
+  pe: ['equity'],
   ls: [
     'pharma',
     'desease',
@@ -205,7 +237,7 @@ const ind = {
     'ministries',
     'donors',
   ],
-  tech: ['technology', 'advanced electronics', 'software'],
+  tech: ['technology', 'electronics', 'software'],
   tmt: ['telecom', 'media'],
   ttl: ['transport', 'logistics', 'travel'],
 };
@@ -225,6 +257,7 @@ const fun = {
   ops: ['procurement', 'manufacturing', 'product development'],
   org: [
     'organization',
+    'org performance',
     'service operations',
     'culture',
     'transformational change',

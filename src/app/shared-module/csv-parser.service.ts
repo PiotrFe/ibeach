@@ -9,7 +9,7 @@ import {
   getTagsFromData,
   sortTags,
   getAffiliations,
-  clearTagDuplicates,
+  consolidateTags,
   getCalendarFromData,
 } from '../utils';
 
@@ -57,16 +57,25 @@ export class CsvParserService {
           this.referenceDateService.excludePast,
           this.referenceDateService.referenceDate
         );
-        const indTags = clearTagDuplicates([
-          ...getTagsFromData(entry['Sector experience'], 'ind'),
-          ...getAffiliations(entry['Core industry affiliations'], 'ind'),
-        ]);
+        const indTags = consolidateTags(
+          [
+            ...getTagsFromData(entry['Sector experience'], 'ind'),
+            ...getAffiliations(entry['Core industry affiliation'], 'ind'),
+          ],
+          'ind'
+        );
 
-        const funTags = clearTagDuplicates([
-          ...getTagsFromData(entry['Functional experience'], 'fun'),
-          ...getAffiliations(entry['Core industry affiliation'], 'fun'),
-          ...getAffiliations(entry['Core growth platform affiliation'], 'fun'),
-        ]);
+        const funTags = consolidateTags(
+          [
+            ...getTagsFromData(entry['Functional experience'], 'fun'),
+            ...getAffiliations(entry['Core functional affiliation'], 'fun'),
+            ...getAffiliations(
+              entry['Core growth platform affiliation'],
+              'fun'
+            ),
+          ],
+          'fun'
+        );
 
         const tags: Tag[] = sortTags([...indTags, ...funTags]);
         const availDate: Date = new Date(

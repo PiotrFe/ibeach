@@ -17,6 +17,7 @@ import { FetchService } from '../../shared-module/fetch.service';
 import { IsOnlineService } from 'src/app/shared-module/is-online.service';
 import { ListEditModeStatusService } from 'src/app/shared-module/list-edit-mode-status.service';
 import { ResizeObserverService } from 'src/app/shared-module/resize-observer.service';
+import { ReferenceDateService } from 'src/app/shared-module/reference-date.service';
 import { TypeaheadService } from '../../shared-module/typeahead.service';
 import {
   AllocateService,
@@ -74,11 +75,17 @@ export class ProjectListComponent
     private isOnlineService: IsOnlineService,
     typeaheadService: TypeaheadService,
     resizeObserverService: ResizeObserverService,
+    referenceDateService: ReferenceDateService,
     private csvParserService: CsvParserService,
     ngZone: NgZone,
     private listEditModeStatusService: ListEditModeStatusService
   ) {
-    super(ngZone, resizeObserverService, typeaheadService);
+    super(
+      ngZone,
+      resizeObserverService,
+      referenceDateService,
+      typeaheadService
+    );
     this.allocateService = allocateService;
   }
 
@@ -86,6 +93,7 @@ export class ProjectListComponent
     this.boundGetClientTypeahead = this.getClientTypeAhead.bind(this);
     this.boundGetLeadershipTypeahead = this.getLeadershipTypeAhead.bind(this);
     this.subscribeToServices();
+    this.onPageInit();
   }
 
   subscribeToServices() {

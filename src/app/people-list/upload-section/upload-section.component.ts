@@ -1,10 +1,18 @@
-import { Component, NgZone, OnChanges, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  NgZone,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  SimpleChanges,
+} from '@angular/core';
 import { ConfigService } from 'src/app/shared-module/config.service';
 import { CsvParserService } from 'src/app/shared-module/csv-parser.service';
 import { DataStoreService } from 'src/app/shared-module/data-store.service';
 import { FetchService } from 'src/app/shared-module/fetch.service';
 import { IsOnlineService } from 'src/app/shared-module/is-online.service';
 import { ResizeObserverService } from 'src/app/shared-module/resize-observer.service';
+import { ReferenceDateService } from 'src/app/shared-module/reference-date.service';
 import { parse } from 'src/app/utils/csv-parser/index';
 import { Person } from '../person';
 import { PageComponent } from 'src/app/shared-module/page/page.component';
@@ -15,7 +23,10 @@ import { WeeklyData } from 'src/app/shared-module/fetch.service';
   templateUrl: './upload-section.component.html',
   styleUrls: ['./upload-section.component.scss'],
 })
-export class UploadSectionComponent extends PageComponent implements OnChanges {
+export class UploadSectionComponent
+  extends PageComponent
+  implements OnInit, OnChanges, OnDestroy
+{
   bsInlineValue: Date = new Date();
   data!: string;
   fileSelected: boolean = false;
@@ -31,9 +42,18 @@ export class UploadSectionComponent extends PageComponent implements OnChanges {
     private csvParserService: CsvParserService,
     private dataStoreService: DataStoreService,
     private fetchService: FetchService,
-    private isOnlineService: IsOnlineService
+    private isOnlineService: IsOnlineService,
+    referenceDateService: ReferenceDateService
   ) {
-    super(ngZone, resizeObserverService);
+    super(ngZone, resizeObserverService, referenceDateService);
+  }
+
+  ngOnInit(): void {
+    this.onPageInit();
+  }
+
+  ngOnDestroy(): void {
+    this.onPageDestroy();
   }
 
   ngOnChanges(changes: SimpleChanges): void {

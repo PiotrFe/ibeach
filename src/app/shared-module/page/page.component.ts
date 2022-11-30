@@ -7,15 +7,21 @@ import {
   Input,
 } from '@angular/core';
 
+import { Subject, pipe, takeUntil } from 'rxjs';
+
 import { ResizeObserverService } from 'src/app/shared-module/resize-observer.service';
-import { SortService } from 'src/app/utils/sortService';
+import { ReferenceDateService } from 'src/app/shared-module/reference-date.service';
+import {
+  SortService,
+  isPersonEditable,
+  isProjectEditable,
+} from 'src/app/utils/sortService';
 import { TypeaheadService } from '../typeahead.service';
 
 import { PersonEditable } from 'src/app/people-list/person';
 import { ProjectEditable } from 'src/app/project-list/project-list/project';
-import { Week } from 'src/app/shared-module/week-days/week';
+import { Week, getDaysLeft } from 'src/app/shared-module/week-days/week';
 
-import { getDaysLeft } from 'src/app/shared-module/week-days/week';
 import { getNewAvailDate, sortTags } from 'src/app/utils';
 
 export interface Filter {
@@ -52,6 +58,7 @@ export class PageComponent implements AfterViewInit {
   inEditMode: boolean = false;
   lastDataUpdateTs: number = 0;
   newRows: (PersonEditable | ProjectEditable)[] = [];
+  referenceDateService: ReferenceDateService;
   resizeObserverService: ResizeObserverService;
   resizeSubscription!: any;
   saveChangesInProgress: boolean = false;
@@ -63,13 +70,17 @@ export class PageComponent implements AfterViewInit {
   uploading: boolean = false;
   uploaded: boolean = false;
 
+  onDestroy$: Subject<void> = new Subject<void>();
+
   constructor(
     ngZone: NgZone,
     resizeObserverService: ResizeObserverService,
+    referenceDateService: ReferenceDateService,
     typeaheadService?: TypeaheadService
   ) {
     this.ngZone = ngZone;
     this.resizeObserverService = resizeObserverService;
+    this.referenceDateService = referenceDateService;
 
     if (typeaheadService) {
       this.typeaheadService = typeaheadService;
@@ -94,9 +105,20 @@ export class PageComponent implements AfterViewInit {
       );
   }
 
+  onPageInit(): void {
+    this.referenceDateService.onReferenceDateChange$
+      .pipe(takeUntil(this.onDestroy$))
+      .subscribe(({ excludePast }) => {
+        if (excludePast !== undefined) {
+          this.updateFilteredView();
+        }
+      });
+  }
+
   onPageDestroy(): void {
     this.resizeObserverService.deregisterElem(this.pageContainer.nativeElement);
     this.resizeSubscription.unsubscribe();
+    this.onDestroy$.next();
   }
 
   // ********************
@@ -132,7 +154,7 @@ export class PageComponent implements AfterViewInit {
     this.updateFilteredView();
   }
 
-  getFilteredView(data: any[]): any[] {
+  getFilteredView(data: (PersonEditable | ProjectEditable)[]): any[] {
     if (!this.filters.length) {
       return data;
     }
@@ -144,13 +166,18 @@ export class PageComponent implements AfterViewInit {
 
       for (let filter of this.filters) {
         if (filter.field === 'days') {
-          daysLeftPass = entry.daysLeft > 0;
+          daysLeftPass =
+            getDaysLeft(
+              entry.week,
+              this.referenceDateService.excludePast,
+              this.referenceDateService.referenceDate
+            ) > 0;
         }
-        if (filter.field === 'pdm') {
+        if (filter.field === 'pdm' && isPersonEditable(entry)) {
           pdmPass = entry.pdm === filter.value;
         }
 
-        if (filter.field === 'skill') {
+        if (filter.field === 'skill' && isPersonEditable(entry)) {
           pdmPass = entry.skill === filter.value;
         }
       }
