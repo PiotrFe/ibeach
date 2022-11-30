@@ -8,7 +8,7 @@ const p = 'mck_clientdev';
   providedIn: 'root',
 })
 export class AuthService {
-  isLoggedIn: boolean = true;
+  isLoggedIn: boolean = false;
   userName: string = '';
   redirectUrl: string | null = null;
 
