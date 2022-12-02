@@ -51,7 +51,7 @@
     type="text"
     placeholder="Client"
     formControlName="client"
-    [typeahead]="getClientTypeAhead()"
+    [typeahead]="typeaheadService.clientTypeahead"
     required
   />
 
@@ -102,7 +102,7 @@
     type="text"
     placeholder="Leadership"
     formControlName="leadership"
-    [typeahead]="getLeadershipTypeAhead()"
+    [typeahead]="typeaheadService.leadershipTypeahead"
   />
 
   <input
@@ -113,7 +113,7 @@
     placeholder="Add leader"
     class="form-control section section-leadership-new data-entry-input mr-12"
     formControlName="leadershipNew"
-    [typeahead]="getLeadershipTypeAhead()"
+    [typeahead]="typeaheadService.leadershipTypeahead"
     (typeaheadOnSelect)="onLeadershipSubmit($event)"
   />
 
@@ -156,7 +156,7 @@
       type="text"
       placeholder="Leadership"
       formControlName="leadership"
-      [typeahead]="getLeadershipTypeAhead()"
+      [typeahead]="typeaheadService.leadershipTypeahead"
     />
     <input
       #leadershipInputSecondary
@@ -166,7 +166,7 @@
       placeholder="Add leader"
       class="form-control section section-leadership-new data-entry-input mr-12"
       formControlName="leadershipNew"
-      [typeahead]="getLeadershipTypeAhead()"
+      [typeahead]="typeaheadService.leadershipTypeahead"
       (typeaheadOnSelect)="onLeadershipSubmit($event)"
     />
     <div

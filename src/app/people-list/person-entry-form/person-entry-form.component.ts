@@ -200,6 +200,7 @@ export class PersonEntryFormComponent
       this.personForm.patchValue({
         skill: person.skill,
         pdm: person.pdm,
+        availDate: person.availDate,
       });
       this.tags = person.tags;
       this.fmno = person.id;

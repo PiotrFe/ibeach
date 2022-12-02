@@ -58,6 +58,18 @@ export class DataStoreService {
     );
   }
 
+  get peopleTypeahead(): Person[] {
+    return this.dataStoreManager.dataStore.lookup;
+  }
+
+  get clientTypeahead(): string[] {
+    return this.dataStoreManager.dataStore.lookupProjects.clients;
+  }
+
+  get leadershipTypeahead(): string[] {
+    return this.dataStoreManager.dataStore.lookupProjects.leadership;
+  }
+
   exportDataStore() {
     this.dataStoreManager.exportDataStore();
   }

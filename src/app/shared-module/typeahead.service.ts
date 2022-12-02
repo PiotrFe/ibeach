@@ -4,6 +4,7 @@ import { Project } from '../project-list/project-list/project';
 import { Tag } from 'src/app/shared-module/entry/entry.component';
 import { getAvailableTags } from 'src/app/utils/getTagsFromData';
 import { ProjectLookupEntry } from '../utils/StorageManager';
+import { DataStoreService } from 'src/app/shared-module/data-store.service';
 import { cleanString, lCaseCompareFn } from '../utils';
 
 enum TableTypes {
@@ -23,28 +24,24 @@ enum Fields {
   providedIn: 'root',
 })
 export class TypeaheadService {
-  _peopleList!: Person[];
-  _projectList!: ProjectLookupEntry;
   _tagList!: Tag[];
 
   tableTypes = TableTypes;
   fields = Fields;
 
-  constructor() {
+  constructor(private dataStoreService: DataStoreService) {
     this._tagList = getAvailableTags();
   }
 
-  storeLookupList(type: TableTypes, list: any): void {
-    if (type === TableTypes.People) {
-      this._peopleList = list as Person[];
-    }
-
-    if (type === TableTypes.Projects) {
-      this._projectList = list as ProjectLookupEntry;
-    }
+  get clientTypeahead(): string[] {
+    return this.dataStoreService.clientTypeahead;
   }
 
-  getTypeahead(field: Fields, dataSet?: any[]): string[] {
+  get leadershipTypeahead(): string[] {
+    return this.dataStoreService.leadershipTypeahead;
+  }
+
+  getTypeahead(field: Fields, dataSet?: any): string[] {
     if (field === Fields.Name) {
       return this._getNameTypeahead(dataSet);
     }
@@ -52,16 +49,8 @@ export class TypeaheadService {
       return this._getTagTypeahead(dataSet);
     }
 
-    if (field === Fields.Client) {
-      return this._getClientTypeahead(dataSet);
-    }
-
-    if (field === Fields.Leadership) {
-      return this._getLeaderTypeahead(dataSet);
-    }
-
     if (field === Fields.Stats) {
-      return this._getStatsTypeahead(dataSet);
+      return this._getStatsTypeahead();
     }
 
     return [];
@@ -76,13 +65,15 @@ export class TypeaheadService {
   }
 
   getPersonByName(name: string): Person | undefined {
-    return this._peopleList.find((person) => person.name === name);
+    return this.dataStoreService.peopleTypeahead.find(
+      (person) => person.name === name
+    );
   }
 
   _getNameTypeahead(dataSet?: any[]): string[] {
-    const retVal = !this._peopleList
+    const retVal = !this.dataStoreService.peopleTypeahead
       ? []
-      : this._peopleList
+      : this.dataStoreService.peopleTypeahead
           .filter((person: Person) => {
             if (!dataSet) {
               return person;
@@ -95,30 +86,6 @@ export class TypeaheadService {
           .map((person: Person) => person.name);
 
     return retVal;
-  }
-
-  _getClientTypeahead(data?: any[]): string[] {
-    const clientsOnPage =
-      data?.map((entry) => cleanString(entry?.client)) || [];
-    const clientSet = new Set([
-      ...(this._projectList?.clients || []),
-      ...clientsOnPage,
-    ]);
-    return [...clientSet].sort(lCaseCompareFn);
-  }
-
-  _getLeaderTypeahead(data?: any[]): string[] {
-    const leadersOnPage =
-      data
-        ?.map((entry) =>
-          entry?.leadership?.map((leader: any) => cleanString(leader?.name))
-        )
-        ?.flat() || [];
-    const leaderSet = new Set([
-      ...(this._projectList?.leadership || []),
-      ...leadersOnPage,
-    ]);
-    return [...leaderSet].sort(lCaseCompareFn);
   }
 
   _getTagTypeahead(dataSet?: Tag[]): string[] {
@@ -135,14 +102,12 @@ export class TypeaheadService {
     return this._tagList.map((tag) => tag.value);
   }
 
-  _getStatsTypeahead(data: any): string[] {
+  _getStatsTypeahead(): string[] {
     return [];
   }
 }
 
 export class TypeaheadServiceMock extends TypeaheadService {
-  override storeLookupList(type: TableTypes, list: any): void {}
-
   override getTypeahead(field: Fields, dataSet?: any[]): string[] {
     return [];
   }
@@ -165,9 +130,5 @@ export class TypeaheadServiceMock extends TypeaheadService {
 
   override _getTagTypeahead(dataSet?: Tag[]): string[] {
     return [];
-  }
-
-  constructor() {
-    super();
   }
 }

@@ -12,6 +12,7 @@ import {
 import { StatsEntry } from 'src/app/stats/stats-entry/stats-entry.component';
 import { WeeklyData } from 'src/app/shared-module/fetch.service';
 import { cleanString, lCaseCompareFn } from 'src/app/utils';
+import { AllocationEntry } from '../shared-module/allocate.service';
 
 export type ContactEntry = {
   first: string;
@@ -413,6 +414,20 @@ export class DataStoreManager implements StoreManager {
     this.dataStore.projects[weekTs] = data;
     this.dataStore.projects.updatedAtTs = ts;
     this.dataStore.updatedAtTs = Date.now();
+    this.dataStore.lookupProjects.clients = [
+      ...new Set([
+        ...this.dataStore.lookupProjects.clients,
+        ...data.map((project) => cleanString(project.client)),
+      ]),
+    ].sort();
+    this.dataStore.lookupProjects.leadership = [
+      ...new Set([
+        ...this.dataStore.lookupProjects.leadership,
+        ...data.flatMap((project) =>
+          project.leadership.map(({ name }) => cleanString(name))
+        ),
+      ]),
+    ].sort();
     this.#syncLocalStorage();
   }
 
@@ -500,7 +515,7 @@ export class DataStoreManager implements StoreManager {
     this.dataStore.master[weekTs] = weeklyData;
     this.dataStore.updatedAtTs = ts;
 
-    this.saveListForLookup(full);
+    this.saveListForLookup(full.map((person) => person.name).sort());
   }
 
   storeMasterProjectData(data: {

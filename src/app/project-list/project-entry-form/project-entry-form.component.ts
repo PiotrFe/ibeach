@@ -51,8 +51,6 @@ export class ProjectEntryFormComponent
 
   @Input() dispatchToParentAndClose: boolean = false;
   @Input() cleanSlate!: boolean;
-  @Input() getClientTypeAhead!: Function;
-  @Input() getLeadershipTypeAhead!: Function;
 
   @Output() formEditEvent = new EventEmitter<ProjectEvent>();
   @Output() formSubmitEvent = new EventEmitter<ProjectEvent>();
@@ -361,27 +359,24 @@ export class ProjectEntryFormComponent
   }
 
   handleSubmitLeader(name: string) {
-    let leadershipStr = this.projectForm.get('leadership')?.value;
-    if (leadershipStr.length) {
-      const arr = leadershipStr
-        .split(',')
-        .map((entry: any) => cleanString(entry, false));
-      const set = new Set([...arr, name]);
-      leadershipStr = [...set].join(', ');
-    }
+    const leadershipStr = this.#getUpdatedLeadershipString(name);
     this.projectForm.patchValue({
       leadership: leadershipStr.length ? leadershipStr : name,
       leadershipNew: '',
     });
   }
 
-  override getTagTypeahead(): string[] {
-    const tags = this.cleanSlate ? this.entryData.tags : this.tags;
+  #getUpdatedLeadershipString(newName: string): string {
+    let leadershipStr = this.projectForm.get('leadership')?.value;
+    if (leadershipStr.length) {
+      const arr = leadershipStr
+        .split(',')
+        .map((entry: any) => cleanString(entry, false));
+      const set = new Set([...arr, cleanString(newName)]);
+      leadershipStr = [...set].join(', ');
+    }
 
-    return this.typeaheadService.getTypeahead(
-      this.typeaheadService.fields.Tag,
-      tags
-    );
+    return leadershipStr;
   }
 
   onPrioClick(): void {

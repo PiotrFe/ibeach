@@ -62,8 +62,6 @@ export class ProjectListComponent
   // records are stored in this array until save / cancel event on the people side
   modifiedEntries: ProjectEditable[] = [];
 
-  boundGetClientTypeahead!: Function;
-  boundGetLeadershipTypeahead!: Function;
   confirmAutoAllocate: boolean = false;
   confirmClear: boolean = false;
   confirmClearString: string = '';
@@ -90,8 +88,6 @@ export class ProjectListComponent
   }
 
   ngOnInit(): void {
-    this.boundGetClientTypeahead = this.getClientTypeAhead.bind(this);
-    this.boundGetLeadershipTypeahead = this.getLeadershipTypeAhead.bind(this);
     this.subscribeToServices();
     this.onPageInit();
   }
@@ -251,7 +247,6 @@ export class ProjectListComponent
           this.dataSet = this.parseAndSortProjectData(newWeeklyData);
           this.updateFilteredView();
           this.lastDataUpdateTs = updatedAtTs;
-          this.updateLookupTable();
           this.onFetchCompleted();
         }
       },
@@ -435,13 +430,6 @@ export class ProjectListComponent
     this.allocateService.handleDeleteRecord(removedEntry, 'projects');
     this.dataSet = this.dataSet.filter((entry) => entry.id !== id);
     this.updateFilteredView();
-  }
-
-  updateLookupTable() {
-    this.typeaheadService.storeLookupList(
-      this.typeaheadService.tableTypes.Projects,
-      this.dataStoreService.getLookupTable('projects')
-    );
   }
 
   setInEditMode(inEditMode: boolean): void {
@@ -690,22 +678,5 @@ export class ProjectListComponent
     if (submit) {
       this.allocateService.runClearAllocation();
     }
-  }
-
-  // **************
-  // TYPEAHEADS
-  // **************
-  getClientTypeAhead(): string[] {
-    return this.typeaheadService.getTypeahead(
-      this.typeaheadService.fields.Client,
-      this.dataSet
-    );
-  }
-
-  getLeadershipTypeAhead(): string[] {
-    return this.typeaheadService.getTypeahead(
-      this.typeaheadService.fields.Leadership,
-      this.dataSet
-    );
   }
 }

@@ -203,7 +203,6 @@ export class PeopleListComponent
           this.dataSet = this.parseAndSortPeopleData(people);
           this.updateFilteredView();
           this.lastDataUpdateTs = peopleUpdatedAtTs;
-          this.updateLookupTable();
           this.onFetchCompleted();
         }
       },
@@ -439,13 +438,6 @@ export class PeopleListComponent
     this.updateFilteredView();
   }
 
-  updateLookupTable() {
-    this.typeaheadService.storeLookupList(
-      this.typeaheadService.tableTypes.People,
-      this.dataStoreService.getLookupTable()
-    );
-  }
-
   updatePersonDetails(objParam: {
     id: string;
     name: string;
@@ -536,7 +528,6 @@ export class PeopleListComponent
       data: this.dataSet as PersonEditable[],
       weekOf: this.referenceDate,
     });
-    this.updateLookupTable();
   }
 
   _onWeeklyData(data: WeeklyData) {

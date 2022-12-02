@@ -172,11 +172,9 @@ export class EntryComponent {
   }
 
   getTagTypeahead(): string[] {
-    const tags = this.entryData ? this.entryData.tags : this.tags;
-
     return this.typeaheadService.getTypeahead(
       this.typeaheadService.fields.Tag,
-      tags
+      this.entryData?.tags || this.tags
     );
   }
 }
