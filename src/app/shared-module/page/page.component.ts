@@ -11,14 +11,10 @@ import { Subject, pipe, takeUntil } from 'rxjs';
 
 import { ResizeObserverService } from 'src/app/shared-module/resize-observer.service';
 import { ReferenceDateService } from 'src/app/shared-module/reference-date.service';
-import {
-  SortService,
-  isPersonEditable,
-  isProjectEditable,
-} from 'src/app/utils/sortService';
+import { SortService } from 'src/app/utils/sortService';
 import { TypeaheadService } from '../typeahead.service';
 
-import { PersonEditable } from 'src/app/people-list/person';
+import { PersonEditable, isPersonEditable } from 'src/app/people-list/person';
 import { ProjectEditable } from 'src/app/project-list/project-list/project';
 import { Week, getDaysLeft } from 'src/app/shared-module/week-days/week';
 
@@ -178,7 +174,7 @@ export class PageComponent implements AfterViewInit {
         }
 
         if (filter.field === 'skill' && isPersonEditable(entry)) {
-          pdmPass = entry.skill === filter.value;
+          skillPass = entry.skill === filter.value;
         }
       }
 
@@ -294,9 +290,10 @@ export class PageComponent implements AfterViewInit {
     id: string;
     value: string;
     type: string;
+    percent?: number;
     action: 'add' | 'remove';
   }): void {
-    const { id, value, type, action } = objParam;
+    const { id, value, type, action, percent } = objParam;
 
     const entryIdx: number | undefined = this.dataSet.findIndex(
       (person) => person.id === id
@@ -313,6 +310,9 @@ export class PageComponent implements AfterViewInit {
       tags.push({
         value,
         type,
+        ...(percent && {
+          percent,
+        }),
       });
     }
     if (action === 'remove') {

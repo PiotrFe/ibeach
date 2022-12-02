@@ -90,6 +90,14 @@
       (calendarChange)="onCalendarChange($event)"
       (allocation)="onAllocation($event)"
     ></week-days>
+    <span class="clickable">
+      <i
+        *ngIf="daysLeft > 0 && !inEditMode"
+        class="bi bi-search"
+        (click)="onFindPersonMatch()"
+      ></i
+      >&nbsp;</span
+    >
   </div>
   <span class="section section-add-project">&nbsp;</span>
   <div

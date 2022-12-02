@@ -1,5 +1,15 @@
-import { Person, PersonEditable } from 'src/app/people-list/person';
-import { Project, ProjectEditable } from '../project-list/project-list/project';
+import {
+  Person,
+  PersonEditable,
+  isPerson,
+  isPersonEditable,
+} from 'src/app/people-list/person';
+import {
+  Project,
+  ProjectEditable,
+  isProject,
+  isProjectEditable,
+} from '../project-list/project-list/project';
 import { StatsEntry } from 'src/app/stats/stats-entry/stats-entry.component';
 import { Tag } from 'src/app/shared-module/entry/entry.component';
 
@@ -31,30 +41,6 @@ const PROJECT_INDEX = {
 interface SortEntry {
   field: string;
   order: 1 | 0 | -1;
-}
-
-function isPerson(entry: any): entry is Person {
-  return entry.name !== undefined && entry.skill !== undefined;
-}
-
-export function isPersonEditable(entry: any): entry is PersonEditable {
-  return (
-    entry.name !== undefined &&
-    entry.skill !== undefined &&
-    entry.isEditable !== undefined
-  );
-}
-
-function isProject(entry: any): entry is Project {
-  return entry.client !== undefined;
-}
-
-export function isProjectEditable(entry: any): entry is ProjectEditable {
-  return (
-    entry.client !== undefined &&
-    entry.type !== undefined &&
-    entry.isEditable !== undefined
-  );
 }
 
 export class SortService {

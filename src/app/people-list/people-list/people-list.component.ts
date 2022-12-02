@@ -766,6 +766,7 @@ export class PeopleListComponent
     id: string;
     value: string;
     type: string;
+    percent?: number;
     action: 'add' | 'remove';
   }): void {
     this.updateTags(objParam);

@@ -23,6 +23,18 @@ export interface PersonEditable extends Person {
   inEditMode: boolean;
 }
 
+export function isPerson(entry: any): entry is Person {
+  return entry.name !== undefined && entry.skill !== undefined;
+}
+
+export function isPersonEditable(entry: any): entry is PersonEditable {
+  return (
+    entry.name !== undefined &&
+    entry.skill !== undefined &&
+    entry.inEditMode !== undefined
+  );
+}
+
 @Component({
   template: '',
 })

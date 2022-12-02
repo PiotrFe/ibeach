@@ -466,6 +466,13 @@ li {
 .calendar-group {
   width: 16.7rem;
   min-width: 16.7rem;
+  position: relative;
+
+  & > span {
+    position: absolute;
+    right: -25px;
+    top: 20%;
+  }
 }
 
 .cal-entry--illegal {

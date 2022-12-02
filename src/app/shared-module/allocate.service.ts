@@ -1028,7 +1028,7 @@ export class AllocateService {
     this.#emitData();
   }
 
-  runAutoAllocation() {
+  runAutoAllocation(projectId?: string) {
     if (!this.hasEntriesToAutoAllocate) {
       return;
     }
@@ -1036,9 +1036,21 @@ export class AllocateService {
     const { data: peopleData } = this.dataStoreService.getPeopleList(
       this.referenceDateService.referenceDate
     );
-    const { data: projectData } = this.dataStoreService.getProjectList(
-      this.referenceDateService.referenceDate
-    );
+
+    let projectData: Project[] = [];
+
+    if (projectId) {
+      const project = this.dataStoreService
+        .getProjectList(this.referenceDateService.referenceDate)
+        .data.find(({ id }) => id === projectId);
+
+      if (project) {
+        projectData.push(project);
+      }
+    } else
+      ({ data: projectData } = this.dataStoreService.getProjectList(
+        this.referenceDateService.referenceDate
+      ));
 
     const getPassPhase = (
       comments: ProfileConfig['comments'],
@@ -1104,11 +1116,36 @@ export class AllocateService {
       if (phase.comments) {
         this.#allocateByComments(peopleData, projectData);
       } else {
-        this.#allocateByProfile(peopleData, projectData, phase);
+        const [peopleAvail, projectsOpen] = this.#allocateByProfile(
+          peopleData,
+          projectData,
+          phase
+        );
+
+        if (!peopleAvail || !projectsOpen) {
+          break;
+        }
       }
     }
 
-    this.#updateDataset(peopleData, projectData);
+    const projectArr = !projectId
+      ? projectData
+      : [
+          ...this.dataStoreService.getProjectList(
+            this.referenceDateService.referenceDate
+          ).data,
+        ];
+
+    if (projectId) {
+      // if project id provided, replace that project in project array with the modified object
+      projectArr.splice(
+        projectArr.findIndex(({ id }) => id === projectId),
+        1,
+        projectData[0]
+      );
+    }
+
+    this.#updateDataset(peopleData, projectArr);
     this.#emitData();
   }
 
@@ -1157,11 +1194,14 @@ export class AllocateService {
     peopleList: Person[],
     projectList: Project[],
     profileConfig: ProfileConfig
-  ) {
+  ): [number, number] {
     this.workInProgressSubject$.next(true);
 
     const personNameToCheck = '';
     const clientNameToCheck = '';
+
+    let peopleWithDaysAvail = peopleList.length;
+    let projectsWithDaysAvail = projectList.length;
 
     for (let person of peopleList) {
       const personDays = Object.values(person.week).filter(
@@ -1173,6 +1213,8 @@ export class AllocateService {
       // }
 
       if (!personDays) {
+        peopleWithDaysAvail--;
+
         continue;
       }
       let projectDays = 0;
@@ -1185,23 +1227,27 @@ export class AllocateService {
           );
 
       if (profileConfig.tagThreshold > 0 && !tagsAboveThreshold.length) {
+        // console.log('====== BELOW TAG THRESHOLD =====');
         continue;
       }
+
+      projectsWithDaysAvail = projectList.length;
 
       for (let project of projectList) {
         projectDays = Object.values(project.week).filter(
           (day) => typeof day === 'boolean' && day
         ).length;
 
+        if (!projectDays) {
+          projectsWithDaysAvail--;
+          continue;
+        }
+
         // if (project.client === clientNameToCheck) {
         //   if (person.name === personNameToCheck) {
         //     console.log({ project, projectDays });
         //   }
         // }
-
-        if (!projectDays) {
-          continue;
-        }
 
         // match skill
         const skillAdjustement =
@@ -1249,6 +1295,7 @@ export class AllocateService {
           // }
 
           if (!tagsMatch) {
+            // console.log('====== NO TAG MATCH =====');
             continue;
           }
         }
@@ -1305,5 +1352,7 @@ export class AllocateService {
     }
 
     this.workInProgressSubject$.next(false);
+
+    return [peopleWithDaysAvail, projectsWithDaysAvail];
   }
 }

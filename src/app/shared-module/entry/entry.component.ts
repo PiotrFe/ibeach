@@ -17,8 +17,8 @@ import { Week, getDaysLeft } from 'src/app/shared-module/week-days/week';
 import { TypeaheadService } from 'src/app/shared-module/typeahead.service';
 import { ReferenceDateService } from 'src/app/shared-module/reference-date.service';
 import { sortTags } from 'src/app/utils';
-import { Project } from 'src/app/project-list/project-list/project';
-import { Person } from 'src/app/people-list/person';
+import { Project, isProject } from 'src/app/project-list/project-list/project';
+import { Person, isPerson } from 'src/app/people-list/person';
 
 export interface Tag {
   type: string;
@@ -56,12 +56,12 @@ export class EntryComponent {
     id: string;
     calendarObj: Week;
   }>();
-  @Output() tagChangeEvent = new EventEmitter<{
-    id: string;
-    value: string;
-    type: string;
-    action: 'add' | 'remove';
-  }>();
+  @Output() tagChangeEvent = new EventEmitter<
+    Tag & {
+      id: string;
+      action: 'add' | 'remove';
+    }
+  >();
   @Output() collapseEvent = new EventEmitter<{
     id: string;
     collapsed: boolean;
@@ -135,6 +135,7 @@ export class EntryComponent {
           id: this.id,
           value: tagObj.value,
           type: tagObj.type,
+          percent: 100,
           action: 'add',
         });
       } else {
@@ -142,6 +143,7 @@ export class EntryComponent {
           ...this.tags,
           {
             ...tagObj,
+            percent: 100,
           },
         ]);
       }

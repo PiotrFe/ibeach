@@ -53,6 +53,18 @@ export interface ProjectEditable extends Project {
   inEditMode: boolean;
 }
 
+export function isProject(entry: any): entry is Project {
+  return entry.client !== undefined;
+}
+
+export function isProjectEditable(entry: any): entry is ProjectEditable {
+  return (
+    entry.client !== undefined &&
+    entry.type !== undefined &&
+    entry.inEditMode !== undefined
+  );
+}
+
 export type ProjectEvent = {
   id: string;
   client: string;

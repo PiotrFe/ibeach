@@ -107,6 +107,14 @@ export class ProjectEntryComponent
       allocationEntry
     );
   }
+
+  onFindPersonMatch() {
+    if (!this.daysLeft || this.inEditMode) {
+      return;
+    }
+    this.allocateService.runAutoAllocation(this.entryData.id);
+  }
+
   handleDragStart(event: any) {
     this.dragAndDrop.onDragStart(event, this.id, 'match', 'projects');
     return false;
