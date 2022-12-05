@@ -122,7 +122,7 @@ export class CalendarComponent implements OnInit, OnChanges {
     const newDate = new Date(changes['dateVal'].currentValue);
     if (
       newDate &&
-      !isNaN(newDate.getTime()) &&
+      !isNaN(newDate?.getTime()) &&
       newDate !== this.displayDate.value
     ) {
       newDate.setHours(0, 0, 0, 0);
