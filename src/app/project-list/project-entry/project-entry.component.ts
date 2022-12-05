@@ -103,7 +103,7 @@ export class ProjectEntryComponent
     };
 
     this.allocateService.registerAllocation(
-      this.referenceDate,
+      this.referenceDateService.referenceDate,
       allocationEntry
     );
   }

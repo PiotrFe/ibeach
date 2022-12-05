@@ -633,20 +633,12 @@ export class AllocateService {
     peopleData[personIdx] = {
       ...peopleData[personIdx],
       week: personWeek,
-      daysLeft: getDaysLeft(
-        personWeek
-        // this.referenceDateService.excludePast,
-        // this.referenceDateService.referenceDate
-      ),
+      daysLeft: getDaysLeft(personWeek),
     };
     projectData[projectIdx] = {
       ...projectData[projectIdx],
       week: projectWeek,
-      daysLeft: getDaysLeft(
-        projectWeek
-        // this.referenceDateService.excludePast,
-        // this.referenceDateService.referenceDate
-      ),
+      daysLeft: getDaysLeft(projectWeek),
       emailSent: false,
     };
   };
@@ -798,11 +790,7 @@ export class AllocateService {
     peopleData[personIdx] = {
       ...peopleData[personIdx],
       week: personWeek,
-      daysLeft: getDaysLeft(
-        personWeek
-        // this.referenceDateService.excludePast,
-        // this.referenceDateService.referenceDate
-      ),
+      daysLeft: getDaysLeft(personWeek),
     };
 
     const currentProjectWeek = {
@@ -813,11 +801,7 @@ export class AllocateService {
     projectData[currentProjectIndex] = {
       ...projectData[currentProjectIndex],
       week: currentProjectWeek,
-      daysLeft: getDaysLeft(
-        currentProjectWeek
-        // this.referenceDateService.excludePast,
-        // this.referenceDateService.referenceDate
-      ),
+      daysLeft: getDaysLeft(currentProjectWeek),
       emailSent: false,
     };
 
@@ -835,11 +819,7 @@ export class AllocateService {
     projectData[newProjectIndex] = {
       ...projectData[newProjectIndex],
       week: newProjectWeek,
-      daysLeft: getDaysLeft(
-        newProjectWeek
-        // this.referenceDateService.excludePast,
-        // this.referenceDateService.referenceDate
-      ),
+      daysLeft: getDaysLeft(newProjectWeek),
       emailSent: false,
     };
   };
@@ -887,11 +867,7 @@ export class AllocateService {
     projectData[projectIdx] = {
       ...projectData[projectIdx],
       week: projectWeek,
-      daysLeft: getDaysLeft(
-        projectWeek
-        // this.referenceDateService.excludePast,
-        // this.referenceDateService.referenceDate
-      ),
+      daysLeft: getDaysLeft(projectWeek),
       emailSent: false,
     };
 
@@ -903,11 +879,7 @@ export class AllocateService {
     peopleData[currentPersonIndex] = {
       ...peopleData[currentPersonIndex],
       week: currentPersonWeek,
-      daysLeft: getDaysLeft(
-        currentPersonWeek
-        // this.referenceDateService.excludePast,
-        // this.referenceDateService.referenceDate
-      ),
+      daysLeft: getDaysLeft(currentPersonWeek),
     };
 
     const newPersonWeek = {
@@ -923,11 +895,7 @@ export class AllocateService {
     peopleData[newPersonIndex] = {
       ...peopleData[newPersonIndex],
       week: newPersonWeek,
-      daysLeft: getDaysLeft(
-        newPersonWeek
-        // this.referenceDateService.excludePast,
-        // this.referenceDateService.referenceDate
-      ),
+      daysLeft: getDaysLeft(newPersonWeek),
     };
   };
 

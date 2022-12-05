@@ -78,6 +78,19 @@ export class PersonEntryFormComponent
   initialDate!: Date;
   subscription: Subscription = new Subscription();
 
+  personForm = new FormGroup({
+    name: new FormControl('', [Validators.required, Validators.minLength(3)]),
+    skill: new FormControl('', [
+      Validators.required,
+      forbiddenValueValidator(/skill/i),
+    ]),
+    availDate: new FormControl(getWeekDayDate(1, 'next'), [
+      Validators.required,
+    ]),
+    comments: new FormControl(''),
+    pdm: new FormControl(this.pdm),
+  });
+
   // ***************
   // CONSTRUCTOR
   // ***************
@@ -132,7 +145,9 @@ export class PersonEntryFormComponent
       this.localCalendarObj = this.entryData.week;
     } else {
       this.localCalendarObj = getNewWeek();
-      this.personForm.patchValue({ availDate: this.referenceDate });
+      this.personForm.patchValue({
+        availDate: this.referenceDateService.referenceDate,
+      });
     }
 
     this.setDaysLeft(this.localCalendarObj);
@@ -178,19 +193,6 @@ export class PersonEntryFormComponent
   // ***************
   // FORM GROUP
   // ***************
-
-  personForm = new FormGroup({
-    name: new FormControl('', [Validators.required, Validators.minLength(3)]),
-    skill: new FormControl('', [
-      Validators.required,
-      forbiddenValueValidator(/skill/i),
-    ]),
-    availDate: new FormControl(getWeekDayDate(1, 'next'), [
-      Validators.required,
-    ]),
-    comments: new FormControl(''),
-    pdm: new FormControl(this.pdm),
-  });
 
   onNameSelect(name: TypeaheadMatch) {
     const { value } = name;
@@ -273,14 +275,14 @@ export class PersonEntryFormComponent
       const newCalendarObj = getCalendarFromDate(
         date,
         this.localCalendarObj,
-        this.referenceDate
+        this.referenceDateService.referenceDate
       );
 
       this.personForm.patchValue({ availDate: date });
       this.daysLeft = getDaysLeft(
         newCalendarObj,
         this.excludePast,
-        this.referenceDate
+        this.referenceDateService.referenceDate
       );
       this.localCalendarObj = newCalendarObj;
     }
@@ -288,7 +290,10 @@ export class PersonEntryFormComponent
 
   onCalendarChange(calendarObj: Week) {
     this.ignoreNextDateChange = true;
-    const newAvailDate = getNewAvailDate(calendarObj, this.referenceDate);
+    const newAvailDate = getNewAvailDate(
+      calendarObj,
+      this.referenceDateService.referenceDate
+    );
     this.personForm.patchValue({ availDate: newAvailDate });
     this.localCalendarObj = calendarObj;
     this.setDaysLeft(calendarObj);
@@ -298,7 +303,7 @@ export class PersonEntryFormComponent
     this.daysLeft = getDaysLeft(
       calendarObj,
       this.excludePast,
-      this.referenceDate
+      this.referenceDateService.referenceDate
     );
   }
 

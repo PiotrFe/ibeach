@@ -70,7 +70,8 @@ export class UploadSectionComponent
   handleDateChange(date: Date) {
     this.onDateChange(date);
     this.referenceDateEnd = new Date(
-      this.referenceDate.getTime() + 1000 * 60 * 60 * 24 * 5
+      this.referenceDateService.referenceDate.getTime() +
+        1000 * 60 * 60 * 24 * 5
     );
     this.previewData = [];
     this.fetchData();
@@ -89,25 +90,27 @@ export class UploadSectionComponent
   }
 
   _fetchDataFromOnlineStore() {
-    this.fetchService.fetchWeeklyList(this.referenceDate, true).subscribe({
-      next: (data: WeeklyData) => {
-        const { people }: { people: Person[] } = data;
-        this.previewData = !people?.length
-          ? []
-          : people.sort(this.sortService.sortByName);
-      },
-      error: (e) => {
-        this.fetchError = e.message;
-        this.fetching = false;
-      },
-      complete: () => {
-        this.fetching = false;
-      },
-    });
+    this.fetchService
+      .fetchWeeklyList(this.referenceDateService.referenceDate, true)
+      .subscribe({
+        next: (data: WeeklyData) => {
+          const { people }: { people: Person[] } = data;
+          this.previewData = !people?.length
+            ? []
+            : people.sort(this.sortService.sortByName);
+        },
+        error: (e) => {
+          this.fetchError = e.message;
+          this.fetching = false;
+        },
+        complete: () => {
+          this.fetching = false;
+        },
+      });
   }
 
   _fetchDataFromLocalStore() {
-    const ts = this.referenceDate.getTime();
+    const ts = this.referenceDateService.referenceDate.getTime();
     this.fetching = false;
     // this.previewData =
   }
@@ -139,7 +142,7 @@ export class UploadSectionComponent
           this.fileSelected = true;
           const parsedPreview = this.csvParserService.parse(
             data,
-            this.referenceDate,
+            this.referenceDateService.referenceDate,
             this.referenceDateEnd
           );
           this.previewData = !this.configService.getPDMs().length
@@ -187,7 +190,7 @@ export class UploadSectionComponent
     this.uploading = true;
 
     this.fetchService
-      .storeMasterList(this.referenceDate, {
+      .storeMasterList(this.referenceDateService.referenceDate, {
         week: this.previewData,
         full: this.fullData,
       })
@@ -207,9 +210,12 @@ export class UploadSectionComponent
   }
 
   _storeDataLocally() {
-    this.dataStoreService.storeMasterList(this.referenceDate, {
-      week: this.previewData,
-      full: this.fullData,
-    });
+    this.dataStoreService.storeMasterList(
+      this.referenceDateService.referenceDate,
+      {
+        week: this.previewData,
+        full: this.fullData,
+      }
+    );
   }
 }

@@ -279,7 +279,7 @@ export class PageComponent implements AfterViewInit {
         daysLeft: getDaysLeft(
           calendarObj,
           this.excludePast,
-          this.referenceDate
+          this.referenceDateService.referenceDate
         ),
       };
     });

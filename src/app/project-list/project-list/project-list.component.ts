@@ -185,7 +185,7 @@ export class ProjectListComponent
                 daysLeft: getDaysLeft(
                   updatedWeek as Week,
                   this.excludePast,
-                  this.referenceDate
+                  this.referenceDateService.referenceDate
                 ),
               };
             }
@@ -239,7 +239,7 @@ export class ProjectListComponent
   subscribeToStoreServices() {
     const dataStoreSubscription = this.dataStoreService.storeData$.subscribe({
       next: (data: DataStore) => {
-        const ts = this.referenceDate.getTime();
+        const ts = this.referenceDateService.referenceDate.getTime();
         const newWeeklyData = data.projects[ts];
         const { updatedAtTs } = data.projects;
 
@@ -338,7 +338,11 @@ export class ProjectListComponent
         type,
         comments,
         availDate,
-        daysLeft: getDaysLeft(week, this.excludePast, this.referenceDate),
+        daysLeft: getDaysLeft(
+          week,
+          this.excludePast,
+          this.referenceDateService.referenceDate
+        ),
         leadership: leadership.map<LeadershipEntry>((str) =>
           str.match(/\*/i)
             ? {
@@ -386,7 +390,11 @@ export class ProjectListComponent
       week,
       comments,
       inEditMode: false,
-      daysLeft: getDaysLeft(week, this.excludePast, this.referenceDate),
+      daysLeft: getDaysLeft(
+        week,
+        this.excludePast,
+        this.referenceDateService.referenceDate
+      ),
       tags,
       leadership: leadership.map<LeadershipEntry>((str) =>
         str.match(/\*/i)
@@ -439,7 +447,7 @@ export class ProjectListComponent
       this.listEditModeStatusService.onEnterEditMode('projects');
 
       const closestLastMonday = getClosestPastMonday(new Date());
-      if (this.referenceDate < closestLastMonday) {
+      if (this.referenceDateService.referenceDate < closestLastMonday) {
         this.showPastRecordsLabel = true;
       }
     }
@@ -483,7 +491,7 @@ export class ProjectListComponent
     this.allocateService.registerDataset({
       dataType: 'projects',
       data: this.dataSet as ProjectEditable[],
-      weekOf: this.referenceDate,
+      weekOf: this.referenceDateService.referenceDate,
     });
   }
 
@@ -522,7 +530,7 @@ export class ProjectListComponent
 
   #fetchDataFromLocalStore() {
     const weeklyList: WeeklyProjectList = this.dataStoreService.getProjectList(
-      this.referenceDate
+      this.referenceDateService.referenceDate
     );
 
     const { data, updatedAtTs } = weeklyList;
@@ -554,21 +562,26 @@ export class ProjectListComponent
   }
 
   #postChangesToOnlineStore(data: Project[]) {
-    this.fetchService.saveProjectList(this.referenceDate, data).subscribe({
-      next: () => {
-        this.fetchData();
-      },
-      error: (e) => {
-        this.fetchError = e;
-        this.fetching = true;
-        this.setInEditMode(false);
-      },
-      complete: () => {},
-    });
+    this.fetchService
+      .saveProjectList(this.referenceDateService.referenceDate, data)
+      .subscribe({
+        next: () => {
+          this.fetchData();
+        },
+        error: (e) => {
+          this.fetchError = e;
+          this.fetching = true;
+          this.setInEditMode(false);
+        },
+        complete: () => {},
+      });
   }
 
   #postChangesToLocalStore(data: Project[]) {
-    this.dataStoreService.saveChangesToProjectList(this.referenceDate, data);
+    this.dataStoreService.saveChangesToProjectList(
+      this.referenceDateService.referenceDate,
+      data
+    );
     this.setInEditMode(false);
     this.fetching = false;
   }

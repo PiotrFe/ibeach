@@ -144,7 +144,9 @@ export class ProjectEntryFormComponent
       this.localCalendarObj = this.entryData.week;
     } else {
       this.localCalendarObj = getNewWeek();
-      this.projectForm.patchValue({ availDate: this.referenceDate });
+      this.projectForm.patchValue({
+        availDate: this.referenceDateService.referenceDate,
+      });
     }
     this.setDaysLeft(this.localCalendarObj);
   }
@@ -260,7 +262,10 @@ export class ProjectEntryFormComponent
 
   onCalendarChange(calendarObj: Week) {
     this.ignoreNextDateChange = true;
-    const newAvailDate = getNewAvailDate(calendarObj, this.referenceDate);
+    const newAvailDate = getNewAvailDate(
+      calendarObj,
+      this.referenceDateService.referenceDate
+    );
     this.projectForm.patchValue({ availDate: newAvailDate });
     this.localCalendarObj = calendarObj;
     this.setDaysLeft(calendarObj);
@@ -274,7 +279,7 @@ export class ProjectEntryFormComponent
       const newCalendarObj = getCalendarFromDate(
         date,
         this.localCalendarObj,
-        this.referenceDate
+        this.referenceDateService.referenceDate
       );
       this.localCalendarObj = newCalendarObj;
     }
@@ -325,7 +330,7 @@ export class ProjectEntryFormComponent
     this.daysLeft = getDaysLeft(
       calendarObj,
       this.excludePast,
-      this.referenceDate
+      this.referenceDateService.referenceDate
     );
   }
 
@@ -368,6 +373,7 @@ export class ProjectEntryFormComponent
 
   #getUpdatedLeadershipString(newName: string): string {
     let leadershipStr = this.projectForm.get('leadership')?.value;
+
     if (leadershipStr.length) {
       const arr = leadershipStr
         .split(',')
@@ -376,7 +382,7 @@ export class ProjectEntryFormComponent
       leadershipStr = [...set].join(', ');
     }
 
-    return leadershipStr;
+    return leadershipStr.replace(/,\s?$/, '');
   }
 
   onPrioClick(): void {

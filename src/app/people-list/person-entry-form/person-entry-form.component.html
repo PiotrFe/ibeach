@@ -52,6 +52,7 @@
     placeholder="Name"
     formControlName="name"
     [typeahead]="getNameTypeAhead()"
+    [typeaheadMinLength]="3"
     (typeaheadOnSelect)="onNameSelect($event)"
     required
     tabindex="0"
@@ -77,6 +78,7 @@
     [dateVal]="personForm.get('availDate')!.value"
     [showError]="isFieldInvalid('availDate')"
     [isSmall]="true"
+    [contained]="true"
     (dateChangeEvent)="onDateChange($event)"
   ></calendar>
 

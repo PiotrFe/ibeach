@@ -115,26 +115,34 @@ export class CalendarComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (this.contained) {
-      return;
-    }
-    if (changes['dateVal'].currentValue !== this.displayDate.value) {
-      const newDate = new Date(changes['dateVal'].currentValue);
-      const dayOfWeek = newDate.getDay();
+    // if (this.contained) {
+    //   return;
+    // }
+
+    const newDate = new Date(changes['dateVal'].currentValue);
+    if (
+      newDate &&
+      !isNaN(newDate.getTime()) &&
+      newDate !== this.displayDate.value
+    ) {
       newDate.setHours(0, 0, 0, 0);
 
-      if (this.weekly && this.baseDay !== dayOfWeek) {
-        const dayDiff = dayOfWeek - this.baseDay;
-        if (dayDiff >= 1 && dayDiff <= 2) {
-          this.displayDate.setValue(
-            getWeekDayDate(this.baseDay, 'prev', newDate)
-          );
-        } else {
-          this.displayDate.setValue(
-            getWeekDayDate(this.baseDay, 'next', newDate)
-          );
+      if (!this.contained) {
+        const dayOfWeek = newDate.getDay();
+
+        if (this.weekly && this.baseDay !== dayOfWeek) {
+          const dayDiff = dayOfWeek - this.baseDay;
+          if (dayDiff >= 1 && dayDiff <= 2) {
+            this.displayDate.setValue(
+              getWeekDayDate(this.baseDay, 'prev', newDate)
+            );
+          } else {
+            this.displayDate.setValue(
+              getWeekDayDate(this.baseDay, 'next', newDate)
+            );
+          }
+          return;
         }
-        return;
       }
 
       this.displayDate.setValue(newDate);

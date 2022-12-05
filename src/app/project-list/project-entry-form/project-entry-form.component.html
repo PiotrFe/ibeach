@@ -52,6 +52,7 @@
     placeholder="Client"
     formControlName="client"
     [typeahead]="typeaheadService.clientTypeahead"
+    [typeaheadMinLength]="3"
     required
   />
 
@@ -114,6 +115,7 @@
     class="form-control section section-leadership-new data-entry-input mr-12"
     formControlName="leadershipNew"
     [typeahead]="typeaheadService.leadershipTypeahead"
+    [typeaheadMinLength]="3"
     (typeaheadOnSelect)="onLeadershipSubmit($event)"
   />
 
@@ -157,6 +159,7 @@
       placeholder="Leadership"
       formControlName="leadership"
       [typeahead]="typeaheadService.leadershipTypeahead"
+      [typeaheadMinLength]="3"
     />
     <input
       #leadershipInputSecondary
@@ -167,6 +170,7 @@
       class="form-control section section-leadership-new data-entry-input mr-12"
       formControlName="leadershipNew"
       [typeahead]="typeaheadService.leadershipTypeahead"
+      [typeaheadMinLength]="3"
       (typeaheadOnSelect)="onLeadershipSubmit($event)"
     />
     <div

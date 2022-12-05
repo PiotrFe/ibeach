@@ -460,6 +460,7 @@ export class DataStoreManager implements StoreManager {
     if (this.dataStore === undefined) {
       this.dataStore = this.getEmptyStore();
     }
+
     if (listType === 'people') {
       this.dataStore.lookup = data;
     } else {
@@ -515,7 +516,17 @@ export class DataStoreManager implements StoreManager {
     this.dataStore.master[weekTs] = weeklyData;
     this.dataStore.updatedAtTs = ts;
 
-    this.saveListForLookup(full.map((person) => person.name).sort());
+    this.saveListForLookup(
+      full.sort((personA, personB): number => {
+        if (personA.name < personB.name) {
+          return -1;
+        }
+        if (personB.name < personA.name) {
+          return 1;
+        }
+        return 0;
+      })
+    );
   }
 
   storeMasterProjectData(data: {

@@ -186,7 +186,7 @@ export class PeopleListComponent
           masterUpdatedAtTs > this.lastDataUpdateTs
         ) {
           const newWeeklyData = this.dataStoreService.getWeeklyMasterList(
-            this.referenceDate,
+            this.referenceDateService.referenceDate,
             false,
             data
           );
@@ -198,7 +198,7 @@ export class PeopleListComponent
           this.displayedIn === 'ALLOCATE' &&
           peopleUpdatedAtTs > this.lastDataUpdateTs
         ) {
-          const ts = this.referenceDate.getTime();
+          const ts = this.referenceDateService.referenceDate.getTime();
           const people = data.people[ts];
           this.dataSet = this.parseAndSortPeopleData(people);
           this.updateFilteredView();
@@ -289,7 +289,7 @@ export class PeopleListComponent
           daysLeft: getDaysLeft(
             updatedWeek as Week,
             this.excludePast,
-            this.referenceDate
+            this.referenceDateService.referenceDate
           ),
         };
       }
@@ -303,7 +303,7 @@ export class PeopleListComponent
       this.listEditModeStatusService.onEnterEditMode('people');
 
       const closestLastMonday = getClosestPastMonday(new Date());
-      if (this.referenceDate < closestLastMonday) {
+      if (this.referenceDateService.referenceDate < closestLastMonday) {
         this.showPastRecordsLabel = true;
       }
     }
@@ -460,7 +460,11 @@ export class PeopleListComponent
         skill,
         comments,
         availDate,
-        daysLeft: getDaysLeft(week, this.excludePast, this.referenceDate),
+        daysLeft: getDaysLeft(
+          week,
+          this.excludePast,
+          this.referenceDateService.referenceDate
+        ),
         pdm,
         week,
         tags,
@@ -493,7 +497,11 @@ export class PeopleListComponent
       pdm,
       comments,
       inEditMode: false,
-      daysLeft: getDaysLeft(week, this.excludePast, this.referenceDate),
+      daysLeft: getDaysLeft(
+        week,
+        this.excludePast,
+        this.referenceDateService.referenceDate
+      ),
       tags,
     });
 
@@ -526,7 +534,7 @@ export class PeopleListComponent
     this.allocateService.registerDataset({
       dataType: 'people',
       data: this.dataSet as PersonEditable[],
-      weekOf: this.referenceDate,
+      weekOf: this.referenceDateService.referenceDate,
     });
   }
 
@@ -591,7 +599,7 @@ export class PeopleListComponent
 
   #fetchDataForSubmitSection() {
     const data = this.dataStoreService.getWeeklyMasterList(
-      this.referenceDate,
+      this.referenceDateService.referenceDate,
       false
     );
 
@@ -606,7 +614,7 @@ export class PeopleListComponent
 
   #fetchDataForAllocateSection() {
     const { data, updatedAtTs } = this.dataStoreService.getPeopleList(
-      this.referenceDate
+      this.referenceDateService.referenceDate
     );
 
     if (data) {
@@ -628,7 +636,7 @@ export class PeopleListComponent
     this.allocateService.registerDataset({
       dataType: 'people',
       data: this.dataSet as PersonEditable[],
-      weekOf: this.referenceDate,
+      weekOf: this.referenceDateService.referenceDate,
     });
   }
 
@@ -660,7 +668,7 @@ export class PeopleListComponent
 
   #postToOnlineStore(pdmParam: string, dataset: Person[]) {
     this.fetchService
-      .saveList(this.referenceDate, pdmParam, dataset)
+      .saveList(this.referenceDateService.referenceDate, pdmParam, dataset)
       .subscribe({
         next: () => {
           this.fetchData();
@@ -678,7 +686,7 @@ export class PeopleListComponent
 
   #postToLocalStore(pdmParam: string, dataset: Person[]) {
     this.dataStoreService.saveChangesToPeopleList(
-      this.referenceDate,
+      this.referenceDateService.referenceDate,
       pdmParam,
       dataset
     );
@@ -711,7 +719,11 @@ export class PeopleListComponent
 
   #submitToOnlineStore(dataset: Person[]) {
     this.fetchService
-      .submitList(this.referenceDate, this.pdmFilter.value, dataset)
+      .submitList(
+        this.referenceDateService.referenceDate,
+        this.pdmFilter.value,
+        dataset
+      )
       .subscribe({
         next: () => {
           this.fetchData();
@@ -728,7 +740,7 @@ export class PeopleListComponent
 
   #submitToLocalStore(dataset: Person[]) {
     this.dataStoreService.submitPeopleList(
-      this.referenceDate,
+      this.referenceDateService.referenceDate,
       this.pdmFilter.value,
       dataset
     );
