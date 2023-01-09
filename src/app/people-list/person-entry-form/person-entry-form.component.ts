@@ -74,7 +74,7 @@ export class PersonEntryFormComponent
 
   pdmArr!: string[];
   fmno!: string;
-  ignoreNextDateChange: boolean = false;
+  ignoreNextDateChange: boolean = true;
   initialDate!: Date;
   subscription: Subscription = new Subscription();
 
@@ -294,6 +294,7 @@ export class PersonEntryFormComponent
       calendarObj,
       this.referenceDateService.referenceDate
     );
+
     this.personForm.patchValue({ availDate: newAvailDate });
     this.localCalendarObj = calendarObj;
     this.setDaysLeft(calendarObj);

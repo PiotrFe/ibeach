@@ -69,10 +69,20 @@ export const isDayInPast = (day: keyof Week, referenceDate: Date): boolean => {
   const today = setTimeToMidnight(new Date(Date.now()));
   const lastMonday = getMondayOfSameWeek(today);
 
+  // if ref date is in the prev week, return true
   if (referenceDateCopy < lastMonday) {
     return true;
   }
 
+  // if ref date is in the following week return false
+  if (
+    referenceDateCopy.getTime() - 7 * dayInMs >=
+    lastMonday.getTime() - 10000 // offsetting by 10secs just in case
+  ) {
+    return false;
+  }
+
+  // if ref date is in the same week, compare week days
   const dayInt = getDayInt(day);
   const todayInt = today.getDay();
   return dayInt < todayInt;
