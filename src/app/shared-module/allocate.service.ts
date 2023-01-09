@@ -13,6 +13,7 @@ import { DayHighlighterService } from 'src/app/shared-module/day-highlighter.ser
 import { FetchService } from 'src/app/shared-module/fetch.service';
 import { IsOnlineService } from 'src/app/shared-module/is-online.service';
 import { cleanString, getSkillGroupColor, SkillColor } from 'src/app/utils';
+import { WeeklyPeopleList, WeeklyProjectList } from '../utils/StorageManager';
 
 export interface Dataset {
   dataType: 'people' | 'projects';
@@ -1027,10 +1028,10 @@ export class AllocateService {
       days: ProfileConfig['days']
     ): ProfileConfig => {
       return {
-        tagThreshold,
-        skill,
-        days,
         comments,
+        days,
+        skill,
+        tagThreshold,
       };
     };
 
@@ -1038,35 +1039,36 @@ export class AllocateService {
       tagThreshold: ProfileConfig['tagThreshold']
     ): ProfileConfig[] => {
       return [
+        // full skill match, up to 2 days diff
         getPassPhase(false, tagThreshold, true, true),
         getPassPhase(false, tagThreshold, true, -1),
         getPassPhase(false, tagThreshold, true, -2),
-        getPassPhase(false, tagThreshold, true, -3),
-        getPassPhase(false, tagThreshold, true, -4),
-        getPassPhase(false, tagThreshold, true, false),
+
+        //  skill -1 match, up to 2 days diff
         getPassPhase(false, tagThreshold, -1, true),
         getPassPhase(false, tagThreshold, -1, -1),
         getPassPhase(false, tagThreshold, -1, -2),
-        getPassPhase(false, tagThreshold, -1, -3),
-        getPassPhase(false, tagThreshold, -1, -4),
-        getPassPhase(false, tagThreshold, -1, false),
+
+        //  skill +1 match, up to 2 days diff
         getPassPhase(false, tagThreshold, 1, true),
         getPassPhase(false, tagThreshold, 1, -1),
         getPassPhase(false, tagThreshold, 1, -2),
-        getPassPhase(false, tagThreshold, 1, -3),
-        getPassPhase(false, tagThreshold, 1, -4),
-        getPassPhase(false, tagThreshold, 1, false),
+
+        //  skill -2 match, up to 2 days diff
         getPassPhase(false, tagThreshold, -2, true),
         getPassPhase(false, tagThreshold, -2, -1),
         getPassPhase(false, tagThreshold, -2, -2),
+
+        // 3-day diff within 2-point skill range
+        getPassPhase(false, tagThreshold, true, -3),
+        getPassPhase(false, tagThreshold, -1, -3),
+        getPassPhase(false, tagThreshold, 1, -3),
         getPassPhase(false, tagThreshold, -2, -3),
+
+        // up to 3-day diff 3 skill levels below
         getPassPhase(false, tagThreshold, -3, -1),
         getPassPhase(false, tagThreshold, -3, -2),
         getPassPhase(false, tagThreshold, -3, -3),
-        getPassPhase(false, tagThreshold, -2, -4),
-        getPassPhase(false, tagThreshold, -2, false),
-        getPassPhase(false, tagThreshold, -3, -4),
-        getPassPhase(false, tagThreshold, -3, false),
       ];
     };
 
@@ -1077,8 +1079,24 @@ export class AllocateService {
       ...generatePassArrForTagThreshold(50),
       ...generatePassArrForTagThreshold(20),
       ...generatePassArrForTagThreshold(0),
+      // 4-day diff across all skill levels
+      getPassPhase(false, 20, true, -4),
+      getPassPhase(false, 20, -1, -4),
+      getPassPhase(false, 20, 1, -4),
+      getPassPhase(false, 20, -2, -4),
+      getPassPhase(false, 20, -3, -4),
+
+      // no day match, allocate whatever's left
+      getPassPhase(false, 20, true, false),
+      getPassPhase(false, 20, -1, false),
+      getPassPhase(false, 20, 1, false),
+      getPassPhase(false, 20, -2, false),
+      getPassPhase(false, 20, -3, false),
       getPassPhase(false, 0, false, false),
     ];
+
+    this.#sortListByOpenDays(peopleData, false);
+    this.#sortListByOpenDays(projectData, false);
 
     for (let phase of passPhases) {
       if (phase.comments) {
@@ -1165,9 +1183,6 @@ export class AllocateService {
   ): [number, number] {
     this.workInProgressSubject$.next(true);
 
-    const personNameToCheck = '';
-    const clientNameToCheck = '';
-
     let peopleWithDaysAvail = peopleList.length;
     let projectsWithDaysAvail = projectList.length;
 
@@ -1175,10 +1190,6 @@ export class AllocateService {
       const personDays = Object.values(person.week).filter(
         (day) => typeof day === 'boolean' && day
       ).length;
-
-      // if (person.name === personNameToCheck) {
-      //   console.log({ person, personDays, profileConfig });
-      // }
 
       if (!personDays) {
         peopleWithDaysAvail--;
@@ -1268,34 +1279,53 @@ export class AllocateService {
           }
         }
 
+        let daysOverlap = 0;
+        let overlapThresholdMet;
+
+        for (let day of Object.keys(person.week)) {
+          const personDayIsAvail =
+            typeof person.week[day as keyof Week] === 'boolean' &&
+            person.week[day as keyof Week];
+          const projectDayIsAvail =
+            typeof project.week[day as keyof Week] === 'boolean' &&
+            project.week[day as keyof Week];
+
+          if (personDayIsAvail && projectDayIsAvail) {
+            daysOverlap++;
+          }
+        }
+
+        if (profileConfig.days === true) {
+          // full match required
+          overlapThresholdMet = personDays === daysOverlap;
+        } else if (profileConfig.days === false) {
+          // no match required
+          overlapThresholdMet = true;
+        } else {
+          // offset match required
+          overlapThresholdMet = daysOverlap === profileConfig.days;
+        }
+
+        if (overlapThresholdMet) {
+          console.log({ person, project, profileConfig, daysOverlap });
+        }
+
         // match days
-        const daysOverlap =
-          profileConfig.days === true // full match required
-            ? projectDays === personDays
-            : profileConfig.days === false // no match required
-            ? true
-            : Math.abs(projectDays - personDays) ===
-              Math.abs(profileConfig.days); // partial match, e.g. person days = 4; project days = 2; diff: 2; if profileConfig.days === -2 (i.e. allows for a 2-day difference), there's a match
+        // const daysOverlap =
+        //   profileConfig.days === true // full match required
+        //     ? projectDays === personDays
+        //     : profileConfig.days === false // no match required
+        //     ? true
+        //     : Math.abs(projectDays - personDays) ===
+        //       Math.abs(profileConfig.days); // partial match, e.g. person days = 4; project days = 2; diff: 2; if profileConfig.days === -2 (i.e. allows for a 2-day difference), there's a match
         //  Math.max(projectDays + profileConfig.days, 1); // partial match required (either -1 or -2 days)
 
-        // if (person.name === personNameToCheck) {
-        //   console.log({
-        //     daysOverlap,
-        //     projectDays,
-        //     personDays,
-        //   });
-        // }
-
-        if (!daysOverlap) {
+        if (!overlapThresholdMet) {
           continue;
         }
 
         matchedProject = project;
       }
-      // if (person.name === personNameToCheck) {
-      //   console.log({ matchedProject });
-      //   console.log('=====================================');
-      // }
 
       if (matchedProject) {
         const allocationEntry: AllocationEntry = {
@@ -1322,5 +1352,19 @@ export class AllocateService {
     this.workInProgressSubject$.next(false);
 
     return [peopleWithDaysAvail, projectsWithDaysAvail];
+  }
+
+  #sortListByOpenDays(list: Person[] | Project[], asc = true) {
+    list.sort((a: Person | Project, b: Person | Project): number => {
+      const aDays = Object.values(a.week).filter(
+        (day) => typeof day === 'boolean' && day
+      ).length;
+
+      const bDays = Object.values(b.week).filter(
+        (day) => typeof day === 'boolean' && day
+      ).length;
+
+      return asc ? aDays - bDays : bDays - aDays;
+    });
   }
 }
